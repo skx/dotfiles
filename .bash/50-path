@@ -6,5 +6,5 @@ for i in ~/bin ~/bin-$(hostname --short) ; do
     [ -d $i ] && PATH=$i:${PATH}
 done
 
-export PATH=$PATH:/usr/sbin:/sbin:/usr/games
+export PATH=$PATH:/bin:/usr/bin:/usr/sbin:/sbin:/usr/games
 
