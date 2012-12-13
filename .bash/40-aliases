@@ -1,2 +1,49 @@
-alias .G='git --work-tree=/home/steve/ --git-dir=/home/steve/dotfiles.git'
+#
+#  For working with the dotfiles repository
+#
+alias .G='git --work-tree=$HOME --git-dir=$HOME/dotfiles.git'
+
+#
+# Coloured ls by default.
+#
+alias ls='ls --color=auto'
+
+#
+# Move up
+#
+alias ..='cd ..'
+
+#
+# Show free memory in Mb.
+#
+alias free='free -m'
+
+#
+#  For easy updates.
+#
+alias apt='sudo apt-get update && sudo apt-get upgrade'
+
+#
+#  Make passwords a little nicer
+#
+[ -x /usr/bin/pwgen ] && alias pwgen='pwgen -B 12'
+
+#
+#  For Xine
+#
+if [ -x /usr/bin/xine ]; then
+    alias xine='xine -g --no-logo --no-splash -V=40'
+    alias xine-fullscreen='xine --fullscreen'
+    alias xine-silent='xine -A none'
+    alias xine-shuffle='xine --loop=shuffle+ *'
+fi
+
+#
+#  Calendar
+#
+if [ -x /usr/bin/when ]; then
+    alias upcoming='when cw'
+    alias birthdays='when  --past=0 --future=365 | grep Birthday'
+fi
+
 
