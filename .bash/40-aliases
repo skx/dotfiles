@@ -1,7 +1,8 @@
 #
 #  For working with the dotfiles repository
 #
-alias .G='git --work-tree=$HOME --git-dir=$HOME/dotfiles.git'
+[[ -d ~/git/dotfiles.git ]] && alias .DOTFILES='git --work-tree=$HOME --git-dir=$HOME/git/dotfiles.git'
+[[ -d ~/dotfiles.git ]] && alias .DOTFILES='git --work-tree=$HOME --git-dir=$HOME/dotfiles.git'
 
 #
 # Coloured ls by default.
