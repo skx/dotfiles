@@ -1,0 +1,2 @@
+alias .G='git --work-tree=/home/steve/ --git-dir=/home/steve/dotfiles.git'
+
