@@ -6,3 +6,5 @@
 !.bashrc
 !.bash_profile
 
+# Don't ignore the MySQL config file
+!.my.cnf
