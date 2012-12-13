@@ -1,0 +1,92 @@
+
+
+# ls for Directories.
+function lsd
+{
+    ls -1F $* | grep '/$'
+}
+
+
+#
+#  ssh + scp without storing or prompting for keys.
+#
+function sshtmp
+{
+    ssh -o "ConnectTimeout 3" \
+        -o "StrictHostKeyChecking no" \
+        -o "UserKnownHostsFile /dev/null" \
+        "$@"
+}
+function scptmp
+{
+    exec scp -o "ConnectTimeout 3" \
+        -o "StrictHostKeyChecking no" \
+        -o "UserKnownHostsFile /dev/null" \
+        "$@"
+}
+
+#
+#  If we have completion function for ssh then use it for those too.
+#
+if [ "$(type -t _ssh)x" = "functionx" ]; then
+    complete -F _ssh sshtmp
+    complete -F _ssh scptmp
+fi
+
+
+
+#
+#  Extract named archive(s).
+#
+x ()
+{
+    for archive in "$@"; do
+        case "$archive" in
+            *.tar* | *.t?z)
+                case $archive in
+                    *.gz | *tgz | *.Z)
+                        TARFLAGS="--use-compress-prog gzip"
+                    ;;
+                    *.bz | *.bz2 | *tbz)
+                        TARFLAGS="--use-compress-prog bzip2"
+                    ;;
+                    *)
+                        TARFLAGS=""
+                    ;;
+                esac;
+                tar xf "$archive" ${TARFLAGS}
+            ;;
+            *.zip | *.ZIP)
+                unzip -q "$archive"
+            ;;
+            *.gz | *.GZ)
+                gunzip "$archive"
+            ;;
+            *.deb)
+                dpkg-deb -x "$archive" .
+            ;;
+            *.rar)
+                unrar x "$archive"
+            ;;
+            *.cpio)
+                cpio --extract --make-directories --file="$archive"
+            ;;
+            *.cpio.gz)
+                gzip -dc "$archive" | cpio --extract --make-directories
+            ;;
+            *)
+                echo "Unknown archive format" 1>&2
+            ;;
+        esac;
+    done
+}
+
+
+#
+#  Create a screen session with the name of the current host, or attach to
+# it here and now if it already exists.
+#
+screeny ()
+{
+    screen -D -R -S `hostname`
+}
