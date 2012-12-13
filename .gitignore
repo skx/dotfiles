@@ -1,0 +1,6 @@
+# Ignore all by default
+/*
+
+# Don't ignore the bash files
+!.bash_*
+!.bash/
