@@ -2,5 +2,7 @@
 /*
 
 # Don't ignore the bash files
-!.bash_*
 !.bash/
+!.bashrc
+!.bash_profile
+
