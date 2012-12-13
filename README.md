@@ -26,8 +26,10 @@ Step three: See which files will be over-written in your current home directory:
 
 Step four:  If no files will be corrupted, or you're happy to replace them, do the necessary:
 
-     .G checkout -b -f original_files 
+     .G checkout -b -f original_files
      .G commit -a  -m 'original files'
-     .G checkout master 
+     .G checkout master
 
 Now you're golden.  You can update as often as you like, and that will fetch the files and changes I commit.
+
+It is perhaps more sane to merely use the github browser to cherry-pick the files and functions you want, but each to their own.
