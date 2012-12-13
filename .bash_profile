@@ -3,7 +3,6 @@
 
 if [ -d ~/.bash/ ]; then
    for i in ~/.bash/*; do
-       echo "Sourcing $i"
        . $i
    done
 fi
