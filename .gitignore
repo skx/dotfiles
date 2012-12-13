@@ -8,3 +8,9 @@
 
 # Don't ignore the MySQL config file
 !.my.cnf
+
+# Don't ignore perltidy file
+!.perltidyrc
+
+# Don't ignore my SSH configuration file
+!.ssh/config
