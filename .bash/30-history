@@ -12,3 +12,24 @@ HISTCONTROL=ignoreboth
 
 # append to the history file, don't overwrite it
 shopt -s histappend
+
+#
+# We'll store the history in a directory.
+#
+[ -d ~/.history.d/ ] || mkdir -p ~/.history.d/
+
+
+#
+# Bash
+#
+export HISTFILE=~/.history.d/bash.history
+
+#
+# Less
+#
+export LESSHISTFILE=~/.history.d/less.history.$USER
+
+#
+# MySQL
+#
+export MYSQL_HISTFILE=~/.history.d/mysql.history.$USER
