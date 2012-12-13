@@ -1,0 +1,10 @@
+
+#
+#  Set the PATH to include ~/bin and ~/bin-$hostname if they exist.
+#
+for i in ~/bin ~/bin-$(hostname --short) ; do
+    [ -d $i ] && PATH=$i:${PATH}
+done
+
+export PATH=$PATH:/usr/sbin:/sbin:/usr/games
+
