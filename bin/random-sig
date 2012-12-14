@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# If ~/.sigs/ exists then pick a random file from it
+# otherwise output a sane default.
+#
+# The key to this script is using "sort -R", to implement a random
+# sort of the files we've found, and then pick the first.
+#
+# Steve
+# -- 
+#
+
+if [ -d ~/.sigs/ ]; then
+
+    # find a random file/symlink
+    file=$(find ~/.sigs/ \( -type f -o -type l \) -print | sort -R | head -n 1)
+
+    # did we get one?
+    if [ ! -z "$file" ]; then
+        # show it
+        cat $file
+        exit 0
+    fi
+fi
+
+#
+#  OK we didn't find something.
+#
+#  Output a sane default.
+#
+cat <<EOF
+Steve
+-- 
+EOF
