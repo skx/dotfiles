@@ -1,0 +1,269 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+unread-mail - Show mailboxes which have unread mail in them.
+
+=head1 SYNOPSIS
+
+  unread-mail [options]
+
+  General Options:
+
+   --count   Show unread counts too.
+   --dump    Show the To/From/Subject for unread mail.
+   --mail    The path to the maildir folder.
+
+  Alternatives:
+
+   --empty   Show only folders with zero messages in them.
+
+  Help Options:
+
+   --help    Show brief help information.
+   --manual  Read the manual
+
+=cut
+
+=head1 DESCRIPTION
+
+ This script outputs a summary of unread mail for a given Maildir folder.
+
+=cut
+
+=head1 AUTHOR
+
+ Steve
+ --
+ http://www.steve.org.uk/
+
+=cut
+
+=head1 LICENSE
+
+Copyright (c) 2009 by Steve Kemp.  All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
+
+use File::Basename;
+use Getopt::Long;
+use Pod::Usage;
+
+
+
+#
+#  Parse the command line.
+#
+my %CONFIG = parseCommandLine();
+
+
+#
+#  If the mail directory wasn't specified attempt to determine a default.
+#
+if ( !$CONFIG{ 'mail' } )
+{
+    foreach my $dir (qw! Mail Maildir !)
+    {
+        $CONFIG{ 'mail' } = $ENV{ 'HOME' } . "/" . $dir
+          if ( -d $ENV{ 'HOME' } . "/" . $dir );
+    }
+}
+
+#
+#  If there is no directory found then exit.
+#
+if ( !$CONFIG{ 'mail' } || !-d $CONFIG{ 'mail' } )
+{
+    print "Please specify the path to your Maildir hierarchy with --mail\n";
+    exit 1;
+}
+
+
+#
+#  Special case the detection of empty mailboxes
+#
+if ( $CONFIG{ 'empty' } )
+{
+    showEmpty();
+    exit;
+}
+
+
+#
+#  Find folders beneath the prefix.
+#
+#  TODO: Handle recursion.
+#
+foreach my $dir ( sort glob( $CONFIG{ 'mail' } . "/.*/" ) )
+{
+
+    #
+    #  The name of the folder.
+    #
+    my $folder = basename($dir);
+
+    #
+    #  The name of the mailbox - same as the folder name but without
+    # the leading ".".
+    #
+    my $name = $folder;
+    $name =~ s/^\.//g;
+
+    #
+    #  Is there anything in new/?
+    #
+    #  (i.e. Does this folder have unread mail in it.)
+    #
+    my @mails = glob( $dir . "/new/*" );
+
+    if ( scalar @mails )
+    {
+        if ( $CONFIG{ 'count' } )
+        {
+            my $out = sprintf( "[%5d] %s", scalar(@mails), $name );
+            print $out . "\n";
+        }
+        elsif ( $CONFIG{ 'dump' } )
+        {
+            print $name . "\n";
+            foreach my $file (@mails)
+            {
+                printSummary($file);
+            }
+        }
+        else
+        {
+            print $name. "\n";
+        }
+    }
+}
+
+
+#
+#  All done
+#
+exit 0;
+
+
+
+=begin doc
+
+  Minimal command line parser.
+
+=end doc
+
+=cut
+
+sub parseCommandLine
+{
+    my $HELP   = undef;
+    my $MANUAL = undef;
+
+    my %config;
+
+
+    if (
+         !GetOptions( "help",   \$HELP,
+                      "manual", \$MANUAL,
+                      "mail=s", \$config{ 'mail' },
+                      "empty",  \$config{ 'empty' },
+                      "count",  \$config{ 'count' },
+                      "dump",   \$config{ 'dump' },
+                    ) )
+    {
+        exit;
+    }
+
+    if ( ( $config{ 'count' } ) && ( $config{ 'dump' } ) )
+    {
+        print "Please choose one of --count and --dump.\n";
+        exit 1;
+    }
+    pod2usage(1) if ( defined($HELP) );
+    pod2usage( -verbose => 2 ) if ( defined($MANUAL) );
+    return (%config);
+
+}
+
+
+=begin doc
+
+  Assuming we've been passed the name of a mailfile show a summary of it.
+
+=end doc
+
+=cut
+
+sub printSummary
+{
+    my ($file) = (@_);
+
+    open( FILE, "<", $file ) or
+      die "failed to open: $file $!";
+
+    my $header = 1;
+    while ( my $line = <FILE> )
+    {
+        next if ( ( !$header ) || ( !defined($line) ) );
+        chomp($line);
+        $header = 0 if ( $line =~ /^$/ );
+
+        #
+        #  Fields we care about
+        #
+        print "\tTo: $1\n"      if ( $line =~ /^To: (.*)/ );
+        print "\tFrom: $1\n"    if ( $line =~ /^From: (.*)/ );
+        print "\tSubject: $1\n" if ( $line =~ /^Subject: (.*)/ );
+    }
+    close(FILE);
+    print "\n";
+}
+
+
+=begin doc
+
+Show foldes which are empty of messages.
+
+=end doc
+
+=cut
+
+sub showEmpty
+{
+    foreach my $dir ( sort glob( $CONFIG{ 'mail' } . "/.*/" ) )
+    {
+
+        #
+        # If it doesn't has new/ cur/ & tmp/ sub directories it isn't
+        # a maildir
+        #
+        next unless ( -d $dir . "/new/" );
+        next unless ( -d $dir . "/cur/" );
+        next unless ( -d $dir . "/tmp/" );
+
+        #
+        #  Count the files
+        #
+        my $count = 0;
+        foreach my $folder (qw! new cur tmp !)
+        {
+            foreach my $file ( glob( $dir . "/" . $folder . "/*" ) )
+            {
+                $count += 1;
+            }
+        }
+
+        if ( $count < 1 )
+        {
+            my $name = basename($dir);
+            $name =~ s/^\.//g;
+            print $name . "\n";
+        }
+    }
+}

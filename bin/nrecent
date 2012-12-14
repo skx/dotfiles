@@ -1,0 +1,237 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+nrecent - Keep the N most recent files in a directory, remove the rest.
+
+=cut
+
+=head1 SYNOPSIS
+
+Usage:
+
+  nrecent [options] /path/to/prune1 /path/to/prune2 .. /path/to/pruneN
+
+  Flags:
+
+   --help           Show minimal help.
+   --manual         Read the manual.
+   --number|--keep  Specify the number of files to keep.
+   --simulate       Don't delete anything.  Just pretend we did.
+   --verbose        Run more verbosely.
+
+=cut
+
+=head1 ABOUT
+
+This script is designed to remove files from a each specified directory, leaving
+the most recent N files alone.
+
+No attempt to remove directories is made, anything which is not a file is ignored.
+
+=cut
+
+=head1 ONLINE
+
+The most recent version of this code should be located at:
+
+      http://nrecent.repository.steve.org.uk/raw-file/tip/nrecent
+
+=cut
+
+=head1 AUTHOR
+
+ Steve
+ --
+ http://www.steve.org.uk/
+
+=cut
+
+
+=head1 LICENSE
+
+Copyright (c) 2012 by Steve Kemp.  All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+
+#
+#  Defaults.
+#
+my %CONFIG = ();
+$CONFIG{ 'nrecent' } = 5;
+$CONFIG{ 'verbose' } = 0;
+
+
+
+#
+#  Parse any command line arguments which might be present.
+#
+parseCommandLine();
+
+#
+#  Ensure we have at least one directory argument.
+#
+if ( !scalar @ARGV )
+{
+    print
+      "Usage: nrecent [options] /path/to/prune1 /path/to/prune2 .. /path/to/pruneN\n";
+    exit 1;
+}
+
+
+#
+#  For each directory specified upon the command line...
+#
+foreach my $dir (@ARGV)
+{
+    if ( !-d $dir )
+    {
+        print "WARNING: Directory not found: $dir\n"
+          if ( $CONFIG{ 'verbose' } );
+    }
+    else
+    {
+        pruneDirectory($dir);
+    }
+}
+
+
+#
+#  All done.
+#
+exit 0;
+
+
+
+=begin doc
+
+Prune the contents of the given directory.
+
+=end doc
+
+=cut
+
+sub pruneDirectory
+{
+    my ($dir) = (@_);
+
+    $CONFIG{ 'verbose' } &&
+      print "INFO: Keeping most recent $CONFIG{'nrecent'} entries in $dir\n";
+
+    #
+    #  read the contents of the directory.
+    #
+    my @found;
+
+    foreach my $entry ( glob( $dir . "/*" ) )
+    {
+        if ( !-d $entry )
+        {
+            push( @found, $entry );
+            ( $CONFIG{ 'verbose' } >= 3 ) && print "Found: $entry\n";
+        }
+    }
+
+
+    #
+    #  If we found fewer entries than the number we should keep then we should
+    # just return without deleting anything.
+    #
+    if ( scalar(@found) < $CONFIG{ 'nrecent' } )
+    {
+        $CONFIG{ 'verbose' } &&
+          print
+          "INFO: Found fewer than $CONFIG{'nrecent'} files - nothing to do.\n";
+
+        return;
+    }
+
+
+    #
+    #  Sort the files by modification time.
+    #
+    my @sorted = reverse map {$_->[0]}
+      sort {$a->[1] <=> $b->[1]}
+      map {[$_, -M $_]} @found;
+
+
+    #
+    #  Skip the files we should keep.
+    #
+    while ( ( $CONFIG{ 'nrecent' } ) && ( scalar(@sorted) ) )
+    {
+        my $safe = pop(@sorted);
+        ( $CONFIG{ 'verbose' } >= 2 ) &&
+          print "INFO: Leaving file alone: $safe\n";
+
+        # Decrease.
+        $CONFIG{ 'nrecent' } -= 1;
+    }
+
+
+    #
+    #  Now remove the remainding files.
+    #
+    foreach my $file ( reverse @sorted )
+    {
+        ( $CONFIG{ 'verbose' } >= 1 ) && print "INFO: Removing file: $file\n";
+
+        unlink($file) unless ( $CONFIG{ 'dry-run' } || ( -d $file ) );
+    }
+}
+
+
+=begin doc
+
+Parse the command line.
+
+=end doc
+
+=cut
+
+sub parseCommandLine
+{
+    my $HELP   = 0;
+    my $MANUAL = 0;
+
+    #
+    #  Parse options.
+    #
+    if (
+        !GetOptions(
+
+            # Help options
+            "help",     \$HELP,
+            "manual",   \$MANUAL,
+            "verbose+", \$CONFIG{ 'verbose' },
+
+            # the number to keep.
+            "number=s", \$CONFIG{ 'nrecent' },
+            "keep=s",   \$CONFIG{ 'nrecent' },
+
+            # dry run?
+            "dry-run",  \$CONFIG{ 'dry-run' },
+            "simulate", \$CONFIG{ 'dry-run' },
+        ) )
+    {
+        exit;
+    }
+
+    pod2usage(1) if $HELP;
+    pod2usage( -verbose => 2 ) if $MANUAL;
+
+}
+
