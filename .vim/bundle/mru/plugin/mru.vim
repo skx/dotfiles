@@ -223,11 +223,6 @@ if !exists('MRU_Max_Entries')
     let MRU_Max_Entries = 100
 endif
 
-" Files to exclude from the MRU list
-if !exists('MRU_Exclude_Files')
-    let MRU_Exclude_Files = ''
-endif
-
 " Files to include in the MRU list
 if !exists('MRU_Include_Files')
     let MRU_Include_Files = ''
