@@ -1,0 +1,10 @@
+#!/usr/bin/perl -pi
+#
+#  Convert a file with Unix line endings into one with DOS line endings.
+#
+# Steve
+# --
+# http://www.steve.org.uk/
+#
+
+s/\n/\r\n/;

@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# Recursively remove temporary files beneath the named directory.
+#
+# (Defaults to the current directory.)
+#
+# Steve
+# --
+# http://www.steve.org.uk/
+
+
+dir=.
+
+#
+# If named then the first argument is the starting directory.
+#
+if [ -n "$1" ]; then
+	dir=$1
+fi
+
+if [ ! -d "$dir" ] ;then
+    echo "Not a directory: $dir"
+    exit 1
+fi
+
+#
+# Do the deletion.
+#
+find $dir \( -name '*~' -o -name '.*~' -o -name '.#*' \) -exec rm -f \{\} \;
+
+
+if [ -e Makefile ]; then
+    make clean
+fi
