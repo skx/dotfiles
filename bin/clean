@@ -26,7 +26,7 @@ fi
 #
 # Do the deletion.
 #
-find $dir \( -name '*~' -o -name '.*~' -o -name '.#*' \) -exec rm -f \{\} \;
+find $dir \( -name '*~' -o -name '*.bak' -o -name '.*~' -o -name '.#*' \) -exec rm -f \{\} \;
 
 
 if [ -e Makefile ]; then
