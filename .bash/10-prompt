@@ -1,1 +1,18 @@
-export PS1='\[\033[01;31m\]\u\[\033[01;33m\]@\[\033[01;36m\]\h \[\033[01;33m\]\w \[\033[01;35m\]\$ \[\033[00m\]'
+#
+# If we're connecting via SSH then the prompt will show the username.
+#
+if [ -n "$SSH_CONNECTION" ]; then
+
+    #
+    # Remote.
+    #
+    export PS1='\[\033[01;31m\]\u\[\033[01;33m\]@\[\033[01;36m\]\h \[\033[01;33m\]\w \[\033[01;35m\]\$ \[\033[00m\]'
+
+else
+
+    #
+    # Local.
+    #
+    export PS1='\[\033[01;36m\]\h \[\033[01;33m\]\w \[\033[01;35m\]\$ \[\033[00m\]'
+
+fi
