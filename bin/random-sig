@@ -23,12 +23,25 @@ if [ -d ~/.sigs/ ]; then
     fi
 fi
 
+
+
 #
-#  OK we didn't find something.
+#  OK we didn't find something in ~/.sigs/, use ~/.signature if it
+# is present.
 #
-#  Output a sane default.
+if [ -e ~/.signature ]; then
+    cat ~/.signature
+    exit 0
+fi
+
+
+
+#
+#  Our final fall-back.
 #
 cat <<EOF
 Steve
 -- 
 EOF
+
+exit 0
