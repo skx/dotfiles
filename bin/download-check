@@ -1,0 +1,151 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+download-check - Look for regular expressions in webpages
+
+=head1 SYNOPSIS
+
+  download-check [options]
+
+  General Options:
+
+   --config    Specify a configuration file, rather than the default.
+   --verbose   Show the patterns & URLs we're looking for.
+
+  Help Options:
+
+   --help      Show brief help information.
+   --manual    Read the manual
+
+=cut
+
+=head1 DESCRIPTION
+
+This script reads a list of URLs and regular expressions from a configuration
+file, (C<~/.download-check.conf> by default), and reports on pages that don't
+match the pattern.
+
+=cut
+
+=head1 CONFIGURAION FILE
+
+The configuration file is assumed to be white-space seperated lines of the form
+"url pattern".
+
+Here is a simple example - as you can see comments begin with "#" and are ignored,
+along with blank-lines.
+
+=for example begin
+
+     #
+     #  I want to know if the version of node.js updates.
+     #
+     http://nodejs.org/    v0.8.16
+
+=for example end
+
+=cut
+
+
+=head1 AUTHOR
+
+ Steve
+ --
+ http://www.steve.org.uk/
+
+=cut
+
+=head1 LICENSE
+
+Copyright (c) 2009-2012 by Steve Kemp.  All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+The LICENSE file contains the full text of the license.
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use LWP::Simple;
+use Pod::Usage;
+
+
+
+#
+# The options
+#
+my %CONFIG = ( 'config' => $ENV{ 'HOME' } . "/.download-check.conf" );
+
+#
+#  Get the options
+#
+exit
+  if (
+       !GetOptions( "help",     \$CONFIG{ 'help' },
+                    "manual",   \$CONFIG{ 'manual' },
+                    "config=s", \$CONFIG{ 'config' },
+                    "verbose",  \$CONFIG{ 'verbose' },
+                  ) );
+
+#
+# Handle help/manual flags.
+#
+pod2usage(1) if ( $CONFIG{ 'help' } );
+pod2usage( -verbose => 2 ) if ( $CONFIG{ 'manual' } );
+
+
+#
+# Read the configuration file.
+#
+open( my $file, "<", $CONFIG{ 'config' } ) or
+  die "Failed to open $CONFIG{'config'} - $!";
+
+#
+# Process each line
+#
+foreach my $line (<$file>)
+{
+
+    #
+    # Skip comments and blank lines.
+    #
+    chomp($line);
+    next if ( $line =~ /^#/ || !length($line) );
+
+    #
+    #  The parsing.
+    #
+    if ( $line =~ /^([^ \t]+)([ \t]+)(.*)$/ )
+    {
+        my $url     = $1;
+        my $pattern = $3;
+
+        #
+        # Show what we found.
+        #
+        $CONFIG{ 'verbose' } &&
+          print "Looking for pattern '$pattern' in $url\n";
+
+        #
+        #  Fetch the URL
+        #
+        my $content = get($url);
+        if ( $content !~ /$pattern/ )
+        {
+            print "URL $url - no longer matches $pattern\n";
+        }
+    }
+}
+
+#
+# All done with the file parsing
+#
+close($file);
+
+
+exit 0;
