@@ -14,3 +14,7 @@
 
 # Don't ignore my SSH configuration file
 !.ssh/config
+
+# Vim is covered
+!.vimrc
+!.vim/
