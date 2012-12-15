@@ -18,3 +18,7 @@
 # Vim is covered
 !.vimrc
 !.vim/
+
+# Revision control systems
+!.gitconfig
+!.hgrc

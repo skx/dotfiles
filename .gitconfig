@@ -1,0 +1,15 @@
+[user]
+    name = Steve Kemp
+    email = steve@steve.org.uk
+
+[color]
+    diff  = auto
+    status= auto
+    branch= auto
+    interactive = true
+
+[alias]
+    ci = commit
+    di = diff --color-words
+    st = status
+
