@@ -244,7 +244,7 @@ endif
 
 if !exists('MRU_File')
     if has('unix') || has('macunix')
-        let MRU_File = $HOME . '/.vim_mru_files'
+        let MRU_File = $HOME . '/.history.d/vim_mru_files'
     else
         let MRU_File = $VIM . '/_vim_mru_files'
         if has('win32')
