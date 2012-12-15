@@ -22,3 +22,6 @@
 # Revision control systems
 !.gitconfig
 !.hgrc
+
+# Shell input
+!.inputrc
