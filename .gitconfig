@@ -13,3 +13,5 @@
     di = diff --color-words
     st = status
 
+[core]
+	editor = vim
