@@ -1,0 +1,85 @@
+#
+# ~/.screenrc startup file for GNU Screen.
+#
+# Steve
+# --
+#
+
+#
+# skip the startup message
+#
+startup_message off
+
+#
+# Start in our home dir
+#
+chdir
+
+#
+# we're not graphical
+#
+unsetenv DISPLAY
+
+#
+# Automatically detach on hangup.
+#
+autodetach on
+
+#
+# Change default scrollback value for new windows
+#
+defscrollback 5000
+
+#
+# start with visual bell as default
+#
+vbell on
+vbell_msg "bell on %t (%n)"
+activity "Activity in %t(%n)"
+
+
+#
+# look and feel for the bottom two lines.
+#
+caption     always        "%{+b rk}%H%{gk} |%c %{yk}%d.%m.%Y | %72=Load: %l %{wk}"
+hardstatus alwayslastline "%?%{yk}%-Lw%?%{wb}%n*%f %t%?(%u)%?%?%{yk}%+Lw%?"
+
+
+
+
+#
+#  Toggle 'fullscreen' or not.
+#
+bind f eval "caption splitonly" "hardstatus ignore"
+bind F eval "caption always"    "hardstatus alwayslastline"
+
+#
+# Shell title.
+#
+shelltitle "shell"
+
+#
+# Our shells are login shells.
+#
+defshell -bash
+
+#
+# Keep dead windows around until I tell them to exit.
+#
+zombie cr
+
+
+#
+# These keybindings always annoy me: xon/xoff.
+# Remove them.
+#
+bind ^Q
+bind q
+bind ^S
+bind s
+
+#
+# If a window goes unresponsive, don't block the whole session waiting for it.
+#
+nonblock on
+

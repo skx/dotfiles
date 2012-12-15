@@ -25,3 +25,7 @@
 
 # Shell input
 !.inputrc
+
+# Terminal sharing utilities
+!.screenrc
+!.tmux.conf
