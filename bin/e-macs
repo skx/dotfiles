@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+#  Simple emacs/emacsclient wrapper.
+#
+
+
+#
+# Not running under X11/X.org?
+#
+if [ -z "$DISPLAY" ]; then
+    exec /usr/bin/emacs $*
+fi
+
+#
+#  Load the editor, starting if necessary.
+#
+exec emacsclient --alternate-editor="emacs" -n $@ &
