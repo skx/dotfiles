@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-#  Install the slaughter client.
+#  Install the slaughter client:
 #
-#  Source for curl:
+#  wget -O - https://raw.github.com/skx/dotfiles/master/bin/get-slaughter | sh
 #
-#  https://raw.github.com/skx/dotfiles/master/bin/get-slaughter
+#  Probably me-specific.
 #
 # Steve
 # --
@@ -26,21 +26,36 @@ deb     http://packages.steve.org.uk/slaughter/squeeze/ ./
 EOF
 fi
 
+
+
+#
+#  Make the configuration directory.
+#
+mkdir -p /etc/slaughter || true
+
+
+
 #
 #  If we don't have a conf file, create it.
 #
-mkdir -p /etc/slaughter || true
-cat > /etc/slaughter/slaughter.conf <<EOF
+if ( ! -e  /etc/slaughter/slaughter.conf ); then
+    cat > /etc/slaughter/slaughter.conf <<EOF
 prefix    = rsync://www.steve.org.uk/slaughter
 transport = rsync
 EOF
+fi
+
+
 
 #
-#  Update
+#  Update the system.
 #
 apt-get update
+
+
 
 #
 #  Install the package
 #
 apt-get install --yes --force-yes slaughter2-client
+
