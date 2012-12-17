@@ -5,6 +5,20 @@
 [[ -d ~/dotfiles.git ]] && alias .DOTFILES='git --work-tree=$HOME --git-dir=$HOME/dotfiles.git'
 
 #
+# If we have .DOTFILES configured
+#
+# AND
+#
+# If we have a git completion handler
+# then use it.
+#
+if ( type .DOTFILES >/dev/null 2>/dev/null ); then
+    if ( type _git 2>/dev/null >/dev/null ); then
+       complete -o default -o nospace -F _git  .DOTFILES
+   fi
+fi
+
+#
 # Move up
 #
 alias ..='cd ..'
