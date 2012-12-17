@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+#  Install the slaughter client.
+#
+
+
+
+#
+#  Install apt
+#
+if [ ! -e /etc/apt/sources.list.d/slaughter.list ]; then
+    cat > /etc/apt/sources.list.d/slaughter.list <<EOF
+#
+# Slaughter packages for squeeze
+#
+deb-src http://packages.steve.org.uk/slaughter/squeeze/ ./
+deb     http://packages.steve.org.uk/slaughter/squeeze/ ./
+
+EOF
+fi
+
+#
+#  If we don't have a conf file, create it.
+#
+mkdir -p /etc/slaughter || true
+cat > /etc/slaughter/slaughter.conf <<EOF
+prefix    = rsync://www.steve.org.uk/slaughter
+transport = rsync
+EOF
+
+#
+#  Update
+#
+apt-get update
+
+#
+#  Install the package
+#
+apt-get install --yes --force-yes slaughter2-client
