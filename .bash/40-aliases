@@ -5,11 +5,6 @@
 [[ -d ~/dotfiles.git ]] && alias .DOTFILES='git --work-tree=$HOME --git-dir=$HOME/dotfiles.git'
 
 #
-# Coloured ls by default.
-#
-alias ls='ls --color=auto'
-
-#
 # Move up
 #
 alias ..='cd ..'

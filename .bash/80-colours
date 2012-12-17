@@ -1,0 +1,14 @@
+
+#
+# ls should support colouring, but just in case test for it first.
+#
+ls --color=auto > /dev/null 2>&1 && alias ls='ls --color=auto'
+
+#
+# Only some grep versions support `--color=auto'
+#
+if echo x | grep --color=auto x >/dev/null 2>&1; then
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color=auto'
+fi
