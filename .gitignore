@@ -4,6 +4,7 @@
 # Don't ignore the bash files
 !.bash/
 !.bashrc
+!.bash_logout
 !.bash_profile
 
 # Don't ignore the MySQL config file
