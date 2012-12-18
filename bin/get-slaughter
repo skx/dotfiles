@@ -30,6 +30,12 @@ if [ -x /usr/bin/apt-key ]; then
             #  Get the key and pipe to add.
             #
             wget http://packages.steve.org.uk/slaughter/apt-key.pub -O-  | /usr/bin/apt-key add -
+
+            #
+            #  Now clean the downloaded-lists and refetch
+            #
+            apt-get clean
+
         else
             #
             #  Error
