@@ -11,6 +11,34 @@
 #
 
 
+#
+#  See if we have the apt-signature helper.
+#
+if [ -x /usr/bin/apt-key ]; then
+
+    #
+    #  If we're missing the key ..
+    #
+    if ( /usr/bin/apt-key list | grep 2048g/0CB6CBA8 >/dev/null 2>/dev/null ) ; then
+
+        #
+        #  Download and install
+        #
+        if ( which wget >/dev/null 2>/dev/null ) ; then
+
+            #
+            #  Get the key and pipe to add.
+            #
+            wget http://packages.steve.org.uk/slaughter/apt-key.pub -O-  | /usr/bin/apt-key add -
+        else
+            #
+            #  Error
+            #
+            echo "wget not installed - failed to install apt-signing key".
+            exit 1
+        fi
+    fi
+fi
 
 #
 #  Install apt
@@ -38,7 +66,7 @@ mkdir -p /etc/slaughter || true
 #
 #  If we don't have a conf file, create it.
 #
-if ( ! -e  /etc/slaughter/slaughter.conf ); then
+if [ ! -e  /etc/slaughter/slaughter.conf ]; then
     cat > /etc/slaughter/slaughter.conf <<EOF
 prefix    = rsync://www.steve.org.uk/slaughter
 transport = rsync
