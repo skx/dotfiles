@@ -51,7 +51,7 @@ mkdir -p ~/git || true
 if [ ! -d ~/git/dotfiles.git ]; then
     git clone --bare $src ~/git/dotfiles.git
 else
-    git --git-dir=$HOME/git/dotfiles.git --work-tree=$HOME/ update
+    git --git-dir=$HOME/git/dotfiles.git --work-tree=$HOME/ pull
 fi
 
 
