@@ -1,12 +1,12 @@
 #!/bin/sh
 #
-#  Clone my dotfiles into a new host - in an unauthenticated
-# fashion.
+#  Clone my dotfiles into a new host - in an unauthenticated fashion.
 #
-#    wget -O - https://raw.github.com/skx/dotfiles/master/bin/get-skx-dotfiles | sh --force
+#    wget https://raw.github.com/skx/dotfiles/master/bin/get-skx-dotfiles
+#    sh ./get-skx-dotfiles --force
 #
 # Steve
-# -- 
+# --
 #
 
 #
@@ -24,8 +24,13 @@ fi
 
 
 if ( ! which git >/dev/null 2>/dev/null ); then
-	echo "'git' doesn't seem to be installed"
-	exit 1
+
+    if [ ! -z "$force" ]; then
+        apt-get install git-core
+    else
+        echo "'git' doesn't seem to be installed"
+        exit 1
+    fi
 fi
 
 #
