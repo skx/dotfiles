@@ -23,38 +23,55 @@ if [ "$1" = "--force" ]; then
 fi
 
 
+#
+# Ensure we have the git command
+#
 if ( ! which git >/dev/null 2>/dev/null ); then
 
     if [ ! -z "$force" ]; then
-        apt-get install git-core
+        apt-get install git-core --yes --force-yes
     else
         echo "'git' doesn't seem to be installed"
         exit 1
     fi
 fi
 
+
+
 #
 # Store beneath ~/git/
 #
 mkdir -p ~/git || true
 
-#
-#  Checkout
-#
-git clone --bare $src ~/git/dotfiles.git
+
 
 #
-#  See what files would be trashed
+#  Checkout / update if already present
+#
+if [ ! -d ~/git/dotfiles.git ]; then
+    git clone --bare $src ~/git/dotfiles.git
+else
+    git --git-dir=$HOME/git/dotfiles.git --work-tree=$HOME/ update
+fi
+
+
+
+#
+#  Test that no files would be trashed.
 #
 if ( git --git-dir=$HOME/git/dotfiles.git --work-tree=$HOME/  checkout -b  original_files $force ); then
 
- # 
- # Patchup 
- #
- git --git-dir=$HOME/git/dotfiles.git --work-tree=$HOME/ commit -a  -m 'original files'
- git --git-dir=$HOME/git/dotfiles.git --work-tree=$HOME/ checkout master
- exit 0
+    #
+    # OK if none would be then we'll update
+    #
+    git --git-dir=$HOME/git/dotfiles.git --work-tree=$HOME/ commit -a  -m 'original files'
+    git --git-dir=$HOME/git/dotfiles.git --work-tree=$HOME/ checkout master
+    exit 0
 else
- echo "Re-run with --force to overwrite the named files"
- exit 1
+
+    #
+    # Somethign would get replaced, damn you /etc/skel !
+    #
+    echo "re-run with --force to overwrite the named files"
+    exit 1
 fi
