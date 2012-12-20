@@ -46,16 +46,36 @@ if [ -x /usr/bin/apt-key ]; then
     fi
 fi
 
+
+
+
+#
+#  The default distribution.
+#
+distro="squeeze"
+
+#
+#  If we have lsb_base then use it to find the real release.
+#
+if [ -x /usr/bin/lsb_release ]; then
+    new=$(lsb_release -c -s)
+    if [ ! -z "$new" ] ;then
+        distro=$new
+    fi
+fi
+
+
+
 #
 #  Install apt
 #
 if [ ! -e /etc/apt/sources.list.d/slaughter.list ]; then
     cat > /etc/apt/sources.list.d/slaughter.list <<EOF
 #
-# Slaughter packages for squeeze
+# Slaughter packages for $distro
 #
-deb-src http://packages.steve.org.uk/slaughter/squeeze/ ./
-deb     http://packages.steve.org.uk/slaughter/squeeze/ ./
+deb-src http://packages.steve.org.uk/slaughter/$distro/ ./
+deb     http://packages.steve.org.uk/slaughter/$distro/ ./
 
 EOF
 fi
