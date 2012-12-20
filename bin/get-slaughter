@@ -11,6 +11,22 @@
 #
 
 
+
+
+#
+#  Are we even running on Debian/Debian-like system?
+#
+if [ ! -x /usr/bin/apt-get ]; then
+    echo "This system doesn't look like a Debian-like distribution"
+    exit 1
+fi
+if [ ! -d /etc/apt ]; then
+    echo "This system doesn't look like a Debian-like distribution"
+    exit 1
+fi
+
+
+
 #
 #  See if we have the apt-signature helper.
 #
@@ -22,7 +38,7 @@ if [ -x /usr/bin/apt-key ]; then
     if ( /usr/bin/apt-key list | grep 2048g/0CB6CBA8 >/dev/null 2>/dev/null ) ; then
 
         #
-        #  Download and install
+        #  Download and install it.
         #
         if ( which wget >/dev/null 2>/dev/null ) ; then
 
@@ -32,7 +48,7 @@ if [ -x /usr/bin/apt-key ]; then
             wget http://packages.steve.org.uk/slaughter/apt-key.pub -O-  | /usr/bin/apt-key add -
 
             #
-            #  Now clean the downloaded-lists and refetch
+            #  Now clean any previously downloaded-lists.
             #
             apt-get clean
 
@@ -113,3 +129,9 @@ apt-get update
 #
 apt-get install --yes --force-yes slaughter2-client
 
+
+
+#
+#  All done.
+#
+exit 0
