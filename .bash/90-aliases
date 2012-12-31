@@ -29,11 +29,6 @@ alias ..='cd ..'
 alias free='free -m'
 
 #
-#  For easy updates.
-#
-alias apt='sudo apt-get update && sudo apt-get upgrade'
-
-#
 #  Make passwords a little nicer
 #
 [ -x /usr/bin/pwgen ] && alias pwgen='pwgen -B 12'

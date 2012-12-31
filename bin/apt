@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# Update the current system
+#
+
+
+#
+# Ignore non-apt systems
+#
+test -x /usr/bin/apt-get || exit 0
+
+#
+# If root we're good
+#
+prefix=
+if [ "$UID" != "0" ]; then
+    prefix="sudo "
+fi
+
+
+echo "apt-get update"
+$prefix apt-get update --quiet --quiet
+
+echo "apt-get upgrade"
+$prefix apt-get upgrade
+
+
