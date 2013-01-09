@@ -6,5 +6,12 @@ for i in ~/bin ~/bin-$(hostname --short) ; do
     [ -d $i ] && PATH=$i:${PATH}
 done
 
+#
+# Rubygems are an abomination, and yet ..
+#
+if [ -d /var/lib/gems/1.8/bin ]; then
+    export PATH=/var/lib/gems/1.8/bin:$PATH
+fi
+
 export PATH=$PATH:/bin:/usr/bin:/usr/sbin:/sbin:/usr/games
 
