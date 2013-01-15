@@ -25,6 +25,17 @@ if [ -z "$1" ]; then
    exit 0
 fi
 
-# otherwise append to the current week
+# If we're called with "edit" then we'll just launch the editor
+if [ "$1" = "edit" ] && [ -z "$2" ]; then
+
+   if [ -z "$EDITOR" ]; then
+       editor ~/.worklog/${week}.txt
+   else
+       $EDITOR ~/.worklog/${week}.txt
+   fi
+   exit 0
+fi
+
+# just append
 echo "$*" >> ~/.worklog/${week}.txt
 
