@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# Push to either git or hg as appropriate
+#
+
+if [ -d .hg ]; then
+   exec hg push
+fi
+if [ -d .git ] ;then
+   exec git push
+fi
+
+echo "Neither .git/.hg were found.  Aborting"
+exit 1
+

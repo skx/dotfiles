@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# Pull from either git or hg as appropriate
+#
+
+if [ -d .hg ]; then
+   exec hg pull --update
+fi
+if [ -d .git ] ;then
+   exec git pull
+fi
+
+echo "Neither .git/.hg were found.  Aborting"
+exit 1
+
