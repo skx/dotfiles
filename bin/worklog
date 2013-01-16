@@ -16,6 +16,9 @@
 # make sure we have a storage
 test -d ~/.worklog || mkdir -p ~/.worklog
 
+# source the configuration file if we have one.
+test -e ~/.worklog.conf && . ~/.worklog.conf
+
 # current week number
 week=$(date +%V)
 
@@ -37,5 +40,5 @@ if [ "$1" = "edit" ] && [ -z "$2" ]; then
 fi
 
 # just append
-echo "$*" >> ~/.worklog/${week}.txt
+echo "${prefix}$*" >> ~/.worklog/${week}.txt
 
