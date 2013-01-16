@@ -30,3 +30,6 @@
 # Terminal sharing utilities
 !.screenrc
 !.tmux.conf
+
+# ./bin/worklog config file
+!.worklog.conf
