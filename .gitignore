@@ -19,6 +19,7 @@
 # Vim is covered
 !.vimrc
 !.vim/
+.vim/.netrwhist
 
 # Revision control systems
 !.gitconfig
