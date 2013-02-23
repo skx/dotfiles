@@ -1,0 +1,9 @@
+#!/bin/sh
+# set xterm title
+if [ ! -z "$1" ]; then
+    printf "\033]0;$*\007"
+    exit 0
+else
+    echo "Usage: set-title some string to set the title to .."
+    exit 1
+fi
