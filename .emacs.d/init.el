@@ -92,6 +92,18 @@ If FEATURE can't be loaded, don't execute BODY."
 (noerr-require 'uptime)
 (noerr-require 'mpc)
 
+;;
+;;  pwsafe interface.
+;;
+;;  1. cache the password for the database.
+;;  2. Pressing ret/enter will copy the username + password.
+;;
+(with-feature (pwsafe)
+              (setq pwsafe-keep-passwd t)
+              (define-key pwsafe-list-mode-map [(return)] 'pwsafe-copy-user-name-and-password)
+              (define-key pwsafe-list-mode-map [(right)] 'pwsafe-info-current-item))
+
+
 
 ;;
 ;; User-interface tweaks
@@ -103,6 +115,13 @@ If FEATURE can't be loaded, don't execute BODY."
 (if window-system
     (mouse-avoidance-mode 'cat-and-mouse))
 
+
+;;
+;; Encodings
+;;
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
 
 ;;
 ;; Show the time on the status bar.
@@ -143,6 +162,10 @@ If FEATURE can't be loaded, don't execute BODY."
 (setq-default indent-tabs-mode nil)
 
 
+;;  Show the file we've got loaded in the frame title.
+(setq frame-title-format  (concat invocation-name "@" system-name ": %b %+%+ %f"))
+
+
 ;;
 ;; Auto-save
 ;;
@@ -157,3 +180,9 @@ If FEATURE can't be loaded, don't execute BODY."
 (if (file-exists-p (expand-file-name "~/.trash.d/emacs.autosaves/"))
     ()
   (make-directory (expand-file-name "~/.trash.d/emacs.autosaves/" t)))
+
+
+;;
+;; Keybindings
+;;
+(require 'skx-keybindings)
