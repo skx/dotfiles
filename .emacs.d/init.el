@@ -85,10 +85,13 @@ If FEATURE can't be loaded, don't execute BODY."
 ;;  * Check perl syntax when saving files.
 ;;  * Make files executable on write, if they have valid shebang lines.
 ;;  * Report uptime on exit.
+;;  * MPC media client
 ;;
 (noerr-require 'perl-syntax-check)
 (noerr-require 'shebang)
 (noerr-require 'uptime)
+(noerr-require 'mpc)
+
 
 ;;
 ;; User-interface tweaks
