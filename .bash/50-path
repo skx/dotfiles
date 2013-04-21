@@ -1,17 +1,41 @@
 
 #
+#  Add directory to PATH if it exists
+#
+function add_to_path
+{
+   if [ -d "$1" ]; then
+      export PATH=$1:$PATH
+   fi
+}
+
+
+#
+# Add in some optional directories
+#
+add_to_path /opt/node/bin
+add_to_path /opt/sysadmin-util/
+add_to_path /usr/games
+add_to_path /var/lib/gems/1.8/bin
+add_to_path /var/lib/gems/1.9/bin
+
+
+#
 #  Set the PATH to include ~/bin and ~/bin-$hostname if they exist.
 #
 for i in ~/bin ~/bin-$(hostname --short) ; do
     [ -d $i ] && PATH=$i:${PATH}
 done
 
-#
-# Rubygems are an abomination, and yet ..
-#
-if [ -d /var/lib/gems/1.8/bin ]; then
-    export PATH=/var/lib/gems/1.8/bin:$PATH
-fi
 
-export PATH=$PATH:/bin:/usr/bin:/usr/sbin:/sbin:/usr/games
+#
+#  Add in the common things.
+#
+export PATH=$PATH:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
+
+#
+#  Remove duplicate entries.
+#
+export PATH=$(echo "$PATH" | awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}')
 
