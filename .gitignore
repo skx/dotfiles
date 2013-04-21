@@ -7,6 +7,9 @@
 !.bash_logout
 !.bash_profile
 
+# Don't ignore emacs configuration
+!.emacs.d/
+
 # Don't ignore the MySQL config file
 !.my.cnf
 
