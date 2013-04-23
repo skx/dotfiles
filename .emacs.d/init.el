@@ -30,14 +30,14 @@ If FEATURE can't be loaded, don't execute BODY."
 
 (defun skx-add-to-load-path( list )
   "Add each entry on the passed list to the load-path, if it exists as a directory."
-  (while list 
+  (while list
     (if (file-exists-p (expand-file-name (car list)))
 	(add-to-list 'load-path (expand-file-name (car list))))
     (setq list (cdr list))))
 
 ;;
 ;; Setup the load-path
-;;	     
+;;
 (skx-add-to-load-path (list "~/.emacs.d" "~/.emacs.d/lang" "~/.emacs.d/unix" "~/.emacs.d/ui"))
 
 ;;
@@ -114,6 +114,14 @@ If FEATURE can't be loaded, don't execute BODY."
     (color-theme-charcoal-black))
 (if window-system
     (mouse-avoidance-mode 'cat-and-mouse))
+
+
+
+;;
+;; Delete trailing whitespace on save
+;;
+(require 'whitespace)
+(add-hook 'write-file-hooks 'delete-trailing-whitespace)
 
 
 ;;
