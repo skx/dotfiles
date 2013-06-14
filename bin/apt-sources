@@ -8,7 +8,15 @@ apt-sources - A utility for working with apt-sources.
 
 =head1 SYNOPSIS
 
-  apt-sources list|delete [regexp]
+  apt-sources add|delete|list [regexp|entry]
+
+The first term upon the command line is the action to complete:
+
+  add    Add a new entry.
+
+  delete Delete (comment-out) entries matching a pattern.
+
+  list   List entries, optionally only those matching a regexp.
 
 =cut
 
@@ -34,25 +42,68 @@ use warnings;
 use English;
 use File::Copy;
 
+
+#
+#  Our handlers
+#
+my %dispatch = ( "list"   => { sub => \&do_list },
+                 "add"    => { sub => \&do_add, root => 1 },
+                 "delete" => { sub => \&do_delete, root => 1 } );
+
 #
 #  Get our action
 #
-my $action = shift;
-if ( !$action )
+my $action = shift || "list";
+
+
+#
+#  Lookup the entry in our dispatch-table
+#
+my $entry = $dispatch{ lc($action) };
+if ( !$entry )
 {
-    print <<EOF;
-Usage: apt-sources add|list|delete [args..]
-EOF
+    print "Unknown action \"$action\".  Valid actions are:\n";
+    print "\t" . join( ", ", sort( keys(%dispatch) ) ) . "\n";
     exit(1);
 }
 
+#
+#  Do we need to be root?
+#
+if ( $entry->{ 'root' } )
+{
+    if ( $UID != 0 )
+    {
+        print "You must be root to run this action\n";
+        exit(1);
+    }
+}
 
 #
-# Listing is easy.
+#  OK call the handler
 #
-if ( !defined($action) || ( $action =~ /^list$/i ) )
+$entry->{ 'sub' }->( join( " ", @ARGV ) );
+
+
+#
+#  All done.
+#
+exit(0);
+
+
+
+
+=begin doc
+
+List entries.  Optionally limit to those matching a regexp.
+
+=end doc
+
+=cut
+
+sub do_list
 {
-    my $regexp = shift;
+    my ($regexp) = (@_);
 
     my @files = get_files();
 
@@ -85,26 +136,24 @@ if ( !defined($action) || ( $action =~ /^list$/i ) )
 }
 
 
-#
-#  Delete entries
-#
-if ( $action =~ /^delete$/i )
-{
+=begin doc
 
-    #
-    #  Ensure the user is root.
-    #
-    if ( $UID != 0 )
-    {
-        print "You must run this as root\n";
-        exit(1);
-    }
+Delete any mention of a sources.list entry matching the given pattern.
+
+(Where delete means "comment out".)
+
+=end doc
+
+=cut
+
+sub do_delete
+{
+    my ($pattern) = (@_);
 
     #
     #  Ensure a pattern was specified.
     #
-    my $regexp = shift;
-    if ( !$regexp )
+    if ( !$pattern )
     {
         print "You must specify a pattern to delete.\n";
         exit(1);
@@ -135,7 +184,7 @@ if ( $action =~ /^delete$/i )
             next if ( $line =~ /^[ \t\n]+$/ );
 
             # OK so a real entry needs replacing.
-            $replace = 1 if ( $line =~ /$regexp/i );
+            $replace = 1 if ( $line =~ /$pattern/i );
         }
         close($handle);
 
@@ -159,7 +208,7 @@ if ( $action =~ /^delete$/i )
             {
 
                 # replace the line - unless it is a comment.
-                if ( ( $line !~ /^#/ ) && ( $line =~ /$regexp/i ) )
+                if ( ( $line !~ /^#/ ) && ( $line =~ /$pattern/i ) )
                 {
                     $line = "# $line";
                 }
@@ -171,25 +220,14 @@ if ( $action =~ /^delete$/i )
     }
 }
 
-#
-#  Create a new entry.
-#
-if ( $action =~ /^add$/i )
+
+sub do_add
 {
+    my ($addition) = (@_);
 
     #
-    #  Ensure the user is root.
+    #  Ensure an entry was specified.
     #
-    if ( $UID != 0 )
-    {
-        print "You must run this as root\n";
-        exit(1);
-    }
-
-    #
-    #  Ensure a pattern was specified.
-    #
-    my $addition = shift;
     if ( !$addition )
     {
         print "You must specify a source to add.\n";
@@ -208,7 +246,7 @@ if ( $action =~ /^add$/i )
     #
     #  TODO: generate an unused filename beneath /etc/apt/sources.list.d/
     #
-    #  SHA1hash of the source line?
+    #  SHA1hash of the source line?  Eww.
     #
 
     #
