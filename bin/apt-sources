@@ -71,8 +71,6 @@ if ( !defined($action) || ( $action =~ /^list$/i ) )
             next unless ( length($line) > 0 );
             next if ( $line =~ /^[ \t\n]+$/ );
 
-            next if ( !length($line) );
-
             # regexp?
             if ($regexp)
             {
@@ -162,6 +160,54 @@ if ( $action =~ /^delete$/i )
         }
     }
 }
+
+#
+#  Create a new entry.
+#
+if ( $action =~ /^add$/i )
+{
+
+    #
+    #  Ensure the user is root.
+    #
+    if ( $UID != 0 )
+    {
+        print "You must run this as root\n";
+        exit(1);
+    }
+
+    #
+    #  Ensure a pattern was specified.
+    #
+    my $addition = shift;
+    if ( !$addition )
+    {
+        print "You must specify a source to add.\n";
+        exit(1);
+    }
+
+    #
+    #  Ensure the addition looks sane.
+    #
+    if ( $addition !~ /^deb(-src)?\s+/ )
+    {
+        print "This doesn't look like a sane apt line\n";
+        exit(1);
+    }
+
+    #
+    #  TODO: generate an unused filename beneath /etc/apt/sources.list.d/
+    #
+    #  SHA1hash of the source line?
+    #
+
+    #
+    #  TODO: Write the entry there.
+    #
+    print "apt-sources add not implemented\n";
+    exit(1);
+}
+
 
 
 
