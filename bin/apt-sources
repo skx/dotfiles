@@ -126,8 +126,16 @@ if ( $action =~ /^delete$/i )
           die "Failed to open file - $file - $!";
         while ( my $line = <$handle> )
         {
-            $replace = 1 if ( $line =~ /$regexp/i
-                            );
+
+            # skip comments
+            next if ( $line =~ /^#/ );
+
+            # skip empty lines.
+            next unless ( length($line) > 0 );
+            next if ( $line =~ /^[ \t\n]+$/ );
+
+            # OK so a real entry needs replacing.
+            $replace = 1 if ( $line =~ /$regexp/i );
         }
         close($handle);
 
@@ -149,7 +157,9 @@ if ( $action =~ /^delete$/i )
 
             while ( my $line = <$input> )
             {
-                if ( $line =~ /$regexp/i )
+
+                # replace the line - unless it is a comment.
+                if ( ( $line !~ /^#/ ) && ( $line =~ /$regexp/i ) )
                 {
                     $line = "# $line";
                 }
