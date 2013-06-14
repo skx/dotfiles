@@ -1,0 +1,193 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+apt-sources - A utility for working with apt-sources.
+
+=cut
+
+=head1 SYNOPSIS
+
+  apt-sources list|delete [regexp]
+
+=cut
+
+
+=head1 ABOUT
+
+This is a simple utility to list/delete entries from the Debian apt-sources.
+
+=cut
+
+=head1 LICENSE
+
+Copyright (c) 2013 by Steve Kemp.  All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
+
+
+use strict;
+use warnings;
+use English;
+use File::Copy;
+
+#
+#  Get our action
+#
+my $action = shift;
+if ( !$action )
+{
+    print <<EOF;
+Usage: apt-sources add|list|delete [args..]
+EOF
+    exit(1);
+}
+
+
+#
+# Listing is easy.
+#
+if ( !defined($action) || ( $action =~ /^list$/i ) )
+{
+    my $regexp = shift;
+
+    my @files = get_files();
+
+    # for each file.
+    foreach my $file ( sort (@files) )
+    {
+        open( my $handle, "<", $file ) or
+          die "Failed to read $file - $!";
+        while ( my $line = <$handle> )
+        {
+
+            # skip comments
+            next if ( $line =~ /^#/ );
+
+            # skip empty lines.
+            next unless ( length($line) > 0 );
+            next if ( $line =~ /^[ \t\n]+$/ );
+
+            next if ( !length($line) );
+
+            # regexp?
+            if ($regexp)
+            {
+                next unless ( $line =~ /$regexp/i );
+            }
+
+            print $line;
+        }
+        close($handle);
+    }
+    exit 0;
+}
+
+
+#
+#  Delete entries
+#
+if ( $action =~ /^delete$/i )
+{
+
+    #
+    #  Ensure the user is root.
+    #
+    if ( $UID != 0 )
+    {
+        print "You must run this as root\n";
+        exit(1);
+    }
+
+    #
+    #  Ensure a pattern was specified.
+    #
+    my $regexp = shift;
+    if ( !$regexp )
+    {
+        print "You must specify a pattern to delete.\n";
+        exit(1);
+    }
+
+    #
+    #  OK get the files.
+    #
+    my @files = get_files();
+    foreach my $file (@files)
+    {
+
+        #
+        #  See if any we should replace the file.
+        #
+        my $replace;
+
+        open( my $handle, "<", $file ) or
+          die "Failed to open file - $file - $!";
+        while ( my $line = <$handle> )
+        {
+            $replace = 1 if ( $line =~ /$regexp/i
+                            );
+        }
+        close($handle);
+
+        #
+        #  OK do the replacement.
+        #
+        if ($replace)
+        {
+
+            # 1. rename the current file to .bak
+            File::Copy::move( $file, "$file.bak" );
+
+            # 2. open and replace appropriately.
+            open( my $input, "<", "$file.bak" ) or
+              die "Failed to open file for input - $file.bak - $!";
+
+            open( my $output, ">", $file ) or
+              die "Failed to open file for output $file - $!";
+
+            while ( my $line = <$input> )
+            {
+                if ( $line =~ /$regexp/i )
+                {
+                    $line = "# $line";
+                }
+                print $output $line;
+            }
+            close($output);
+            close($input);
+        }
+    }
+}
+
+
+
+=begin doc
+
+Return an array of all sources.list files.
+
+=end doc
+
+=cut
+
+sub get_files
+{
+
+    #
+    #  The per-repo files.
+    #
+    my @files = glob("/etc/apt/sources.list.d/*.list");
+
+    #
+    # The master file.
+    #
+    if ( -e "/etc/apt/sources.lists" )
+    {
+        push( @files, "/etc/apt/sources.list" );
+    }
+
+    return (@files);
+}
