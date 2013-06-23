@@ -41,6 +41,15 @@ use strict;
 use warnings;
 use English;
 use File::Copy;
+use Getopt::Long;
+
+
+#
+#  Get any command line arguments.
+#
+my %CONFIG;
+exit if ( !GetOptions( "file=s", \$CONFIG{ 'file' } ) );
+
 
 
 #
@@ -50,8 +59,9 @@ my %dispatch = ( "list"   => { sub => \&do_list },
                  "add"    => { sub => \&do_add, root => 1 },
                  "delete" => { sub => \&do_delete, root => 1 } );
 
+
 #
-#  Get our action
+#  Get our action, if none is specified default to list.
 #
 my $action = shift || "list";
 
@@ -244,16 +254,72 @@ sub do_add
     }
 
     #
-    #  TODO: generate an unused filename beneath /etc/apt/sources.list.d/
+    #  The file the user specified.
     #
-    #  SHA1hash of the source line?  Eww.
-    #
+    my $file = $CONFIG{ 'file' };
+
+    if ( !$file )
+    {
+
+        #
+        #  Generate an filename for use beneath /etc/apt/sources.list.d/
+        #
+        #  Attempt to use the hostname.
+        #
+        if ( $addition =~ /:\/\/([^\/]+)\// )
+        {
+            my $domain = $1;
+
+            # strip any ftp/www prefix
+            $domain =~ s/^(www\.|ftp\.)//g;
+
+            $file = $domain . ".list";
+        }
+        else
+        {
+            print <<EOF;
+Could not determine filename to write the entry to.
+
+Please specify via "--file".  For example:
+
+apt-sources add "deb http://example.../ --file=foo.list"
+EOF
+            exit(1);
+        }
+    }
 
     #
-    #  TODO: Write the entry there.
+    #  Qualify the file, if not already done so.
     #
-    print "apt-sources add not implemented\n";
-    exit(1);
+    if ( $file !~ /^\// )
+    {
+        $file = "/etc/apt/sources.list.d/$file";
+    }
+
+    #
+    #  If the file exists we're over.
+    #
+    if ( -e $file )
+    {
+        print <<EOF;
+The file already exists:
+
+      $file
+
+Cowardly refusing to over-write.
+EOF
+        exit(1);
+    }
+
+    open( my $handle, ">", $file ) or
+      die "Failed to write to file $file - $!";
+
+    print $handle "\n";
+    print $handle "# Added by apt-sources on " . scalar(localtime) . "\n";
+    print $handle $addition;
+    print $handle "\n";
+    close($handle);
+    exit(0);
 }
 
 
