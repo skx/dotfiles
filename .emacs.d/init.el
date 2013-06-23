@@ -194,3 +194,8 @@ If FEATURE can't be loaded, don't execute BODY."
 ;; Keybindings
 ;;
 (require 'skx-keybindings)
+
+
+(setq c-default-style "linux"
+      c-basic-offset 4)
+(c-set-offset 'substatement-open 0)
