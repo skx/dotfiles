@@ -105,3 +105,29 @@ mysqlgrants()
   sed 's/\(GRANT .*\)/\1;/;s/^\(Grants for .*\)/## \1 ##/;/##/{x;p;x;}'
 }
 
+function shuffle
+{
+   dir="."
+
+   if [ ! -z "$1" ]; then
+      dir=$1
+   fi
+
+    lst=`find $dir -type f \( -name '*.flv' -o -name '*.mpeg' -o -name '*.mpg' -o -name '*.avi' \) -print | sort --random-sort`
+
+    if [ ! -z "$lst" ]; then
+        mplayer $lst
+    else
+        echo "No files found"
+    fi
+
+}
+
+function pwsafe
+{
+   if [ -e ~/git/passwd ]; then
+       /usr/bin/pwsafe --file=$HOME/git/passwd/pwsafe.dat $*
+   else
+       echo "GIT copy of password database not present"
+   fi
+}
