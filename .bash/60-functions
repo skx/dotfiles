@@ -125,9 +125,13 @@ function shuffle
 
 function pwsafe
 {
-   if [ -e ~/git/passwd ]; then
-       /usr/bin/pwsafe --file=$HOME/git/passwd/pwsafe.dat $*
-   else
-       echo "GIT copy of password database not present"
-   fi
+    if [ -x /usr/bin/pwsafe ]; then
+        if [ -e ~/git/passwd ]; then
+            /usr/bin/pwsafe --file=$HOME/git/passwd/pwsafe.dat $*
+        else
+            echo "GIT copy of password database not present"
+        fi
+    else
+        echo "pwsafe doesn't appear to be installed."
+    fi
 }
