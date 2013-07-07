@@ -35,10 +35,18 @@ fi
 # A simple wrapper used so that mail aliases with multiple arguments
 # are handled properly - only with the first being used.
 #
+# Use lumail if installed.  Revert back to mutt.
+#
 function domail
 {
    file=$1
-   lumail --folder "${file}"
+
+   if [ -x /usr/bin/lumail ]; then
+       lumail --folder "${file}"
+   else
+       mutt -f "${file}" -e "push b"
+   fi
+
    true
 }
 
