@@ -4,7 +4,7 @@
 #
 # Steve
 # --
-# http://dotfiles.repository.steve.org.uk/
+# http://github.com/skx/dotfiles
 #
 #
 
@@ -35,10 +35,10 @@ fi
 # A simple wrapper used so that mail aliases with multiple arguments
 # are handled properly - only with the first being used.
 #
-function domutt
+function domail
 {
    file=$1
-   mutt -f "${file}" -e "push b"
+   lumail --folder "${file}"
    true
 }
 
@@ -47,7 +47,7 @@ function domutt
 #  Setup aliases for each mail folder beneath the named prefix.
 #
 #  For example "steve.org.uk" will be defined as a command to open
-# the folder ~/Maildir/.steve.org.uk/ in mutt.
+# the folder ~/Maildir/.steve.org.uk/
 #
 function setupMailAliases
 {
@@ -81,10 +81,16 @@ function setupMailAliases
            name=${name/\//}
 
            #
+           # Strip the trailing / for the folder too, since
+           # lumail doesn't like that.
+           #
+           i=${i%/}
+
+           #
            #  If the name is non-empty create the alias.
            #
            if [ ! -z "$name" ]; then
-               alias $name="domutt $i"
+               alias $name="domail $i"
            fi
 
        fi
