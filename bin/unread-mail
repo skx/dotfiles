@@ -41,7 +41,7 @@ unread-mail - Show mailboxes which have unread mail in them.
 
 =head1 LICENSE
 
-Copyright (c) 2009 by Steve Kemp.  All rights reserved.
+Copyright (c) 2009-2013 by Steve Kemp.  All rights reserved.
 
 This module is free software;
 you can redistribute it and/or modify it under
@@ -52,6 +52,8 @@ The LICENSE file contains the full text of the license.
 
 
 use File::Basename;
+use File::Find;
+use File::Glob qw(bsd_glob);
 use Getopt::Long;
 use Pod::Usage;
 
@@ -95,43 +97,60 @@ if ( $CONFIG{ 'empty' } )
 }
 
 
+my @maildirs;
+
 #
-#  Find folders beneath the prefix.
+#  Find all valid maildirs beneath the root.
 #
-#  TODO: Handle recursion.
+File::Find::find( {
+       wanted => sub {
+           my $name = $File::Find::name;
+           push( @maildirs, $name )
+             if ( ( -d $name ) &&
+                  ( -d "$name/cur" ) &&
+                  ( -d "$name/new" ) &&
+                  ( -d "$name/tmp" ) );
+       },
+       follow   => 0,
+       no_chdir => 1
+    },
+    $CONFIG{ 'mail' } );
+
+
+
 #
-foreach my $dir ( sort glob( $CONFIG{ 'mail' } . "/.*/" ) )
+#  Now process each Maildir
+#
+foreach my $dir ( sort(@maildirs) )
 {
 
     #
     #  The name of the folder.
     #
-    my $folder = basename($dir);
-
-    #
-    #  The name of the mailbox - same as the folder name but without
-    # the leading ".".
-    #
-    my $name = $folder;
-    $name =~ s/^\.//g;
+    my $folder = $dir;
+    if ( length($folder) > length( $CONFIG{ 'mail' } ) )
+    {
+        $folder = substr( $dir, length( $CONFIG{ 'mail' } ) + 1 );
+        $folder =~ s/^\.//g;
+    }
 
     #
     #  Is there anything in new/?
     #
     #  (i.e. Does this folder have unread mail in it.)
     #
-    my @mails = glob( $dir . "/new/*" );
+    my @mails = bsd_glob( $dir . "/new/*" );
 
     if ( scalar @mails )
     {
         if ( $CONFIG{ 'count' } )
         {
-            my $out = sprintf( "[%5d] %s", scalar(@mails), $name );
+            my $out = sprintf( "[%5d] %s", scalar(@mails), $folder );
             print $out . "\n";
         }
         elsif ( $CONFIG{ 'dump' } )
         {
-            print $name . "\n";
+            print $folder . "\n";
             foreach my $file (@mails)
             {
                 printSummary($file);
@@ -139,7 +158,7 @@ foreach my $dir ( sort glob( $CONFIG{ 'mail' } . "/.*/" ) )
         }
         else
         {
-            print $name. "\n";
+            print $folder. "\n";
         }
     }
 }
@@ -204,7 +223,7 @@ sub printSummary
 {
     my ($file) = (@_);
 
-    open( FILE, "<", $file ) or
+    open( FILE, "<", "$file" ) or
       die "failed to open: $file $!";
 
     my $header = 1;
