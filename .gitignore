@@ -37,3 +37,6 @@
 
 # ./bin/worklog config file
 !.worklog.conf
+
+# Don't ignore signatures.
+!.sigs/
