@@ -57,6 +57,9 @@ function daily()
                         "lfd on swd02.spotlightwebsites.com" )
 
    mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
+                        "SSH login alert for" )
+
+   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
                         "/usr/sbin/csf" )
 
     mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
