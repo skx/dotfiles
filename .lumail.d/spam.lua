@@ -18,8 +18,11 @@ function spam()
    end
 
    if ( val == "" ) then
-      msg( "IP address not found in message." );
-   else
+      msg( "IP address not found in message." )
+      return
+   end
+
+   if ( val:match( "^(%d+.%d+.%d+.%d+)$" ) ) then
       file = "/etc/blacklist.d/" .. val
 
       if ( file_exists( file ) ) then
@@ -30,5 +33,7 @@ function spam()
          ff:close();
          msg( "blacklisted IP: " .. val );
       end
+   else
+      msg( "Not an IPv4 address " .. val );
    end
 end
