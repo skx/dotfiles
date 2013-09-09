@@ -34,7 +34,7 @@ function mark_read_in_folder( path, pattern )
          mark_read()
          handled = handled + 1
       else
-         msg( "Ignoring match " .. subject )
+         msg( "Ignoring message " .. subject )
       end
       cur = cur + 1
    end
