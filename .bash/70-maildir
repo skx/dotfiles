@@ -40,10 +40,12 @@ fi
 function domail
 {
    file=$1
+   client=$2
 
-   if [ -x /usr/bin/lumail ]; then
+   if [ "$client" = "lumail" ] ;then
        lumail --folder "${file}"
-   else
+   fi
+   if [ "$client" = "mutt" ]; then
        mutt -f "${file}" -e "push b"
    fi
 
@@ -98,7 +100,8 @@ function setupMailAliases
            #  If the name is non-empty create the alias.
            #
            if [ ! -z "$name" ]; then
-               alias $name="domail $i"
+               alias $name="domail $i lumail"
+               alias ${name}.m="domail $i mutt"
            fi
 
        fi
