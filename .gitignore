@@ -9,6 +9,7 @@
 
 # Don't ignore emacs configuration
 !.emacs.d/
+.emacs.d/auto-save-list/
 
 # Don't ignore the MySQL config file
 !.my.cnf
