@@ -13,7 +13,7 @@ function on_folder_selection( folder )
    if ( string.find( folder, "debian-administration", 1, true )  ) then
       from ("Steve <steve@debian-administration.org>");
    elseif ( string.find( folder, "debian" , 1, true )  ) then
-      from("Steve <skx@debian.org>");
+      from("Steve <steve@steve.org.uk>");
    elseif ( string.find( folder, "edinburgh-portraits.com" , 1, true )  ) then
       from("Steve <steve@edinburgh-portraits.com>");
    else
