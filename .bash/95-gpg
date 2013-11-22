@@ -1,0 +1,17 @@
+#
+# If we don't have a pinentry program then we'll abort
+#
+
+
+if [ -x  /usr/bin/pinentry-curses ]; then
+    # ensure we have a directory
+    test -d ~/.gnupg || mkdir ~/.gnupg
+
+    envfile=~/.gnupg/gpg-agent.env
+    if [[ -e "$envfile" ]] && kill -0 $(grep GPG_AGENT_INFO "$envfile" | cut -d: -f 2) 2>/dev/null; then
+        eval "$(cat "$envfile")"
+    else
+        eval "$(gpg-agent --daemon --pinentry-program /usr/bin/pinentry-curses --write-env-file "$envfile")"
+    fi
+    export GPG_AGENT_INFO
+fi
