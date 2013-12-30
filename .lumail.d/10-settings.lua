@@ -100,7 +100,7 @@ index_format( "[$FLAGS] $DAY/$MONTH/$YEAR $FROM - $SUBJECT" )
 --
 -- (The headers listed are shown in the order they are specified here.)
 --
-headers = { "$TO", "$FROM", "$DATE", "$SUBJECT", "$X-Remote-Host", "$X-Remote-IP" }
+headers = { "$TO", "$CC", "$FROM", "$DATE", "$SUBJECT", "$X-Remote-Host", "$X-Remote-IP" }
 
 --
 -- The maildir format controls how maildirs are displayed in maildir-mode.
