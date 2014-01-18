@@ -47,7 +47,7 @@ function mark_read_in_folder( path, pattern )
 end
 
 function daily()
-   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.Automated.backups",
+   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.Automated.backups-ok",
                         "backup2l: success" );
 
    mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
