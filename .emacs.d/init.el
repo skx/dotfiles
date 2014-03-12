@@ -105,6 +105,10 @@ If FEATURE can't be loaded, don't execute BODY."
 
 
 
+(with-feature (markdown-mode)
+              (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+              (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
+
 ;;
 ;; User-interface tweaks
 ;;
@@ -199,3 +203,4 @@ If FEATURE can't be loaded, don't execute BODY."
 (setq c-default-style "linux"
       c-basic-offset 4)
 (c-set-offset 'substatement-open 0)
+(put 'scroll-left 'disabled nil)
