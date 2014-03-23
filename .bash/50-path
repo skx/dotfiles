@@ -20,6 +20,13 @@ add_to_path /usr/games
 add_to_path /var/lib/gems/1.8/bin
 add_to_path /var/lib/gems/1.9/bin
 
+#
+# Go
+#
+if [ -d /opt/go ]; then
+   add_to_path /opt/go/bin
+   export GOROOT=/opt/go
+fi
 
 #
 #  Set the PATH to include ~/bin and ~/bin-$hostname if they exist.
