@@ -1,6 +1,7 @@
 [user]
     name = Steve Kemp
     email = steve@steve.org.uk
+	signingkey = 0C626242
 
 [color]
     diff  = auto
