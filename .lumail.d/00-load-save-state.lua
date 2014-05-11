@@ -42,6 +42,6 @@ function load_state( table )
    maildir_limit( table['ml'] );
    jump_maildir_to( table['mo'] );
 
-   scroll_message_to(table['mmo' ])
+   jump_message_to(table['mmo' ])
 
 end
