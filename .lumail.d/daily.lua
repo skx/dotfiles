@@ -62,7 +62,7 @@ function daily()
    mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
                         "/usr/sbin/csf" )
 
-    mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
+   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
                         "swd02.spotlightwebsites.com: blocked" )
 
 
