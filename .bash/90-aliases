@@ -52,3 +52,9 @@ if [ -x /usr/bin/when ]; then
 fi
 
 
+#
+# Prefer our emacs-wrapper to native emacs
+#
+if [ -x ~/bin/e ] ;then
+    alias emacs=e
+fi
