@@ -26,6 +26,9 @@ add_to_path /var/lib/gems/1.9/bin
 if [ -d /opt/go ]; then
    add_to_path /opt/go/bin
    export GOROOT=/opt/go
+
+    export      GOPATH=$HOME/go
+    add_to_path $HOME/go/bin
 fi
 
 #
