@@ -43,7 +43,7 @@ fi
 #
 #  Shuffling media.
 #
-alias xine-shuffle='play xine -g --no-logo --no-splay --loop=shuffle+'
+alias xine-shuffle='play "xine -g --no-logo --no-splash --loop=shuffle+"'
 alias totem-shuffle='play totem'
 
 #
