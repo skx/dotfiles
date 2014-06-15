@@ -105,21 +105,17 @@ mysqlgrants()
   sed 's/\(GRANT .*\)/\1;/;s/^\(Grants for .*\)/## \1 ##/;/##/{x;p;x;}'
 }
 
-function shuffle
+#
+# Play media found dynamically.  Correctly copes with spaces in files.
+#
+function play
 {
-   dir="."
-
-   if [ ! -z "$1" ]; then
-      dir=$1
+   player=$*
+   if [  -z "$player" ]; then
+      player="xine --loop=shuffle+"
    fi
 
-    lst=`find $dir -type f \( -name '*.flv' -o -name '*.mpeg' -o -name '*.mpg' -o -name '*.avi' \) -print | sort --random-sort`
-
-    if [ ! -z "$lst" ]; then
-        mplayer $lst
-    else
-        echo "No files found"
-    fi
+   find . -type f \( -iname '*.avi' -o -iname '*.m4v' -o -iname '*.wmv' -o -iname '*.flv' -o -iname '*.mp4' -o -iname '*.mov' -o -iname '*.mpg' \) -exec $player "{}" +
 
 }
 

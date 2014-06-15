@@ -38,10 +38,13 @@ alias free='free -m'
 #
 if [ -x /usr/bin/xine ]; then
     alias xine='xine -g --no-logo --no-splash -V=40'
-    alias xine-fullscreen='xine --fullscreen'
-    alias xine-silent='xine -A none'
-    alias xine-shuffle='xine --loop=shuffle+ *'
 fi
+
+#
+#  Shuffling media.
+#
+alias xine-shuffle='play xine -g --no-logo --no-splay --loop=shuffle+'
+alias totem-shuffle='play totem'
 
 #
 #  Calendar
