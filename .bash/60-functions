@@ -115,7 +115,7 @@ function play
       player="xine --loop=shuffle+"
    fi
 
-   find . -type f \( -iname '*.avi' -o -iname '*.m4v' -o -iname '*.wmv' -o -iname '*.flv' -o -iname '*.mp4' -o -iname '*.mov' -o -iname '*.mpg' \) -exec $player "{}" +
+   find . -type f \( -iname '*.avi' -o -iname '*.mkv' -o -iname '*.m4v' -o -iname '*.wmv' -o -iname '*.flv' -o -iname '*.mp4' -o -iname '*.mov' -o -iname '*.mpg' \) -exec $player "{}" +
 
 }
 
