@@ -204,3 +204,28 @@ If FEATURE can't be loaded, don't execute BODY."
       c-basic-offset 4)
 (c-set-offset 'substatement-open 0)
 (put 'scroll-left 'disabled nil)
+
+
+
+(defun my-coding-hook ()
+  (make-local-variable 'column-number-mode)
+  (column-number-mode t)
+  (idle-highlight-mode t))
+
+(with-feature (idle-highlight-mode)
+              (add-hook 'cperl-mode-hook 'my-coding-hook)
+              (add-hook 'ruby-mode-hook 'my-coding-hook)
+              (add-hook 'lua-mode-hook 'my-coding-hook)
+              (add-hook 'emacs-lisp-mode-hook 'my-coding-hook)
+              (add-hook 'lisp-mode-hook 'my-coding-hook)
+              (add-hook 'c++-mode-hook 'my-coding-hook))
+
+
+(defun px-raise-frame-and-give-focus ()
+  (when window-system
+    (raise-frame)
+    (x-focus-frame (selected-frame))
+    (set-mouse-pixel-position (selected-frame) 40 40)
+    (message "raised-window")
+    ))
+(add-hook 'server-switch-hook 'px-raise-frame-and-give-focus)
