@@ -61,3 +61,6 @@ fi
 if [ -x ~/bin/e ] ;then
     alias emacs=e
 fi
+
+
+alias git-source='git config --get remote.origin.url'
