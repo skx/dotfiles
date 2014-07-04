@@ -1,7 +1,8 @@
 
 export HISTFILESIZE=99999999
 export HISTSIZE=99999999
-export HISTCONTROL="ignoreboth"
+export HISTCONTROL=ignoredups:erasedups
+export PROMPT_COMMAND="history -a;history -c;history -r;$PROMPT_COMMAND"
 
 
 # don't put duplicate lines in the history. See bash(1) for more options
