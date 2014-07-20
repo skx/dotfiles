@@ -1,0 +1,10 @@
+
+(if
+    (or
+     (is (window_class) "xine")
+     (is (window_class) "MPlayer")
+     (is (window_class) "Totem")
+     )
+     (above)
+     )
+
