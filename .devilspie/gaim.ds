@@ -1,6 +1,0 @@
-(if (matches (application_name) "Pidgin")
-  (if (matches (window_name) "Buddy List" )
-       (begin
-       (minimize))
-   (set_workspace 2)))
-

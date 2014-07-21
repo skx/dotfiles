@@ -1,1 +1,0 @@
-(if (matches (window_name) "Opera$") (begin maximize (set_workspace 5)))
