@@ -8,6 +8,7 @@ if ( DEBUG ) then
    print( "\tClass " .. window_class() )
 end
 
+
 --
 -- The music-player should be on all windows
 --
@@ -15,6 +16,7 @@ if ( window_class() == "sonata" ) then
    pin()
    minimize()
 end
+
 
 --
 -- Media players deserve to be always-on-top
@@ -62,6 +64,7 @@ if ( ( window_application() == "Web" )  and
    if ( not is_maximized() ) then maximize() end
 end
 
+
 --
 --  Iceweasel
 --
@@ -73,7 +76,7 @@ end
 
 
 --
--- This is my personal configuration for Pidgin.
+-- This is configuration for Pidgin.
 --
 -- The rough layout is a pair of windows looking like this, on workspace 2:
 --
@@ -86,12 +89,6 @@ end
 -- buddy-list occupying 1/5th of the screen estate.
 --
 --
---
--- Usage:
---
---    kpie [--single] ./samples/pidgin.lua
---
-
 
 if ( window_class() == "Pidgin" ) then
 
@@ -101,7 +98,6 @@ if ( window_class() == "Pidgin" ) then
 
    -- The buddy window will be 1/5 of the screen width.
    buddy = width / 5;
-
 
    --
    -- Move the buddy-window to the correct location
@@ -127,7 +123,6 @@ if ( window_class() == "Pidgin" ) then
       -- width,height
       size(width-buddy,height )
    end
-
 
    -- Both windows on workspace two.
    workspace(2)
