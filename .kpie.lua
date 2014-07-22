@@ -105,6 +105,7 @@ if ( window_class() == "Pidgin" ) then
    if ( window_title() == "Buddy List" ) then
 
       if ( is_maximized() ) then unmaximize() end
+      if ( is_minimized() ) then unminimize() end
       if ( is_fullscreen() ) then unfullscreen() end
 
       -- x,y
@@ -115,6 +116,7 @@ if ( window_class() == "Pidgin" ) then
    else
 
       if ( is_maximized() ) then unmaximize() end
+      if ( is_minimized() ) then unminimize() end
       if ( is_fullscreen() ) then unfullscreen() end
 
       -- x,y
