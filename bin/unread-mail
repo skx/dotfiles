@@ -156,6 +156,14 @@ foreach my $dir ( sort(@maildirs) )
                 printSummary($file);
             }
         }
+        elsif ( $CONFIG{ 'json' } )
+        {
+            print $folder . " " ;
+            foreach my $file (@mails)
+            {
+                printSummaryBrief($file);
+            }
+        }
         else
         {
             print $folder. "\n";
@@ -194,6 +202,7 @@ sub parseCommandLine
                       "empty",  \$config{ 'empty' },
                       "count",  \$config{ 'count' },
                       "dump",   \$config{ 'dump' },
+                      "json",   \$config{ 'json' },
                     ) )
     {
         exit;
@@ -239,6 +248,33 @@ sub printSummary
         print "\tTo: $1\n"      if ( $line =~ /^To: (.*)/ );
         print "\tFrom: $1\n"    if ( $line =~ /^From: (.*)/ );
         print "\tSubject: $1\n" if ( $line =~ /^Subject: (.*)/ );
+    }
+    close(FILE);
+    print "\n";
+}
+
+
+
+
+
+sub printSummaryBrief
+{
+    my ($file) = (@_);
+
+    open( FILE, "<", "$file" ) or
+      die "failed to open: $file $!";
+
+    my $header = 1;
+    while ( my $line = <FILE> )
+    {
+        next if ( ( !$header ) || ( !defined($line) ) );
+        chomp($line);
+        $header = 0 if ( $line =~ /^$/ );
+
+        #
+        #  Fields we care about
+        #
+        print "$1" if ( $line =~ /^Subject: (.*)/ );
     }
     close(FILE);
     print "\n";

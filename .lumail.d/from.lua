@@ -24,6 +24,8 @@ function on_folder_selection( folder )
       from("Steve Kemp <steve@dns-api.com>");
    elseif ( string.find( folder, "spare.io" , 1, true )  ) then
       from("Steve <steve@spare.io>");
+   elseif ( string.find( folder, "dhcp.io" , 1, true )  ) then
+      from("Steve <steve@dhcp.io>");
    else
       from( default_email );
    end
