@@ -1,15 +1,31 @@
 #!/bin/sh
 #
-# Push to either git or hg as appropriate
+#  Push to all origins.
 #
 
+
+#
+#  Mercurial
+#
 if [ -d .hg ]; then
    exec hg push
 fi
-if [ -d .git ] ;then
-   exec git push
+
+#
+#  Git
+#
+if [ -d .git ] ; then
+    for i in $(git remote) ; do
+        echo "Pushing to $i"
+        git remote show $i  2>/dev/null| grep URL
+        git push --quiet -u $i master --tags
+    done
+    exit 0;
 fi
 
-echo "Neither .git/.hg were found.  Aborting"
-exit 1
 
+#
+#  Abort
+#
+echo "Neither .git nor .hg found"
+exit 1
