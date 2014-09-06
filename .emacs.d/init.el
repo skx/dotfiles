@@ -199,6 +199,11 @@ If FEATURE can't be loaded, don't execute BODY."
 ;;
 (require 'skx-keybindings)
 
+;;
+;; History persistance
+;;
+(require 'save-history)
+
 
 (setq c-default-style "linux"
       c-basic-offset 4)
