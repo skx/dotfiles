@@ -1,15 +1,31 @@
 #!/bin/sh
 #
-# Pull from either git or hg as appropriate
+#  Pull from all origins.
 #
 
+
+#
+#  Mercurial
+#
 if [ -d .hg ]; then
-   exec hg pull --update
-fi
-if [ -d .git ] ;then
-   exec git pull
+   exec hg pull
 fi
 
-echo "Neither .git/.hg were found.  Aborting"
+#
+#  Git
+#
+if [ -d .git ] ; then
+    for i in $(git remote) ; do
+        echo "Pulling from $i"
+        git remote show $i  2>/dev/null| grep URL
+        git pull --quiet $i 
+    done
+    exit 0;
+fi
+
+
+#
+#  Abort
+#
+echo "Neither .git nor .hg found"
 exit 1
-
