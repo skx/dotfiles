@@ -18,7 +18,7 @@ if [ -d .git ] ; then
     for i in $(git remote) ; do
         echo "Pushing to $i"
         git remote show $i  2>/dev/null| grep URL
-        git push --quiet -u $i master --tags
+        git push --quiet $i master --tags
     done
     exit 0;
 fi
