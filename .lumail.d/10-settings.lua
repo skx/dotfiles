@@ -124,3 +124,7 @@ maildir_format( "$CHECK - $UNREAD/$TOTAL - $PATH" );
 if ( is_maildir( maildir_prefix() .. "/sent-mail" ) ) then
    sent_mail( maildir_prefix() .. "/sent-mail" )
 end
+
+
+
+view_inline_attachments = false
