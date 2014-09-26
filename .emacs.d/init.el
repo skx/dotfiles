@@ -215,6 +215,20 @@ If FEATURE can't be loaded, don't execute BODY."
 (put 'scroll-left 'disabled nil)
 
 
+(with-feature (bm)
+              (add-hook 'after-init-hook 'bm-repository-load)
+              (add-hook 'find-file-hooks 'bm-buffer-restore)
+              (add-hook 'kill-buffer-hook 'bm-buffer-save)
+              (add-hook 'kill-emacs-hook '(lambda nil
+                                            (bm-buffer-save-all)
+                                            (bm-repository-save)))
+              (add-hook 'after-save-hook 'bm-buffer-save)
+              (add-hook 'after-revert-hook 'bm-buffer-restore)
+              (setq bm-restore-repository-on-load t)
+              (setq-default bm-buffer-persistence t)
+              (setq bm-marker 'bm-marker-right)
+              )
+
 
 (defun my-coding-hook ()
   (make-local-variable 'column-number-mode)
