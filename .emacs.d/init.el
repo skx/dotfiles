@@ -204,6 +204,10 @@ If FEATURE can't be loaded, don't execute BODY."
 ;;
 (require 'save-history)
 
+;;
+;; Make modes obvious via cursor-colours
+;;
+(require 'cursor-colours)
 
 (setq c-default-style "linux"
       c-basic-offset 4)
