@@ -252,3 +252,9 @@ If FEATURE can't be loaded, don't execute BODY."
     (message "raised-window")
     ))
 (add-hook 'server-switch-hook 'px-raise-frame-and-give-focus)
+
+
+;;
+;; Copying in emacs should allow pasting into gnome-terminal, etc.
+;;
+(setq x-select-enable-clipboard t)
