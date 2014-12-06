@@ -129,3 +129,9 @@ if ( window_class() == "Pidgin" ) then
    -- Both windows on workspace two.
    workspace(2)
 end
+
+
+
+if ( window_application() == "Terminal" ) then
+   maximize_vertically()
+end
