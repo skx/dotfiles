@@ -7,12 +7,11 @@
 #     git hub skx/e-comments
 #     git hub foo
 #
-# Extra options go on the end:
+# In the latter case "$USER" is used to complete the name.
+#
+# Any extra options for the git clone go on the end:
 #
 #     git hub skx/e-comments /tmp/blah --quiet
-#
-#
-# In the latter case "$USER" is used to complete the name.
 #
 # By default checkouts happen via HTTPS.  If you prefer to use SSH then you'll
 # need to add the "-s" flag.
