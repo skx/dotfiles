@@ -1,24 +1,39 @@
 # Only run if this is not an SSH session (SSH_CONNECTION is not set)
 if [ -z "$SSH_CONNECTION" ]; then
 
-  SSH_ENV="$HOME/.ssh/environment"
+    SSH_ENV="$HOME/.ssh/environment"
 
-  function start_agent {
-    echo "Initialising new SSH agent..."
-    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    echo succeeded
-    chmod 600 "${SSH_ENV}"
-    . "${SSH_ENV}" > /dev/null
-    /usr/bin/ssh-add;
-  }
+    function start_agent {
+        echo "Initialising new SSH agent..."
+        /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+        echo succeeded
+        chmod 600 "${SSH_ENV}"
+        . "${SSH_ENV}" > /dev/null
 
-  # Source SSH settings, if applicable
-  if [ -f "${SSH_ENV}" ]; then
-    . "${SSH_ENV}" > /dev/null
-    ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-      start_agent;
+        # Load the default
+        /usr/bin/ssh-add;
+
+        # Load any other keys from ~/.ssh/keys
+        for i in ~/.ssh/keys/* ; do
+            if [ -e $i ]; then
+                case "$i" in
+                    *.pub)
+                    ;;
+                    *)
+                        echo "OK: $i"
+                        ;;
+                esac
+            fi
+        done
     }
-  else
-    start_agent;
-  fi
+
+    # Source SSH settings, if applicable
+    if [ -f "${SSH_ENV}" ]; then
+        . "${SSH_ENV}" > /dev/null
+        ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+            start_agent;
+        }
+    else
+        start_agent;
+    fi
 fi
