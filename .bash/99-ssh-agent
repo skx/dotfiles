@@ -18,9 +18,9 @@ if [ -z "$SSH_CONNECTION" ]; then
             if [ -e $i ]; then
                 case "$i" in
                     *.pub)
-                    ;;
+                        ;;
                     *)
-                        echo "OK: $i"
+                        ssh-add "$i"
                         ;;
                 esac
             fi
