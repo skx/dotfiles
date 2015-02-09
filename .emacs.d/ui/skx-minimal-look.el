@@ -29,8 +29,8 @@
 ;;
 ;; Configure a timer to call the previous function.
 ;;
-(defun menu-bar-show-hide ()
-  (run-with-idle-timer 0.1 t 'menu-bar-show-hide-helper))
+;;(defun menu-bar-show-hide ()
+;;  (run-with-idle-timer 0.1 t 'menu-bar-show-hide-helper))
 
 ;;
 ;; Call once to set the initial state.

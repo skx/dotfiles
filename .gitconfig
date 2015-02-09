@@ -16,3 +16,5 @@
 
 [core]
 	editor = vim
+[push]
+	default = matching
