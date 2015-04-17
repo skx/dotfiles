@@ -1,0 +1,10 @@
+#
+#  If we have a virtual env (python-magic) beneath ~/ansible/
+# then this will load it.
+#
+if [ -e  ~/ansible/.env/bin/activate ] ; then
+    __vte_prompt_command() { true; }
+    VIRTUAL_ENV_DISABLE_PROMPT=1
+    source ~/ansible/.env/bin/activate >/dev/null 2>/dev/null
+fi
+
