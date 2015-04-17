@@ -99,6 +99,7 @@ If FEATURE can't be loaded, don't execute BODY."
 ;;  2. Pressing ret/enter will copy the username + password.
 ;;
 (with-feature (pwsafe)
+              (setq pwsafe-primary-database "~/git/passwd/pwsafe.dat" )
               (setq pwsafe-keep-passwd t)
               (define-key pwsafe-list-mode-map [(return)] 'pwsafe-copy-user-name-and-password)
               (define-key pwsafe-list-mode-map [(right)] 'pwsafe-info-current-item))

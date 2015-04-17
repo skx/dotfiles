@@ -58,8 +58,7 @@ end
 --
 -- Epiphany
 --
-if ( ( window_application() == "Web" )  and
-     ( window_class() == "Web" ) ) then
+if ( window_class() == "Epiphany-browser" ) then
    workspace(3)
    if ( not is_maximized() ) then maximize() end
 end
