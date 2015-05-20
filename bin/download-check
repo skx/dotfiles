@@ -135,6 +135,10 @@ foreach my $line (<$file>)
         #  Fetch the URL
         #
         my $content = get($url);
+        if ( ! defined( $content ) || ! length($content ) )
+        {
+            print "Failed to load $url\n";
+        }
         if ( $content !~ /$pattern/ )
         {
             print "URL $url - no longer matches $pattern\n";
