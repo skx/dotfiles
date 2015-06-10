@@ -51,6 +51,12 @@ If FEATURE can't be loaded, don't execute BODY."
               (setq auto-mode-alist
                     (append '(("cfagent\\.conf" . cfengine2-mode)) auto-mode-alist)))
 
+
+(with-feature (puppet-mode)
+              (setq auto-mode-alist
+                    (append '(("\\.pp$" . puppet-mode)) auto-mode-alist)))
+
+
 ;;
 ;; Lua-mode
 ;;
