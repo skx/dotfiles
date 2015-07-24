@@ -24,8 +24,6 @@ function on_folder_selection( folder )
       from("Steve <steve@edinburgh-portraits.com>");
    elseif ( string.find( folder, "dns-api.com" , 1, true )  ) then
       from("Steve Kemp <steve@dns-api.com>");
-   elseif ( string.find( folder, "spare.io" , 1, true )  ) then
-      from("Steve <steve@spare.io>");
    elseif ( string.find( folder, "dhcp.io" , 1, true )  ) then
       from("Steve Kemp <steve@dhcp.io>");
    elseif ( string.find( folder, "leith-flat.com" , 1, true )  ) then
