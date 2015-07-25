@@ -40,6 +40,12 @@ fi
 #
 x ()
 {
+    # If we have atool installed then use it.
+    if ( which atool 2>/dev/null >/dev/null ) ; then
+        atool --extract "$@"
+        return
+    fi
+
     for archive in "$@"; do
         case "$archive" in
             *.tar* | *.t?z)
