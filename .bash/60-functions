@@ -137,3 +137,21 @@ function pwsafe
         echo "pwsafe doesn't appear to be installed."
     fi
 }
+
+
+# cd back up to the top-level git/hg repo dir
+# thanks Dan!
+function cds () {
+    ORIGINAL_PWD=`pwd`
+    while [ ! -d ".git" -a ! -d ".hg" -a `pwd` != "/" ]
+    do
+        cd ..
+    done
+    if [  -d ".git" ] ; then
+        :
+    elif [ -d ".hg" ] ; then
+        :
+    else
+        cd $ORIGINAL_PWD
+    fi
+}
