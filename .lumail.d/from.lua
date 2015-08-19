@@ -7,6 +7,10 @@
 --
 function on_folder_selection( folder )
 
+   if ( ( folder == nil ) or ( folder == "" ) ) then
+      return
+   end
+
    --
    -- Change the email address we use depending on our folder.
    --
@@ -21,9 +25,12 @@ function on_folder_selection( folder )
    elseif ( string.find( folder, "dns-api.com" , 1, true )  ) then
       from("Steve Kemp <steve@dns-api.com>");
    elseif ( string.find( folder, "dhcp.io" , 1, true )  ) then
-      from("Steve <steve@dhcp.io>");
+      from("Steve Kemp <steve@dhcp.io>");
+   elseif ( string.find( folder, "leith-flat.com" , 1, true )  ) then
+      from("Steve Kemp <steve@leith-flat.com>");
+   elseif ( string.find( folder, "interesting.photography" , 1, true )  ) then
+      from("Steve Kemp <steve@interesting.photography");
    else
       from( default_email );
    end
 end
-

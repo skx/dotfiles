@@ -40,6 +40,12 @@ fi
 #
 x ()
 {
+    # If we have atool installed then use it.
+    if ( which atool 2>/dev/null >/dev/null ) ; then
+        atool --extract "$@"
+        return
+    fi
+
     for archive in "$@"; do
         case "$archive" in
             *.tar* | *.t?z)
@@ -129,5 +135,23 @@ function pwsafe
         fi
     else
         echo "pwsafe doesn't appear to be installed."
+    fi
+}
+
+
+# cd back up to the top-level git/hg repo dir
+# thanks Dan!
+function cds () {
+    ORIGINAL_PWD=`pwd`
+    while [ ! -d ".git" -a ! -d ".hg" -a `pwd` != "/" ]
+    do
+        cd ..
+    done
+    if [  -d ".git" ] ; then
+        :
+    elif [ -d ".hg" ] ; then
+        :
+    else
+        cd $ORIGINAL_PWD
     fi
 }
