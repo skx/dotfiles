@@ -130,9 +130,9 @@ function pwsafe
     if [ -x /usr/bin/pwsafe ]; then
         found=0
 
-        for i in ~/git/passwd ~/Repos/personal/passwd ; do
-            if [ -d $i ]; then
-                /usr/bin/pwsafe --file=$HOME/git/passwd/pwsafe.dat $*
+        for i in git/passwd Repos/personal/passwd ; do
+            if [ -e ~/${i}/pwsafe.dat ]; then
+                /usr/bin/pwsafe --file=$HOME/${i}/pwsafe.dat $*
                 found=1
             fi
         done
