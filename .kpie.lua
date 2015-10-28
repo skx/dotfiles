@@ -75,6 +75,15 @@ end
 
 
 --
+-- HipChat goes to workspace 2.
+--
+if ( window_class() == "HipChat" ) then
+    workspace(2)
+    if ( not is_maximized() ) then maximize() end
+end
+
+
+--
 -- This is configuration for Pidgin.
 --
 -- The rough layout is a pair of windows looking like this, on workspace 2:
