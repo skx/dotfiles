@@ -180,6 +180,8 @@ If FEATURE can't be loaded, don't execute BODY."
 ;; TAB characters are evil
 (setq-default indent-tabs-mode nil)
 
+;; We want to see trailing whitespace
+(setq-default show-trailing-whitespace t)
 
 ;;  Show the file we've got loaded in the frame title.
 (setq frame-title-format  (concat invocation-name "@" system-name ": %b %+%+ %f"))
