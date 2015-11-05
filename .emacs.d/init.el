@@ -209,6 +209,11 @@ If FEATURE can't be loaded, don't execute BODY."
 (require 'skx-keybindings)
 
 ;;
+;; Align things by "=" neatly
+;;
+(require 'align-equals)
+
+;;
 ;; History persistance
 ;;
 (require 'save-history)
