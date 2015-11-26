@@ -197,9 +197,12 @@ If FEATURE can't be loaded, don't execute BODY."
 (custom-set-variables
   '(auto-save-file-name-transforms '((".*" "~/.trash.d/emacs.autosaves/\\1" t))))
 
-;; create the autosave dir if necessary, since emacs won't.
-(if (file-exists-p (expand-file-name "~/.trash.d/emacs.autosaves/"))
-    ()
+;;
+;; create the autosave directory if it doesn't already exist.
+;;
+(if (not (file-exists-p (expand-file-name "~/.trash.d/")))
+  (make-directory (expand-file-name "~/.trash.d/" t)))
+(if (not (file-exists-p (expand-file-name "~/.trash.d/emacs.autosaves/")))
   (make-directory (expand-file-name "~/.trash.d/emacs.autosaves/" t)))
 
 
