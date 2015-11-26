@@ -1,7 +1,8 @@
 [Desktop Entry]
+X-GNOME-Autostart-enabled=true
 Name=xbindkeys
 Comment=Keyboard Utility
-TryExec=/usr/bin/xbindkeys
+Exec=/usr/bin/xbindkeys
 StartupNotify=false
 Terminal=false
 Type=Application
