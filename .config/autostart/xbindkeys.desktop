@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=xbindkeys
+Comment=Keyboard Utility
+TryExec=/usr/bin/xbindkeys
+StartupNotify=false
+Terminal=false
+Type=Application

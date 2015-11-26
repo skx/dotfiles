@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=KPie
+Comment=Window Utility
+TryExec=/usr/bin/kpie
+StartupNotify=false
+Terminal=false
+Type=Application
