@@ -13,8 +13,9 @@ if [ -z "$SSH_CONNECTION" ]; then
         # Load the default
         /usr/bin/ssh-add;
 
-        # Load any other keys from ~/.ssh/keys
-        for i in ~/.ssh/keys/* ; do
+        # Load any any other keys.
+        #
+        for i in ~/.secure/ssh.d/keys/* ~/.secure/ssh.d/$(hostname --fqdn)/id; do
             if [ -e $i ]; then
                 case "$i" in
                     *.pub)
