@@ -1,7 +1,8 @@
 [Desktop Entry]
 Name=KPie
+X-GNOME-Autostart-enabled=true
 Comment=Window Utility
-TryExec=/usr/bin/kpie
+Exec=/usr/bin/kpie
 StartupNotify=false
 Terminal=false
 Type=Application
