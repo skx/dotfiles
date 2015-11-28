@@ -12,7 +12,7 @@
 
 (require 'cl)
 
-(defun noerr-require (feature)
+ (defun noerr-require (feature)
   "`require' FEATURE, but don't invoke any Lisp errors.
 If FEATURE cannot be loaded, this function will print an error
 message through `message' and return nil. It otherwise behaves
@@ -187,53 +187,43 @@ If FEATURE can't be loaded, don't execute BODY."
 (setq frame-title-format  (concat invocation-name "@" system-name ": %b %+%+ %f"))
 
 
-;;
-;; Auto-save
-;;
-;; Don't make backup files.
-(setq make-backup-files nil)
-(setq delete-auto-save-files t)
-
-(custom-set-variables
-  '(auto-save-file-name-transforms '((".*" "~/.trash.d/emacs.autosaves/\\1" t))))
 
 ;;
 ;; create the autosave directory if it doesn't already exist.
 ;;
 (if (not (file-exists-p (expand-file-name "~/.trash.d/")))
   (make-directory (expand-file-name "~/.trash.d/" t)))
-(if (not (file-exists-p (expand-file-name "~/.trash.d/emacs.autosaves/")))
-  (make-directory (expand-file-name "~/.trash.d/emacs.autosaves/" t)))
+
+(if (not (file-exists-p (expand-file-name "~/.trash.d/emacs.backups/")))
+  (make-directory (expand-file-name "~/.trash.d/emacs.backups/" t)))
+
 (if (not (file-exists-p (expand-file-name "~/.trash.d/emacs.history/")))
   (make-directory (expand-file-name "~/.trash.d/emacs.history/" t)))
+
+
+(require 'backup-dir)
+(make-variable-buffer-local 'backup-inhibited)
+
+(setq bkup-backup-directory-info
+      '((t "~/.trash.d/emacs.backups/" ok-create full-path prepend-name)))
+(setq delete-old-versions t
+      kept-old-versions 1
+      kept-new-versions 3
+      version-control t)
+
+
 
 ;;
 ;; Save our history
 ;;
 (setq savehist-file (concat (expand-file-name "~/.trash.d/emacs.history/") "emacs." (getenv "USER")))
-(savehist-mode 1)))
+(savehist-mode 1)
 
-(require 'recentf)
-(recentf-mode 1)
-(setq recentf-max-menu-items 25)
-(global-set-key "\C-x\ \C-r" 'recentf-open-files)
-
-
-
-;;
-;; Keybindings
-;;
-(require 'skx-keybindings)
 
 ;;
 ;; Align things by "=" neatly
 ;;
 (require 'align-equals)
-
-;;
-;; History persistance
-;;
-(require 'save-history)
 
 ;;
 ;; Make modes obvious via cursor-colours
@@ -327,9 +317,3 @@ If FEATURE can't be loaded, don't execute BODY."
                                (sleep-for 1)))
                          (save-buffers-kill-emacs)))
                      (message "emacs quit aborted")))
-
-
-
-
-
-(provide 'skx-keybindings)
