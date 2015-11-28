@@ -204,6 +204,20 @@ If FEATURE can't be loaded, don't execute BODY."
   (make-directory (expand-file-name "~/.trash.d/" t)))
 (if (not (file-exists-p (expand-file-name "~/.trash.d/emacs.autosaves/")))
   (make-directory (expand-file-name "~/.trash.d/emacs.autosaves/" t)))
+(if (not (file-exists-p (expand-file-name "~/.trash.d/emacs.history/")))
+  (make-directory (expand-file-name "~/.trash.d/emacs.history/" t)))
+
+;;
+;; Save our history
+;;
+(setq savehist-file (concat (expand-file-name "~/.trash.d/emacs.history/") "emacs." (getenv "USER")))
+(savehist-mode 1)))
+
+(require 'recentf)
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+(global-set-key "\C-x\ \C-r" 'recentf-open-files)
+
 
 
 ;;
