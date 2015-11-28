@@ -38,7 +38,7 @@ If FEATURE can't be loaded, don't execute BODY."
 ;;
 ;; Setup the load-path
 ;;
-(skx-add-to-load-path (list "~/.emacs.d" "~/.emacs.d/lang" "~/.emacs.d/unix" "~/.emacs.d/ui"))
+(skx-add-to-load-path (list "~/.emacs.d/util" "~/.emacs.d/lang" "~/.emacs.d/unix" "~/.emacs.d/ui"))
 
 ;;
 ;; Load cfengine mode if available
