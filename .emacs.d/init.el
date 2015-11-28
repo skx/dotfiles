@@ -12,7 +12,7 @@
 
 (require 'cl)
 
- (defun noerr-require (feature)
+(defun noerr-require (feature)
   "`require' FEATURE, but don't invoke any Lisp errors.
 If FEATURE cannot be loaded, this function will print an error
 message through `message' and return nil. It otherwise behaves
@@ -98,20 +98,6 @@ If FEATURE can't be loaded, don't execute BODY."
 (noerr-require 'uptime)
 (noerr-require 'mpc)
 
-;;
-;;  pwsafe interface.
-;;
-;;  1. cache the password for the database.
-;;  2. Pressing ret/enter will copy the username + password.
-;;
-(with-feature (pwsafe)
-              (setq pwsafe-primary-database "~/git/passwd/pwsafe.dat" )
-              (setq pwsafe-keep-passwd t)
-              (define-key pwsafe-list-mode-map [(return)] 'pwsafe-copy-user-name-and-password)
-              (define-key pwsafe-list-mode-map [(right)] 'pwsafe-info-current-item))
-
-
-
 (with-feature (markdown-mode)
               (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
               (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
@@ -189,36 +175,28 @@ If FEATURE can't be loaded, don't execute BODY."
 
 
 ;;
-;; create the autosave directory if it doesn't already exist.
+;; create a directory to hold history
 ;;
 (if (not (file-exists-p (expand-file-name "~/.trash.d/")))
   (make-directory (expand-file-name "~/.trash.d/" t)))
 
-(if (not (file-exists-p (expand-file-name "~/.trash.d/emacs.backups/")))
-  (make-directory (expand-file-name "~/.trash.d/emacs.backups/" t)))
-
 (if (not (file-exists-p (expand-file-name "~/.trash.d/emacs.history/")))
   (make-directory (expand-file-name "~/.trash.d/emacs.history/" t)))
 
-
-(require 'backup-dir)
-(make-variable-buffer-local 'backup-inhibited)
-
-(setq bkup-backup-directory-info
-      '((t "~/.trash.d/emacs.backups/" ok-create full-path prepend-name)))
-(setq delete-old-versions t
-      kept-old-versions 1
-      kept-new-versions 3
-      version-control t)
-
-
-
 ;;
-;; Save our history
+;; Save our history there
 ;;
 (setq savehist-file (concat (expand-file-name "~/.trash.d/emacs.history/") "emacs." (getenv "USER")))
 (savehist-mode 1)
 
+
+;disable backups
+(setq backup-inhibited t)
+(setq make-backup-files nil)
+;disable auto-save
+(setq auto-save-default nil)
+; this is bad
+(setq auto-save-interval (* 60 60 24))
 
 ;;
 ;; Align things by "=" neatly
@@ -234,22 +212,6 @@ If FEATURE can't be loaded, don't execute BODY."
       c-basic-offset 4)
 (c-set-offset 'substatement-open 0)
 (put 'scroll-left 'disabled nil)
-
-
-(with-feature (bm)
-              (add-hook 'after-init-hook 'bm-repository-load)
-              (add-hook 'find-file-hooks 'bm-buffer-restore)
-              (add-hook 'kill-buffer-hook 'bm-buffer-save)
-              (add-hook 'kill-emacs-hook '(lambda nil
-                                            (bm-buffer-save-all)
-                                            (bm-repository-save)))
-              (add-hook 'after-save-hook 'bm-buffer-save)
-              (add-hook 'after-revert-hook 'bm-buffer-restore)
-              (setq bm-restore-repository-on-load t)
-              (setq-default bm-buffer-persistence t)
-              (setq bm-marker 'bm-marker-right)
-              )
-
 
 (defun my-coding-hook ()
   (make-local-variable 'column-number-mode)
