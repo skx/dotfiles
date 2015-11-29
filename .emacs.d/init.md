@@ -91,7 +91,7 @@ automation - so I load modes for those too.
 ```
 
 
-## Language Modes - Perl
+### Language Modes - Perl
 
 I do a lot of my coding in Perl-mode, and this is configured here.
 
@@ -121,7 +121,7 @@ Now we want to make sure that the code is formatted according to my tastes:
 ```
 
 
-## Language Modes - Utilities
+### Language Modes - Utilities
 
 A lot of programming environments allow you to setup variables via something
 like this:
