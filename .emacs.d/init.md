@@ -75,8 +75,6 @@ automation - so I load modes for those too.
 		(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 		(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
 
-    (noerr-require 'align-equals)
-
 	(with-feature (puppet-mode)
         (setq auto-mode-alist
             (append '(("\\.pp$" . puppet-mode)) auto-mode-alist)))
@@ -91,6 +89,7 @@ automation - so I load modes for those too.
     (setq c-basic-offset 4)
     (c-set-offset 'substatement-open 0)
 ```
+
 
 ## Language Modes - Perl
 
@@ -121,6 +120,35 @@ Now we want to make sure that the code is formatted according to my tastes:
     (add-hook 'cperl-mode-hook 'my-cperl-mode-hook t)
 ```
 
+
+## Language Modes - Utilities
+
+A lot of programming environments allow you to setup variables via something
+like this:
+
+```
+     int i = 1;
+     int foo = 2;
+```
+
+Things look neater if they're aligned, thusly:
+
+```
+     int i   = 1;
+     int foo = 2;
+```
+
+The following section of code lets us select a region and run `M-=` to
+align the section based upon the `=` sign:
+
+```lisp
+    (defun align-equals (begin end)
+      (interactive "r")
+      (align-regexp begin end "\\(\\s-*\\)=" 1 1))
+
+
+    (global-set-key (kbd "M-=") 'align-equals)
+```
 
 
 ## Editing Nicities
