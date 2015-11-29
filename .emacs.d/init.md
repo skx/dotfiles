@@ -3,24 +3,31 @@
 This file contains the human-readable initialization configuration for emacs.
 
 
-## Utility Functions
+## Initial Functions
 
-First of all we define some utility-functions to load packages.  The following
-function will load a package and avoid raising an error if it isn't found:
+The first thing we need to do is make sure that the various subdirectories
+beneath the `~/.emacs/` directory are added to the load-path.  This will
+ensure that future use of `require` will find the files we're attempting
+to load:
+
+
+```lisp
+    (defun add-to-load-path (d)
+       "If the supplied parameter is a directory then add it to the load-path"
+        (if (file-directory-p d)
+            (add-to-list 'load-path d)))
+
+    (mapc 'add-to-load-path
+        (directory-files "~/.emacs.d/" t "[a-z]*"))
+```
+
+Now we define some utility-functions to load packages.
+
+The following function will load a package and avoid raising an error
+if it isn't found:
 
 ```lisp
     (require 'cl)
-
-    (defun add-to-load-path( list )
-       "Add each entry to the load-path, if it exists as a directory."
-        (while list
-           (if (file-exists-p (expand-file-name (car list)))
-               (add-to-list 'load-path (expand-file-name (car list))))
-          (setq list (cdr list))))
-
-    (add-to-load-path (list "~/.emacs.d/util" "~/.emacs.d/lang"
-         "~/.emacs.d/unix" "~/.emacs.d/ui"))
-
 
     (defun noerr-require (feature)
         "`require' FEATURE, but don't invoke any Lisp errors.
@@ -32,9 +39,8 @@ function will load a package and avoid raising an error if it isn't found:
      ;; code-end
 ```
 
-
-Now we can use that to execute a block of code if loading a module
-is successful:
+With the previous method in-place we can now ensure that if some package
+is loaded we can conditionally execute some code:
 
 ```lisp
     (defmacro with-feature (feature &rest body)
@@ -44,12 +50,19 @@ is successful:
             (push 'progn body)))
 ```
 
+The initial setup is now complete, such that we can start loading
+packages, making configuration-changes & etc.
+
 
 
 ## Language Modes
 
-Now that we've added our load-path setup, and configured some simple
-things we'll load our language-modes
+Most of the time I spend in Emacs is for developing, and writing code.
+
+Code I write tends to be in some combination of Lua, Ruby, Perl, or C++.
+In addition to these _real_ programming languages I also use
+[CFEngine](http://cfengine.com/) and [Puppet](https://puppetlabs.com/) for
+automation - so I load modes for those too.
 
 ```lisp
 	(with-feature (lua-mode)
