@@ -170,14 +170,46 @@ I prefer to avoid menu-bars, tool-bars, and have a minimal look:
     (if (fboundp 'menu-bar-mode) (menu-bar-mode 0))
 ```
 
-The following section does that, as well as configures a reasonably neat colour-theme by default.
+Once we've removed things that we don't like the next section is
+responsible for configuring the colours - first of all the global
+theme which is used for colours, and then secondly the colour of
+the cursor:
+
+```lisp
+	;; Load a colour-theme.
+	(if (noerr-require 'color-theme)
+        (color-theme-charcoal-black))
+
+    ;; Change cursor color according to mode.
+    ;;  read-only -> red
+    ;;  insert    -> blue
+    ;;  default   -> white
+    (defvar hcz-set-cursor-color-color "")
+    (defvar hcz-set-cursor-color-buffer "")
+
+    (defun hcz-set-cursor-color-according-to-mode ()
+        "change cursor color according to some minor modes."
+        ;; set-cursor-color is somewhat costly, so we only call it when needed:
+        (let ((color
+            (if buffer-read-only "red"
+            (if overwrite-mode "blue"
+             "white"))))
+         (unless (and
+             (string= color hcz-set-cursor-color-color)
+             (string= (buffer-name) hcz-set-cursor-color-buffer))
+         (set-cursor-color (setq hcz-set-cursor-color-color color))
+         (setq hcz-set-cursor-color-buffer (buffer-name)))))
+
+    ;; After a command update things, if required.
+    (add-hook 'post-command-hook 'hcz-set-cursor-color-according-to-mode)
+```
+
+The following section takes care of setting up other user-interface things
+the way that I prefer them.
 
 ```lisp
     ;; Allow font resizing.
 	(noerr-require 'skx-font-sizes)
-
-	;; Load a colour-theme.
-	(if (noerr-require 'color-theme) (color-theme-charcoal-black))
 
 	;; Make sure our cursor doesn't get in the way.
 	(if window-system
@@ -232,12 +264,6 @@ The following section does that, as well as configures a reasonably neat colour-
             (set-mouse-pixel-position (selected-frame) 40 40)
             (message "raised-window")))
     (add-hook 'server-switch-hook 'px-raise-frame-and-give-focus)
-
-    ;; This sets the cursor colour neatly:
-    ;;    read-only -> red
-    ;;    insert    -> blue
-    ;;    default   -> white
-    (require 'cursor-colours)
 ```
 
 
