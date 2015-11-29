@@ -62,8 +62,6 @@ things we'll load our language-modes
 		(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 		(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
 
-	(noerr-require 'skx-perl)
-
     (noerr-require 'align-equals)
 
 	(with-feature (puppet-mode)
@@ -80,6 +78,36 @@ things we'll load our language-modes
     (setq c-basic-offset 4)
     (c-set-offset 'substatement-open 0)
 ```
+
+## Language Modes - Perl
+
+I do a lot of my coding in Perl-mode, and this is configured here.
+
+First of all we want to ensure that we use `cperl-mode`, rather `perl-mode`,
+and we wish to ensure that `*.t` are formatted in this mode too - as these
+are usually test-cases:
+
+```lisp
+    ;;  We always prefer CPerl mode to Perl mode.
+    (fset 'perl-mode 'cperl-mode)
+
+    ;; Load .t files as perl too - as these are usually test-cases
+    (setq auto-mode-alist (append '(("\\.t$" . cperl-mode)) auto-mode-alist))
+```
+
+Now we want to make sure that the code is formatted according to my tastes:
+
+```lisp
+    ;;  BSD Style brace placement, with tab=4 spaces.
+    (defun my-cperl-mode-hook ()
+       (setq cperl-indent-level 4)
+       (setq cperl-brace-offset -2)
+       (setq cperl-label-offset 0))
+
+    ;;  When starting load my hooks
+    (add-hook 'cperl-mode-hook 'my-cperl-mode-hook t)
+```
+
 
 
 ## Editing Nicities
