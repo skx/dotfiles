@@ -157,13 +157,24 @@ I'm annoyed by backups and similar.  So I disable them all:
 
 ## User Interface Tweaks
 
-I prefer to avoid menu-bars, tool-bars, and have a minimal look.
+I prefer to avoid menu-bars, tool-bars, and have a minimal look:
+
+```lisp
+    ;; Disable the scroll-bar(s).
+    (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+
+    ;; Disable the tool-bar.
+    (if (fboundp 'tool-bar-mode) (tool-bar-mode 0))
+
+    ;; Disable the menu.
+    (if (fboundp 'menu-bar-mode) (menu-bar-mode 0))
+```
 
 The following section does that, as well as configures a reasonably neat colour-theme by default.
 
 ```lisp
+    ;; Allow font resizing.
 	(noerr-require 'skx-font-sizes)
-	(noerr-require 'skx-minimal-look)
 
 	;; Load a colour-theme.
 	(if (noerr-require 'color-theme) (color-theme-charcoal-black))
@@ -171,7 +182,6 @@ The following section does that, as well as configures a reasonably neat colour-
 	;; Make sure our cursor doesn't get in the way.
 	(if window-system
 		(mouse-avoidance-mode 'cat-and-mouse))
-
 
 	;; Show the time on the status bar.
 	(setq display-time-24hr-format t)
@@ -187,7 +197,7 @@ The following section does that, as well as configures a reasonably neat colour-
 	;; Avoid the annoying startup message.
 	(setq inhibit-startup-message t)
 
-	;;  Uncompress files.
+	;; Uncompress files.
 	(auto-compression-mode t)
 
 	;; Paste at point, not mouse position
