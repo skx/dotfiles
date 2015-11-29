@@ -9,11 +9,10 @@ First of all we define some utility-functions to load packages.  The following
 function will load a package and avoid raising an error if it isn't found:
 
 ```lisp
-    ;; code-start
     (require 'cl)
 
     (defun add-to-load-path( list )
-        "Add each entry to the load-path, if it exists as a directory."
+       "Add each entry to the load-path, if it exists as a directory."
         (while list
            (if (file-exists-p (expand-file-name (car list)))
                (add-to-list 'load-path (expand-file-name (car list))))
@@ -37,13 +36,13 @@ function will load a package and avoid raising an error if it isn't found:
 Now we can use that to execute a block of code if loading a module
 is successful:
 
-    ;; code-start
+```lisp
     (defmacro with-feature (feature &rest body)
         "Require FEATURE and execute BODY.
         If FEATURE can't be loaded, don't execute BODY."
         (when (noerr-require (car feature))
             (push 'progn body)))
-    ;; code-end
+```
 
 
 
@@ -52,7 +51,7 @@ is successful:
 Now that we've added our load-path setup, and configured some simple
 things we'll load our language-modes
 
-    ;; code-start
+```lisp
 	(with-feature (lua-mode)
         (setq auto-mode-alist
             (append '(("\\.lua$" . lua-mode)) auto-mode-alist))
@@ -80,14 +79,14 @@ things we'll load our language-modes
     (setq c-default-style "linux")
     (setq c-basic-offset 4)
     (c-set-offset 'substatement-open 0)
-    ;; code-end
+```
 
 
 ## Editing Nicities
 
 We like to remove trailing whitespace, and treat our buffers as UTF-8
 
-    ;; code-start
+```lisp
 	;; We want to see trailing whitespace
 	(setq-default show-trailing-whitespace t)
 
@@ -98,14 +97,14 @@ We like to remove trailing whitespace, and treat our buffers as UTF-8
 	(set-terminal-coding-system 'utf-8)
 	(set-keyboard-coding-system 'utf-8)
 	(prefer-coding-system 'utf-8)
-    ;; code-end
+```
 
 
 ## Configuring Backups
 
 I'm annoyed by backups and similar.  So I disable them all:
 
-    ;; code-start
+```lisp
 	;; create a directory to hold history
 	(if (not (file-exists-p (expand-file-name "~/.trash.d/")))
 		(make-directory (expand-file-name "~/.trash.d/" t)))
@@ -124,7 +123,7 @@ I'm annoyed by backups and similar.  So I disable them all:
 	;disable auto-save
 	(setq auto-save-default nil)
 	(setq auto-save-interval (* 60 60 24))
-    ;; code-end
+```
 
 
 
@@ -134,7 +133,7 @@ I prefer to avoid menu-bars, tool-bars, and have a minimal look.
 
 The following section does that, as well as configures a reasonably neat colour-theme by default.
 
-    ;; code-start
+```lisp
 	(noerr-require 'skx-font-sizes)
 	(noerr-require 'skx-minimal-look)
 
@@ -201,7 +200,7 @@ The following section does that, as well as configures a reasonably neat colour-
     ;;    insert    -> blue
     ;;    default   -> white
     (require 'cursor-colours)
-    ;; code-end
+```
 
 
 
@@ -210,7 +209,7 @@ The following section does that, as well as configures a reasonably neat colour-
 I try to avoid too many keybindings that are non-standard, but there are
 some I've grown accustomed to:
 
-    ;; code-start
+```lisp
     (global-set-key "\M-g" 'goto-line)
     (global-set-key "\C-s" 'isearch-forward-regexp)
     (global-set-key "\C-r" 'isearch-backward-regexp)
@@ -236,7 +235,7 @@ some I've grown accustomed to:
                                     (sleep-for 1)))
                                         (save-buffers-kill-emacs)))
                                             (message "emacs quit aborted")))
-    ;; code-end
+```
 
 
 ## Unix-specific tweaks
@@ -244,9 +243,9 @@ some I've grown accustomed to:
 The following section is really just a small collection of tools
 which make life a little more nice for Unix users:
 
-    ;; code-start
+```lisp
 	(noerr-require 'perl-syntax-check)
 	(noerr-require 'shebang)
 	(noerr-require 'uptime)
 	(noerr-require 'mpc)
-    ;; code-end
+```

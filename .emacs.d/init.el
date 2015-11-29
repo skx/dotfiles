@@ -13,11 +13,11 @@
     (forward-line 1)
 
     ;; Skip to the start of the code block.
-    (re-search-forward "^\s*;;\s*code-start" (point-max) t)
+    (re-search-forward "^```lisp$" (point-max) t)
 
     (let ((l (match-end 0)))
       ;; Find the end of the code-block
-      (re-search-forward "^\s*;;\s*code-end" (point-max) t)
+      (re-search-forward "^```$" (point-max) t)
 
       ;; Write out the region we've found for debug-purposes
 ;;      (append-to-file l (match-beginning 0) (expand-file-name "initel.el" user-emacs-directory))
