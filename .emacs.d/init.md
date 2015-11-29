@@ -8,6 +8,7 @@ This file contains the human-readable initialization configuration for emacs.
 First of all we define some utility-functions to load packages.  The following
 function will load a package and avoid raising an error if it isn't found:
 
+```lisp
     ;; code-start
     (require 'cl)
 
@@ -30,6 +31,8 @@ function will load a package and avoid raising an error if it isn't found:
         (ignore-errors
            (require feature (symbol-name feature) t)))
      ;; code-end
+```
+
 
 Now we can use that to execute a block of code if loading a module
 is successful:
