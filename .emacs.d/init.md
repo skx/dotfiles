@@ -217,8 +217,9 @@ theme which is used for colours, and then secondly the colour of
 the cursor:
 
 ```lisp
-	;; Load a colour-theme.
-	(if (noerr-require 'color-theme)
+    ;; If we can load the colour-theme library, choose a dark theme.
+    (with-feature (color-theme)
+	    (color-theme-initialize)
         (color-theme-charcoal-black))
 
     ;; Change cursor color according to mode.
