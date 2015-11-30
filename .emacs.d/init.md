@@ -151,6 +151,26 @@ align the section based upon the `=` sign:
 ```
 
 
+## System Administration
+
+The following snippet is useful for system-administration, allowing
+you to open a file for reading via `sudo`:
+
+```lisp
+    (require 'tramp)
+    (defun sudo-find-file (file-name)
+        "Like find file, but opens the file as root."
+        (interactive "FSudo Find File: ")
+        (let ((tramp-file-name (concat "/sudo::" (expand-file-name file-name))))
+        (find-file tramp-file-name)))
+
+    (global-set-key (kbd "C-x F") 'sudo-find-file)
+```
+
+Once you've opened the file it will be read-only, you can toggle that
+with `Ctrl-x Ctrl-v`.
+
+
 ## Editing Nicities
 
 We like to remove trailing whitespace, and treat our buffers as UTF-8
