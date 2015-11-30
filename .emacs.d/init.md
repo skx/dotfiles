@@ -262,6 +262,9 @@ the way that I prefer them.
 	(setq display-time-day-and-date t)
 	(display-time)
 
+    ; Ignore case when completing file names
+    (setq read-file-name-completion-ignore-case 't)
+
     ;; Show columns too
     (column-number-mode)
 
@@ -306,6 +309,12 @@ the way that I prefer them.
             (set-mouse-pixel-position (selected-frame) 40 40)
             (message "raised-window")))
     (add-hook 'server-switch-hook 'px-raise-frame-and-give-focus)
+
+    ; Text-mode is default mode
+    (setq default-major-mode 'text-mode)
+
+    ; auto-formatting in text-mode
+    (add-hook 'text-mode-hook 'turn-on-auto-fill)
 ```
 
 
