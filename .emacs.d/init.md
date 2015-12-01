@@ -121,7 +121,7 @@ Now we want to make sure that the code is formatted according to my tastes:
     (add-hook 'cperl-mode-hook 'my-cperl-mode-hook t)
 ```
 
-Finally we have a post-save hook which shows if the perl we're writing
+I also install a post-save hook which shows if the perl we're writing
 is well-formed.
 
 **NOTE**: This can be abused as `perl -c ...` will evaluate code found
@@ -130,6 +130,35 @@ in `BEGIN{ .. }` blocks.
 ```lisp
     (noerr-require 'perl-syntax-check)
 ```
+
+The last Perl-specific thing I have is `M-x perltidy` which will
+invoke the `perltidy` command on the contents of the current buffer.
+This works with the
+[.perltidyrc](https://github.com/skx/dotfiles/blob/master/.perltidyrc)
+configuration file I have stored in my dotfiles:
+
+
+```lisp
+(defun perltidy()
+  "Tidy the contents of the current buffer via `perltidy'"
+  (interactive)
+  (shell-command-on-region
+   ;; beginning and end of buffer
+   (point-min)
+   (point-max)
+   ;; command and parameters
+   "perltidy"
+   ;; output buffer
+   (current-buffer)
+   ;; replace?
+   t
+   ;; name of the error buffer
+   "*Error Buffer*"
+   ;; show error buffer?
+   t))
+```
+
+
 
 ### Language Modes - Utilities
 
@@ -158,6 +187,34 @@ align the section based upon the `=` sign:
 
 
     (global-set-key (kbd "M-=") 'align-equals)
+```
+
+
+## Web Utilities
+
+I don't often writen plain HTML these days, instead I use markdown
+for most of my websites via the
+[templer](http://github.com/skx/templer/) static-site generator.
+
+There are times when I need to escape content though, and the
+following  allows that to be done neatly - select the region and run
+`M-x escape-html-region`:
+
+```lisp
+(defun escape-html-region (start end)
+  (interactive "r")
+  (save-excursion
+    (save-restriction
+      (narrow-to-region start end)
+      (goto-char (point-min))
+      (replace-string "&" "&amp;")
+      (goto-char (point-min))
+      (replace-string "<" "&lt;")
+      (goto-char (point-min))
+      (replace-string ">" "&gt;")
+      (goto-char (point-min))
+      (replace-string "\"" "&quot;")
+      )))
 ```
 
 
