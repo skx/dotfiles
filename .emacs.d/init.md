@@ -262,9 +262,10 @@ and can be invoked via `M-x uptime`.
 ```
 
 
-## Editing Nicities
+## Whitespace Handling
 
-We like to remove trailing whitespace, and treat our buffers as UTF-8
+We like to remove trailing whitespace, and define a function to
+collapse muliple newlines into one, across a region.
 
 ```lisp
 	;; We want to see trailing whitespace
@@ -274,7 +275,18 @@ We like to remove trailing whitespace, and treat our buffers as UTF-8
 	(require 'whitespace)
 	(add-hook 'write-file-hooks 'delete-trailing-whitespace)
 
-	(set-terminal-coding-system 'utf-8)
+    (defun collapse-blank-lines(start end)
+     (interactive "r")
+     (replace-regexp "^\n\\{2,\\}" "\n" nil start end))
+```
+
+
+## UTF-8
+
+UTF-8 is the future, we should great it with open-arms.
+
+```lisp
+    (set-terminal-coding-system 'utf-8)
 	(set-keyboard-coding-system 'utf-8)
 	(prefer-coding-system 'utf-8)
 ```
