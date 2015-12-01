@@ -229,6 +229,25 @@ I prefer to avoid menu-bars, tool-bars, and have a minimal look:
 
     ;; Disable the menu.
     (if (fboundp 'menu-bar-mode) (menu-bar-mode 0))
+
+    ;; Ctrl +, or Ctrl - will change the text size.
+    (global-set-key (kbd "C-+") 'text-scale-increase)
+    (global-set-key (kbd "C--") 'text-scale-decrease)
+
+	;; Make sure our cursor doesn't get in the way.
+	(if window-system
+		(mouse-avoidance-mode 'cat-and-mouse))
+```
+
+Now we've tweaked the GUI we can setup the clipboard integration:
+
+```lisp
+    ;; Copying in emacs should allow pasting into gnome-terminal, etc.
+    (setq x-select-enable-clipboard t)
+
+    ;;
+    (setq x-select-enable-primary t)
+    (setq mouse-drag-copy-region t)
 ```
 
 Once we've removed things that we don't like the next section is
@@ -270,13 +289,6 @@ The following section takes care of setting up other user-interface things
 the way that I prefer them.
 
 ```lisp
-    ;; Allow font resizing.
-	(noerr-require 'skx-font-sizes)
-
-	;; Make sure our cursor doesn't get in the way.
-	(if window-system
-		(mouse-avoidance-mode 'cat-and-mouse))
-
 	;; Show the time on the status bar.
 	(setq display-time-24hr-format t)
 	(setq display-time-day-and-date t)
@@ -318,9 +330,6 @@ the way that I prefer them.
 
 	;; Show the file we've got loaded in the frame title.
 	(setq frame-title-format  (concat invocation-name "@" system-name ": %b %+%+ %f"))
-
-    ;; Copying in emacs should allow pasting into gnome-terminal, etc.
-    (setq x-select-enable-clipboard t)
 
     (defun px-raise-frame-and-give-focus ()
         (when window-system
