@@ -5,11 +5,15 @@ This file contains the human-readable initialization configuration for emacs.
 
 ## Initial Functions
 
+```lisp
+    ;; Common Lisp is required by some other later things.
+    (require 'cl)
+```
+
 The first thing we need to do is make sure that the various subdirectories
 beneath the `~/.emacs/` directory are added to the load-path.  This will
 ensure that future use of `require` will find the files we're attempting
 to load:
-
 
 ```lisp
     (defun add-to-load-path (d)
@@ -27,8 +31,6 @@ The following function will load a package and avoid raising an error
 if it isn't found:
 
 ```lisp
-    (require 'cl)
-
     (defun noerr-require (feature)
         "`require' FEATURE, but don't invoke any Lisp errors.
         If FEATURE cannot be loaded, this function will print an error
@@ -36,7 +38,6 @@ if it isn't found:
         exactly as `require'."
         (ignore-errors
            (require feature (symbol-name feature) t)))
-     ;; code-end
 ```
 
 With the previous method in-place we can now ensure that if some package
@@ -120,6 +121,15 @@ Now we want to make sure that the code is formatted according to my tastes:
     (add-hook 'cperl-mode-hook 'my-cperl-mode-hook t)
 ```
 
+Finally we have a post-save hook which shows if the perl we're writing
+is well-formed.
+
+**NOTE**: This can be abused as `perl -c ...` will evaluate code found
+in `BEGIN{ .. }` blocks.
+
+```lisp
+    (noerr-require 'perl-syntax-check)
+```
 
 ### Language Modes - Utilities
 
@@ -169,6 +179,30 @@ you to open a file for reading via `sudo`:
 
 Once you've opened the file it will be read-only, you can toggle that
 with `Ctrl-x Ctrl-v`.
+
+Because I tend to be working all day it is interesting to see how
+long Emacs has been running.  The following function will show that,
+and can be invoked via `M-x uptime`.
+
+```lisp
+(require 'time-date)
+
+(defvar emacs-up-time (current-time)
+  "Time at which Emacs started up.")
+
+(defun uptime ()
+  "Displays the uptime of GNU Emacs."
+  (interactive)
+  (let* ((now (current-time))
+         (second (floor (- (time-to-seconds now)
+                           (time-to-seconds emacs-up-time))))
+         (minute (floor second 60))
+         (hour (floor minute 60))
+         (day (floor hour 24)))
+    (message "Emacs up %s day(s), %02d:%02d"
+              day (% hour 24) (% minute 60))))
+
+```
 
 
 ## Editing Nicities
@@ -371,25 +405,30 @@ some I've grown accustomed to:
     (global-set-key [(control x) (control c)]
         '(lambda ()
             (interactive)
-                (if (y-or-n-p-with-timeout "Do you really want to exit Emacs ? " 10 nil)
-                    (progn
-                        (if window-system
-                            (progn
-                                (uptime)
-                                    (sleep-for 1)))
-                                        (save-buffers-kill-emacs)))
-                                            (message "emacs quit aborted")))
+            (if (y-or-n-p-with-timeout "Do you really want to exit Emacs ? " 10 nil)
+                (progn
+                  (if window-system
+                      (progn
+                        (if (fboundp 'uptime) (uptime))
+                        (sleep-for 1)))
+                  (save-buffers-kill-emacs)))
+            (message "emacs quit aborted")))
 ```
 
 
 ## Unix-specific tweaks
 
-The following section is really just a small collection of tools
-which make life a little more nice for Unix users:
+The following section helper ensures that files are given `+x` permissions
+when they're saved, if they contain a valid shebang line:
 
 ```lisp
-	(noerr-require 'perl-syntax-check)
 	(noerr-require 'shebang)
-	(noerr-require 'uptime)
+```
+
+Finally we allow Emacs to control our music playback, which is supplied
+by [MPD](http://www.musicpd.org/).  There are several different MPD client-modes in Emacs, this
+is my own:
+
+```lisp
 	(noerr-require 'mpc)
 ```
