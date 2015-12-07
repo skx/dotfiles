@@ -18,7 +18,8 @@ Config:set( "global.editor", "vim  +/^$ ++1 '+set tw=72'" )
 --
 -- Setup our default From: address.
 --
-Config:set( "global.sender", "Steve Kemp <steve@steve.org.uk>" )
+local def_from = "Steve Kemp <steve@steve.org.uk>"
+Config:set( "global.sender", def_from )
 
 --
 -- Setup folder-based addresses.
@@ -28,6 +29,7 @@ Config:set( "global.sender", "Steve Kemp <steve@steve.org.uk>" )
 -- why we ported PCRE ;)
 --
 folder_from = {
+   ['.*'] = def_from,
    ['debian%-administration%.'] = "Steve Kemp <steve@debian-administration.org>",
    ['dns%-api.com'] = "Steve Kemp <steve@dns-api.com>",
    ['dhcp.io'] = "Steve Kemp <steve@dhcp.io>",
