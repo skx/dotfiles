@@ -47,25 +47,25 @@ function mark_read_in_folder( path, pattern )
 end
 
 function daily()
-   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.Automated.backups-ok",
+   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/Automated-backups-ok",
                         "backup2l: success" );
 
-   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
+   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/machines-spotlight",
                         "/usr/local/cpanel/scripts/upcp --cron" )
 
-   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
+   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/machines-spotlight",
                         "lfd on swd02.spotlightwebsites.com" )
 
-   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
+   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/machines-spotlight",
                         "SSH login alert for" )
 
-   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
+   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/machines-spotlight",
                         "/usr/sbin/csf" )
 
-   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
+   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/machines-spotlight",
                         "swd02.spotlightwebsites.com: blocked" )
 
 
-   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/.machines.spotlight",
+   mark_read_in_folder( os.getenv( "HOME" ) .. "/Maildir/machines-spotlight",
                         "/opt/dns/make-slave.sh" )
 end
