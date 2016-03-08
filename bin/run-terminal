@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# Launch a graphical terminal.
+#
+
+
+if [ -x /usr/bin/mate-terminal ] ; then
+    exec /usr/bin/mate-terminal
+fi
+
+if [ -x /usr/bin/gnome-terminal ] ; then
+    exec /usr/bin/gnome-terminal
+fi
+
+if [ -x /usr/bin/xterm ]; then
+    exec /usr/bin/xterm
+fi
