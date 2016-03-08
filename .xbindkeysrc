@@ -1,5 +1,14 @@
-"gnome-terminal"
+"run-terminal"
   release+control+alt + t
 
 "firefox"
   release+control+alt + f
+
+"mpc next"
+  release+XF86Forward
+
+"mpc prev"
+  release+XF86Back
+
+"mpc toggle"
+  release+XF86AudioPlay
