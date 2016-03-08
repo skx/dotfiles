@@ -446,7 +446,7 @@ the way that I prefer them.
     (setq default-major-mode 'text-mode)
 
     ; auto-formatting in text-mode
-    (add-hook 'text-mode-hook 'turn-on-auto-fill)
+    ;(add-hook 'text-mode-hook 'turn-on-auto-fill)
 ```
 
 
