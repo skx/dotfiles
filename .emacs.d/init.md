@@ -159,6 +159,17 @@ configuration file I have stored in my dotfiles:
 ```
 
 
+### Language Modes - golang
+
+[golang](https://golang.org/) is a language I've recently started to use, and
+there isn't a native Emacs Lisp mode for it yet.
+
+Installation instead relies the code in [the official github repository](https://github.com/dominikh/go-mode.el):
+
+```lisp
+	(require 'go-mode-autoloads)
+```
+
 
 ### Language Modes - Utilities
 
