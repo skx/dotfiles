@@ -15,11 +15,18 @@ fi
 #  Git
 #
 if [ -d .git ] ; then
-    for i in $(git remote) ; do
-        echo "Pulling from $i"
-        git remote show $i  2>/dev/null| grep URL
-        git pull --quiet $i 
-    done
+
+    git remote -v | grep '(fetch)' |
+        while IFS= read -r line
+        do
+            # parse.
+            name=$(echo $line | awk '{print $1}')
+            loc=$(echo $line | awk '{print $2}' )
+            branch=$(git branch | awk '{print $NF}')
+
+            echo "Pulling branch ${branch} from ${name} [$loc]"
+            git pull --quiet "${name}" "${branch}"
+        done
     exit 0;
 fi
 
