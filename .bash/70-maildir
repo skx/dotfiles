@@ -43,7 +43,7 @@ function domail
    client=$2
 
    if [ "$client" = "lumail" ] ;then
-       lumail --folder "${file}"
+       lumail2 --folder="${file}"
    fi
    if [ "$client" = "mutt" ]; then
        mutt -f "${file}" -e "push b"
@@ -117,4 +117,3 @@ for i in ~/Mail ~/Maildir ; do
         setupMailAliases $i
     fi
 done
-
