@@ -11,6 +11,7 @@ download-check - Look for regular expressions in webpages
   General Options:
 
    --config    Specify a configuration file, rather than the default.
+   --purple    Specify a purple-serve to raise alerts with (optional).
    --verbose   Show the patterns & URLs we're looking for.
 
   Help Options:
@@ -26,6 +27,20 @@ This script reads a list of URLs and regular expressions from a configuration
 file, (C<~/.download-check.conf> by default), and reports on pages that don't
 match the pattern.
 
+By default the status will be sent to STDOUT, with more detail available
+via the use of the C<--verbose> flag.
+
+If you prefer you can raise/clear alert(s) via the Purple Alert service:
+
+=over 8
+
+=item https://github.com/skx/purple
+
+=back
+
+In that case specify C<--purple=https://alert.example.com/events>, using
+the appropriate hostname.
+
 =cut
 
 =head1 CONFIGURAION FILE
@@ -33,8 +48,8 @@ match the pattern.
 The configuration file is assumed to be white-space seperated lines of the form
 "url pattern".
 
-Here is a simple example - as you can see comments begin with "#" and are ignored,
-along with blank-lines.
+Here is a simple example - as you can see comments begin with "#" and
+are ignored as are blank-lines.
 
 =for example begin
 
@@ -58,7 +73,7 @@ along with blank-lines.
 
 =head1 LICENSE
 
-Copyright (c) 2009-2012 by Steve Kemp.  All rights reserved.
+Copyright (c) 2009-2016 by Steve Kemp.  All rights reserved.
 
 This module is free software;
 you can redistribute it and/or modify it under
@@ -70,14 +85,15 @@ The LICENSE file contains the full text of the license.
 use strict;
 use warnings;
 
+use JSON;
 use Getopt::Long;
 use LWP::Simple;
 use Pod::Usage;
-
+use Digest::SHA qw(sha1_base64);
 
 
 #
-# The options
+# The default options.
 #
 my %CONFIG = ( 'config' => $ENV{ 'HOME' } . "/.download-check.conf" );
 
@@ -89,6 +105,7 @@ exit
        !GetOptions( "help",     \$CONFIG{ 'help' },
                     "manual",   \$CONFIG{ 'manual' },
                     "config=s", \$CONFIG{ 'config' },
+                    "purple=s", \$CONFIG{ 'purple' },
                     "verbose",  \$CONFIG{ 'verbose' },
                   ) );
 
@@ -135,21 +152,122 @@ foreach my $line (<$file>)
         #  Fetch the URL
         #
         my $content = get($url);
-        if ( ! defined( $content ) || ! length($content ) )
+        if ( !defined($content) || !length($content) )
         {
-            print "Failed to load $url\n";
+            print "Failed to download the contents of $url\n";
         }
-        if ( $content !~ /$pattern/ )
+        if ( $content =~ /$pattern/ )
         {
-            print "URL $url - no longer matches $pattern\n";
+            clear( $url, $pattern );
+        }
+        else
+        {
+            raise( $url, $pattern );
         }
     }
 }
 
+
 #
-# All done with the file parsing
+# All done.
 #
 close($file);
+exit(0);
 
 
-exit 0;
+
+
+sub raise
+{
+    my ( $url, $pattern ) = (@_);
+
+    #
+    #  If we're not using a purple-server then just output
+    # the message.
+    #
+    if ( !$CONFIG{ 'purple' } )
+    {
+        print "URL $url - no longer matches $pattern\n";
+        return;
+    }
+
+    $CONFIG{ 'verbose' } && print "Raising via $CONFIG{'purple'}\n";
+
+    my %data;
+
+    my $id = sha1_base64($url);
+    $data{ 'id' }      = "$url.$id.once";
+    $data{ 'raise' }   = "now";
+    $data{ 'subject' } = "URL no longer matches pattern.";
+    $data{ 'detail' } =
+      "<p><a href=\"$url\">$url</a> no longer matches the pattern \"<tt>$pattern</tt>\"</p>";
+
+    my $json = to_json( \%data );
+    send_purple_alert($json);
+
+}
+
+
+
+
+sub clear
+{
+    my ( $url, $pattern ) = (@_);
+
+    #
+    #  If we're not using a purple-server then do nothing.
+    #
+    return unless $CONFIG{ 'purple' };
+
+
+    $CONFIG{ 'verbose' } && print "Clearing via $CONFIG{'purple'}\n";
+
+    my %data;
+
+    my $id = sha1_base64($url);
+    $data{ 'id' }      = "$url.$id.once";
+    $data{ 'raise' }   = "clear";
+    $data{ 'subject' } = "URL no longer matches pattern.";
+    $data{ 'detail' } =
+      "<p><a href=\"$url\">$url</a> no longer matches the pattern \"<tt>$pattern</tt>\"</p>";
+
+    my $json = to_json( \%data );
+    send_purple_alert($json);
+}
+
+
+
+
+sub send_purple_alert
+{
+    my ($json) = (@_);
+
+
+    my $req = HTTP::Request->new( 'POST', $CONFIG{ 'purple' } );
+
+    $req->header( 'Content-Type' => 'application/json' );
+    $req->content($json);
+
+    #
+    # Now make the request
+    #
+    my $lwp = LWP::UserAgent->new;
+    my $res = $lwp->request($req);
+
+
+    #
+    #  Success?  Then exit.
+    #
+    if ( $res->is_success() )
+    {
+        $CONFIG{ 'verbose' } && print "Sent alert\n";
+
+    }
+    else
+    {
+
+        $CONFIG{ 'verbose' } &&
+          print "Failed to send alert: " . $res->status_line() . "\n";
+    }
+
+}
