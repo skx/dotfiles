@@ -24,7 +24,7 @@ web-check - Look for regular expressions in webpages.
 =head1 DESCRIPTION
 
 This script reads a list of URLs and regular expressions from a configuration
-file, (C<~/.download-check.conf> by default), and reports on pages that
+file, (C<~/.web-check.conf> by default), and reports on pages that
 do, or do not, contain the required pattern.
 
 By default the status will be sent to STDOUT, with more detail available
@@ -59,10 +59,10 @@ are ignored as are blank-lines.
      #  The following line will generate output if the page doesn't
      # contain the given pattern.
      #
-     http://nodejs.org/  present  v0.8.16
+     present http://nodejs.org/   v0.8.16
 
      # Here we raise an alert only if somebody is dead:
-     https://news.bbc.co.uk missing dead
+     missing https://news.bbc.co.uk  dead
 
 =for example end
 
@@ -101,7 +101,7 @@ use Digest::SHA qw(sha1_base64);
 #
 # The default options.
 #
-my %CONFIG = ( 'config' => $ENV{ 'HOME' } . "/.download-check.conf" );
+my %CONFIG = ( 'config' => $ENV{ 'HOME' } . "/.web-check.conf" );
 
 #
 #  Get the options
