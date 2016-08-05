@@ -229,6 +229,34 @@ following  allows that to be done neatly - select the region and run
 ```
 
 
+### Language Modes - Web Mode
+
+One of the annoyances with writing HTML is that often it contains
+extra things inline, such as Javascript and CSS.  To solve this
+problem - of wanting to mix HTML-mode along with Javascript-mode for example,
+I use [web-mode](http://web-mode.org/):
+
+```lisp
+    (require 'web-mode)
+    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+```
+
+The default choices seem to have tags be almost invisible, so we'll
+explicitly set them to pink, and configure the indentation too:
+
+```lisp
+    (set-face-attribute 'web-mode-html-tag-bracket-face nil :foreground "Pink1")
+    ;; Highlighting the current element helps the fight against divitus.
+    (setq web-mode-enable-current-element-highlight t)
+
+    ;; All modes should use the same indentation.
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+
+```
+
 ## System Administration
 
 The following snippet is useful for system-administration, allowing
