@@ -92,13 +92,34 @@ automation - so I load modes for those too.
 ```
 
 
+### Language Modes - C / C++
+
+Allow "*.ino" to be recognized as C++.
+
+Now we have C++ loaded for Arduino files we should enable the
+hide/show toggling:
+
+```lisp
+    (add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
+
+    (defun my-c-mode-hook ()
+      (hs-minor-mode 1))
+
+    (add-hook 'c++-mode-hook 'my-c-mode-hook t)
+    (add-hook 'c-mode-hook 'my-c-mode-hook t)
+
+```
+
+
+
+
 ### Language Modes - Perl
 
 I do a lot of my coding in Perl-mode, and this is configured here.
 
-First of all we want to ensure that we use `cperl-mode`, rather `perl-mode`,
-and we wish to ensure that `*.t` are formatted in this mode too - as these
-are usually test-cases:
+First of all we want to ensure that we use `cperl-mode`, rather than
+`perl-mode`, and we wish to ensure that `*.t` are formatted in this mode
+too - as these are usually test-cases:
 
 ```lisp
     ;;  We always prefer CPerl mode to Perl mode.
