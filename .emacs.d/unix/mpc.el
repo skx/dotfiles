@@ -19,6 +19,8 @@
   (define-key mpc-mode-map [?p] 'mpc-play-prev)
   (define-key mpc-mode-map [?r] 'mpc-refresh-display)
   (define-key mpc-mode-map "\C-m" 'mpc-play-cur)
+  (define-key mpc-mode-map [?\+] 'mpc-louder)
+  (define-key mpc-mode-map [?\-] 'mpc-quieter)
   (define-key mpc-mode-map [? ] 'mpc-pause)
 )
 
@@ -123,6 +125,24 @@
   (mpc-insert)
   )
 
+
+;;
+;; Volume tweaking
+;;
+(defun mpc-louder()
+  "Make the volume louder"
+  (interactive)
+  (shell-command
+   (format "%s volume +5 >/dev/null" mpc-path))
+  (message "%s" "Louder .."))
+
+
+(defun mpc-quieter()
+  "Make the volume quieter."
+  (interactive)
+  (shell-command
+   (format "%s volume -5 >/dev/null" mpc-path))
+  (message "%s" "Quieter .."))
 
 ;;
 ;;  All done
