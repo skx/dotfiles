@@ -348,7 +348,7 @@ collapse muliple newlines into one, across a region.
 
 ## UTF-8
 
-UTF-8 is the future, we should great it with open-arms.
+UTF-8 is the future, we should greet it with open-arms.
 
 ```lisp
     (set-terminal-coding-system 'utf-8)
