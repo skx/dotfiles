@@ -85,22 +85,27 @@ automation - so I load modes for those too.
 	(setq interpreter-mode-alist
 		(append interpreter-mode-alist '(("rb"   . ruby-mode))))
 
-    ;; Coding formatting
-    (setq c-default-style "linux")
-    (setq c-basic-offset 4)
-    (c-set-offset 'substatement-open 0)
 ```
 
+"`*.ino`" files are used by the Arduino IDE to compile code, and
+this is really just C++ with magic-wrapping:
+
+```lisp
+    ;; Coding formatting
+    (add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
+```
 
 ### Language Modes - C / C++
 
-Allow "*.ino" to be recognized as C++.
 
-Now we have C++ loaded for Arduino files we should enable the
-hide/show toggling:
+Now we can configure basic formatting, as well as setting up support
+for code-folding (which allows you to toggle the display of function
+bodies, etc).
 
 ```lisp
-    (add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
+    (setq c-default-style "linux")
+    (setq c-basic-offset 4)
+    (c-set-offset 'substatement-open 0)
 
     (defun my-c-mode-hook ()
       (hs-minor-mode 1))
