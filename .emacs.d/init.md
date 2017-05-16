@@ -91,7 +91,7 @@ automation - so I load modes for those too.
 this is really just C++ with magic-wrapping:
 
 ```lisp
-    ;; Coding formatting
+    ;; Arduino input-files.
     (add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
 ```
 
