@@ -66,24 +66,24 @@ In addition to these _real_ programming languages I also use
 automation - so I load modes for those too.
 
 ```lisp
-	(with-feature (lua-mode)
+    (with-feature (lua-mode)
         (setq auto-mode-alist
             (append '(("\\.lua$" . lua-mode)) auto-mode-alist))
-		(setq interpreter-mode-alist
+        (setq interpreter-mode-alist
             (append '(("lua" . lua-mode)) interpreter-mode-alist)))
 
-	(with-feature (markdown-mode)
-		(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-		(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
+    (with-feature (markdown-mode)
+        (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+        (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
 
-	(with-feature (puppet-mode)
+    (with-feature (puppet-mode)
         (setq auto-mode-alist
             (append '(("\\.pp$" . puppet-mode)) auto-mode-alist)))
 
-	(setq auto-mode-alist
-		(append '(("\\.rb$" . ruby-mode)) auto-mode-alist))
-	(setq interpreter-mode-alist
-		(append interpreter-mode-alist '(("rb"   . ruby-mode))))
+    (setq auto-mode-alist
+        (append '(("\\.rb$" . ruby-mode)) auto-mode-alist))
+    (setq interpreter-mode-alist
+        (append interpreter-mode-alist '(("rb"   . ruby-mode))))
 
 ```
 
@@ -193,7 +193,7 @@ there isn't a native Emacs Lisp mode for it yet.
 Installation instead relies the code in [the official github repository](https://github.com/dominikh/go-mode.el):
 
 ```lisp
-	(require 'go-mode-autoloads)
+    (require 'go-mode-autoloads)
 ```
 
 
@@ -333,12 +333,12 @@ We like to remove trailing whitespace, and define a function to
 collapse muliple newlines into one, across a region.
 
 ```lisp
-	;; We want to see trailing whitespace
-	(setq-default show-trailing-whitespace t)
+    ;; We want to see trailing whitespace
+    (setq-default show-trailing-whitespace t)
 
     ;; We want to remove trailing whitespace when a file is saved.
-	(require 'whitespace)
-	(add-hook 'write-file-hooks 'delete-trailing-whitespace)
+    (require 'whitespace)
+    (add-hook 'write-file-hooks 'delete-trailing-whitespace)
 
     (defun collapse-blank-lines(start end)
      (interactive "r")
@@ -352,8 +352,8 @@ UTF-8 is the future, we should great it with open-arms.
 
 ```lisp
     (set-terminal-coding-system 'utf-8)
-	(set-keyboard-coding-system 'utf-8)
-	(prefer-coding-system 'utf-8)
+    (set-keyboard-coding-system 'utf-8)
+    (prefer-coding-system 'utf-8)
 ```
 
 
@@ -362,24 +362,24 @@ UTF-8 is the future, we should great it with open-arms.
 I'm annoyed by backups and similar.  So I disable them all:
 
 ```lisp
-	;; create a directory to hold history
-	(if (not (file-exists-p (expand-file-name "~/.trash.d/")))
-		(make-directory (expand-file-name "~/.trash.d/" t)))
+    ;; create a directory to hold history
+    (if (not (file-exists-p (expand-file-name "~/.trash.d/")))
+        (make-directory (expand-file-name "~/.trash.d/" t)))
 
-	(if (not (file-exists-p (expand-file-name "~/.trash.d/emacs.history/")))
-		(make-directory (expand-file-name "~/.trash.d/emacs.history/" t)))
+    (if (not (file-exists-p (expand-file-name "~/.trash.d/emacs.history/")))
+        (make-directory (expand-file-name "~/.trash.d/emacs.history/" t)))
 
-	;; Save our history there
-	(setq savehist-file (concat (expand-file-name "~/.trash.d/emacs.history/") "emacs." (getenv "USER")))
-	(savehist-mode 1)
+    ;; Save our history there
+    (setq savehist-file (concat (expand-file-name "~/.trash.d/emacs.history/") "emacs." (getenv "USER")))
+    (savehist-mode 1)
 
-	;disable backups
-	(setq backup-inhibited t)
-	(setq make-backup-files nil)
+    ;disable backups
+    (setq backup-inhibited t)
+    (setq make-backup-files nil)
 
-	;disable auto-save
-	(setq auto-save-default nil)
-	(setq auto-save-interval (* 60 60 24))
+    ;disable auto-save
+    (setq auto-save-default nil)
+    (setq auto-save-interval (* 60 60 24))
 ```
 
 
@@ -402,9 +402,9 @@ I prefer to avoid menu-bars, tool-bars, and have a minimal look:
     (global-set-key (kbd "C-+") 'text-scale-increase)
     (global-set-key (kbd "C--") 'text-scale-decrease)
 
-	;; Make sure our cursor doesn't get in the way.
-	(if window-system
-		(mouse-avoidance-mode 'cat-and-mouse))
+    ;; Make sure our cursor doesn't get in the way.
+    (if window-system
+        (mouse-avoidance-mode 'cat-and-mouse))
 ```
 
 Now we've tweaked the GUI we can setup the clipboard integration:
@@ -426,7 +426,7 @@ the cursor:
 ```lisp
     ;; If we can load the colour-theme library, choose a dark theme.
     (with-feature (color-theme)
-	    (color-theme-initialize)
+        (color-theme-initialize)
         (color-theme-charcoal-black))
 
     ;; Change cursor color according to mode.
@@ -457,10 +457,10 @@ The following section takes care of setting up other user-interface things
 the way that I prefer them.
 
 ```lisp
-	;; Show the time on the status bar.
-	(setq display-time-24hr-format t)
-	(setq display-time-day-and-date t)
-	(display-time)
+    ;; Show the time on the status bar.
+    (setq display-time-24hr-format t)
+    (setq display-time-day-and-date t)
+    (display-time)
 
     ; Ignore case when completing file names
     (setq read-file-name-completion-ignore-case 't)
@@ -468,36 +468,36 @@ the way that I prefer them.
     ;; Show columns too
     (column-number-mode)
 
-	;; Show matching brackets easily.
-	(show-paren-mode t)
+    ;; Show matching brackets easily.
+    (show-paren-mode t)
 
-	;; Avoid the annoying startup message.
-	(setq inhibit-startup-message t)
+    ;; Avoid the annoying startup message.
+    (setq inhibit-startup-message t)
 
-	;; Uncompress files.
-	(auto-compression-mode t)
+    ;; Uncompress files.
+    (auto-compression-mode t)
 
-	;; Paste at point, not mouse position
-	(setq mouse-yank-at-point t)
+    ;; Paste at point, not mouse position
+    (setq mouse-yank-at-point t)
 
-	;; Make all "yes or no" prompts show "y or n" instead
-	(fset 'yes-or-no-p 'y-or-n-p)
+    ;; Make all "yes or no" prompts show "y or n" instead
+    (fset 'yes-or-no-p 'y-or-n-p)
 
-	;; Highlight the region between point and mark at all times.
-	(transient-mark-mode t)
+    ;; Highlight the region between point and mark at all times.
+    (transient-mark-mode t)
 
-	;; make searches case insensitive
-	(setq case-fold-search t)
+    ;; make searches case insensitive
+    (setq case-fold-search t)
 
-	;; Moving cursor down at bottom scrolls only a single line, not half page
-	(setq scroll-step 1)
-	(setq scroll-conservatively 5)
+    ;; Moving cursor down at bottom scrolls only a single line, not half page
+    (setq scroll-step 1)
+    (setq scroll-conservatively 5)
 
-	;; TAB characters are evil
-	(setq-default indent-tabs-mode nil)
+    ;; TAB characters are evil
+    (setq-default indent-tabs-mode nil)
 
-	;; Show the file we've got loaded in the frame title.
-	(setq frame-title-format  (concat invocation-name "@" system-name ": %b %+%+ %f"))
+    ;; Show the file we've got loaded in the frame title.
+    (setq frame-title-format  (concat invocation-name "@" system-name ": %b %+%+ %f"))
 
     (defun px-raise-frame-and-give-focus ()
         (when window-system
@@ -556,7 +556,7 @@ The following section helper ensures that files are given `+x` permissions
 when they're saved, if they contain a valid shebang line:
 
 ```lisp
-	(noerr-require 'shebang)
+    (noerr-require 'shebang)
 ```
 
 Finally we allow Emacs to control our music playback, which is supplied
@@ -564,5 +564,5 @@ by [MPD](http://www.musicpd.org/).  There are several different MPD client-modes
 is my own:
 
 ```lisp
-	(noerr-require 'mpc)
+    (noerr-require 'mpc)
 ```
