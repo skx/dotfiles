@@ -557,7 +557,7 @@ this is explicitly disabled here:
     ;; get rid of pesky "Ctrl-z" and "Ctrl-x Ctrl-z" annoying minimize
     (global-set-key "\C-z" 'nil)
     (global-set-key "\C-x\C-z" 'nil)
-````
+```
 
 
 ## Unix-specific tweaks
