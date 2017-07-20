@@ -549,6 +549,16 @@ some I've grown accustomed to:
             (message "emacs quit aborted")))
 ```
 
+One thing that often catches me out is the backgrounding on `Ctrl-z`, so
+this is explicitly disabled here:
+
+
+```lisp
+    ;; get rid of pesky "Ctrl-z" and "Ctrl-x Ctrl-z" annoying minimize
+    (global-set-key "\C-z" 'nil)
+    (global-set-key "\C-x\C-z" 'nil)
+````
+
 
 ## Unix-specific tweaks
 
