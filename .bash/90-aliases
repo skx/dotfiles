@@ -1,9 +1,8 @@
 #
 #  For working with the dotfiles repository
 #
-[[ -d ~/Repos/personal/dotfiles.git ]] && alias .DOTFILES='git --work-tree=$HOME --git-dir=$HOME/Repos/personal/dotfiles.git'
-[[ -d ~/git/dotfiles.git ]] && alias .DOTFILES='git --work-tree=$HOME --git-dir=$HOME/git/dotfiles.git'
-[[ -d ~/dotfiles.git ]] && alias .DOTFILES='git --work-tree=$HOME --git-dir=$HOME/dotfiles.git'
+alias .DOTFILES='git --work-tree=$HOME --git-dir=$HOME/Repos/github.com/skx/dotfiles/.git'
+
 
 #
 # If we have .DOTFILES configured
