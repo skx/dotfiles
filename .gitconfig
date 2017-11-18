@@ -16,5 +16,6 @@
 
 [core]
 	editor = vim
+	quotepath = false
 [push]
 	default = matching
