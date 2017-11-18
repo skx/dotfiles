@@ -68,6 +68,6 @@ alias git-source='git config --get remote.origin.url'
 #
 #  Configure password manager
 #
-if [ -d $HOME/Repos/personal/pass ]; then
-    export PASSWORD_STORE_DIR=$HOME/Repos/personal/pass/
+if [ -d $HOME/Repos/git.steve.org.uk/skx/pass ]; then
+    export PASSWORD_STORE_DIR=$HOME/Repos/git.steve.org.uk/skx/pass
 fi
