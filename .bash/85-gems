@@ -1,0 +1,5 @@
+
+if [ -d ~/gems ]; then
+   export GEM_HOME=~/gems/
+   export PATH=$PATH:$HOME/gems/bin/
+fi
