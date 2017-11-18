@@ -1,6 +1,9 @@
 "run-terminal"
   release+control+alt + t
 
+"toggle-vertical"
+  release+control+alt + r
+
 "firefox"
   release+control+alt + f
 
