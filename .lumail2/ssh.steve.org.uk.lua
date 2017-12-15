@@ -1,3 +1,5 @@
+
+
 --
 -- This is the per-user configuration file for lumail.
 --
@@ -65,8 +67,7 @@ local HOME = os.getenv("HOME")
 --
 -- The default Maildir location is ~/Maildir
 --
-Config:set( "maildir.prefix", { "/home/steve/Maildir", "/spam/today/" } )
-
+Config:set( "maildir.prefix", HOME .. "/Maildir" );
 
 --
 -- NOTE: You could also set an array of prefixes, which will be
@@ -119,13 +120,22 @@ Config:set( "colour.unread", "red" )
 --
 -- Save persistant history of our input in the named file.
 --
-Config:set( "global.history", HOME .. "/.lumail2.history" )
+-- Create ~/.lumail2/history/ if missing
+--
+if ( not Directory:exists( HOME .. "/.lumail2/history" ) ) then
+   Directory:mkdir(HOME .. "/.lumail2/history")
+end
 
 --
--- Configure a cache-file, and populate it
+-- Write our history to ~/.lumail2/history/$HOSTNAME
 --
-Config:set( "message.cache", HOME .. "/.lumail2.cache" )
-cache:load( Config:get( "message.cache") )
+Config:set( "global.history", HOME .. "/.lumail2/history/" .. Net:hostname() )
+
+--
+-- Configure a cache-prefix, and populate it
+--
+Config:set( "cache.prefix", HOME .. "/.lumail2/cache" )
+
 
 --
 -- Set the default sorting method.  Valid choices are:
@@ -136,7 +146,9 @@ cache:load( Config:get( "message.cache") )
 --  `subject` - Sort by subject.
 --  `from`    - Sort by sender.
 --
-sorting_method( "file" )
+Config:set( "index.sort", "threads" )
+Config:set( "threads.sort", "date" );
+Config:set( "threads.output", " ;`;-> ")
 
 --
 --  IMAP setup
@@ -180,18 +192,19 @@ for i,o in ipairs(Global:modes()) do
    colour_table[o] = {}
 end
 
+
 --
 -- Setup our colours - for Maildir-mode
 --
 colour_table['maildir'] = {
    ['Automated'] = 'yellow|underline',
-   ['people%-']  = 'green|bold',
+   ['lists']     = 'green|bold',
 }
 
 -- Setup our colours - for index-mode
 colour_table['index'] = {
-   ['Steve'] = 'blue',
-   ['Ian']   = 'blue',
+   ['charge.failed'] = 'green|bold',
+   ['invoice.payment_failed']= 'green|bold',
 }
 
 -- Setup our colours - for a message
@@ -209,6 +222,8 @@ colour_table['message'] = {
    ['^>%s*[^>%s]'] = 'blue',
    ['^>%s$']       = 'blue',
 }
+
+
 --
 -- Show only maildirs which have received mail today by default.
 --
@@ -277,6 +292,9 @@ function on_folder_changed(fld)
       ['dns%-api.com'] = "Steve Kemp <steve@dns-api.com>",
       ['dhcp%-io'] = "Steve Kemp <steve@dhcp.io>",
       ['steve%-fi'] = "Steve Kemp <steve@steve.fi>",
+      ['people%-sini'] = "Steve Kemp <steve@steve.fi>",
+      ['etuovi%-com'] = "Steve Kemp <etuovi@steve.fi>",
+
    }
 
    for pattern,email in pairs(from) do
@@ -289,4 +307,56 @@ function on_folder_changed(fld)
 
    -- No match - use the default.
    Config:set( "global.sender", def_from )
+end
+
+Config:set("index.format",
+           "[${4|flags}] ${2|message_flags} - ${name|20} - ${indent}${subject}" )
+
+
+
+function on_cleanup_name(name)
+   -- Remove "(via Twitter)" if present
+   name = string.gsub(name, "%(via Twitter%)", "" )
+
+   -- Remove leading/trailing spaces.
+   name = (name:gsub("^%s*(.-)%s*$", "%1"))
+
+   -- Remove any wrapping by "-characters.
+   name = string.match(name,"^\"(.*)\"$") or name
+
+   -- Remove leading/trailing spaces.
+   name = (name:gsub("^%s*(.-)%s*$", "%1"))
+
+   return(name)
+end
+
+-- compatibility
+function on_clean_name(name)
+   return(on_cleanup_name(name))
+end
+
+function on_get_recipient(to,msg)
+    if ( string.find(to, "kirsi.kemp@iki.fi" ) ) then
+        return( "Kirsi Kemp <gayrzah@gmail.com>" )
+    else
+        return to
+    end
+end
+
+function show_html()
+   local msg = Message.at_point()
+   if not msg then
+      error_msg "Failed to find message!"
+   end
+
+  local parts = mimeparts2table(msg)
+  local a_count = 0
+  for i, o in ipairs(parts) do
+     if o['type'] == "text/html" then
+        Config:set( "global.mode", "attachment" )
+        Config:set("attachment.current", i -1)
+        view_mime_part("lynx -force_html %s" )
+    end
+  end
+
 end
