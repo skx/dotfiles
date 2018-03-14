@@ -50,6 +50,14 @@ done
 
 
 #
+# Installation of passwordstore.org + extensions
+#
+if [ -d /opt/pass ]; then
+    add_to_path /opt/pass
+    . /opt/pass/completion/pass.bash-completion
+fi
+
+#
 #  Add in the common things.
 #
 export PATH=$PATH:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
