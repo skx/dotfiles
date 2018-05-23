@@ -307,23 +307,22 @@ long Emacs has been running.  The following function will show that,
 and can be invoked via `M-x uptime`.
 
 ```lisp
-(require 'time-date)
+    (require 'time-date)
 
-(defvar emacs-up-time (current-time)
-  "Time at which Emacs started up.")
+    (defvar emacs-up-time (current-time)
+    "Time at which Emacs started up.")
 
-(defun uptime ()
-  "Displays the uptime of GNU Emacs."
-  (interactive)
-  (let* ((now (current-time))
+    (defun uptime ()
+      "Displays the uptime of GNU Emacs."
+      (interactive)
+      (let* ((now (current-time))
          (second (floor (- (time-to-seconds now)
                            (time-to-seconds emacs-up-time))))
          (minute (floor second 60))
          (hour (floor minute 60))
          (day (floor hour 24)))
-    (message "Emacs up %s day(s), %02d:%02d"
-              day (% hour 24) (% minute 60))))
-
+         (message "Emacs up %s day(s), %02d:%02d"
+         day (% hour 24) (% minute 60))))
 ```
 
 
@@ -343,6 +342,15 @@ collapse muliple newlines into one, across a region.
     (defun collapse-blank-lines(start end)
      (interactive "r")
      (replace-regexp "^\n\\{2,\\}" "\n" nil start end))
+```
+
+When running Emacs upon a terminal, rather than graphically, lines that
+are too long have a "`\`" character added to them.  This makes copying
+and pasting to other terminal-applications annoying.  Disable that wrapping
+behaviour here:
+
+```lisp
+    (set-display-table-slot standard-display-table 'wrap ?\ )
 ```
 
 
