@@ -2,6 +2,18 @@
 
 This file contains the human-readable initialization configuration for emacs.
 
+When emacs launches it will attempt to load an init file looking for:
+
+* `~/.emacs`
+* `~/.emacs.el`
+* `~/.emacs.d/init.el`
+
+I've created the file [emacs.d/init.el](init.el) which parses and executes
+the contents of _this_ (markdown) file, allowing me to write my Emacs
+configuration in a somewhat literate form.
+
+Hopefully this is neat :)
+
 
 ## Initial Functions
 
