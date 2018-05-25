@@ -193,9 +193,30 @@ there isn't a native Emacs Lisp mode for it yet.
 Installation instead relies the code in [the official github repository](https://github.com/dominikh/go-mode.el):
 
 ```lisp
-    (require 'go-mode-autoloads)
+    (require 'go-mode)
+    (add-to-list 'auto-mode-alist (cons "\\.go\\'" 'go-mode))
 ```
 
+The following hook ensures that code is formatted prior to being saved.
+
+If [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) is present it will be used, otherwise we'll fall back to the default formatter which uses `gofmt`:
+
+```lisp
+    ;; prefer goimports, if present
+    (if (executable-find "goimports")
+      (setq gofmt-command "goimports"))
+
+    (add-hook 'before-save-hook 'gofmt-before-save)
+```
+
+Finally we can use [godef](github.com/rogpeppe/godef) to jump to method definitions, much like ctags:
+
+```lisp
+  ; esc-space to jump to definition
+  (local-set-key (kbd "M- ") 'godef-jump)
+  ; escp-b to jump (b)ack
+  (local-set-key (kbd "M-b") 'pop-tag-mark)
+```
 
 ### Language Modes - Utilities
 
