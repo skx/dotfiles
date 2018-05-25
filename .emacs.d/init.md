@@ -135,11 +135,12 @@ bodies, etc).
 
 ### Language Modes - Perl
 
-I do a lot of my coding in Perl-mode, and this is configured here.
+I do a lot of my coding in Perl, and this is configured here.
 
 First of all we want to ensure that we use `cperl-mode`, rather than
 `perl-mode`, and we wish to ensure that `*.t` are formatted in this mode
-too - as these are usually test-cases:
+too - as these files almost always contain perl test-cases in my
+experience:
 
 ```lisp
     ;;  We always prefer CPerl mode to Perl mode.
@@ -202,10 +203,7 @@ configuration file I have stored in my dotfiles:
 
 ### Language Modes - golang
 
-[golang](https://golang.org/) is a language I've recently started to use, and
-there isn't a native Emacs Lisp mode for it yet.
-
-Installation instead relies the code in [the official github repository](https://github.com/dominikh/go-mode.el):
+[golang](https://golang.org/) is a language I use a fair bit, but there isn't a mode for it included in the releases of Emacs as packaged for Debian GNU/Linux, so installation instead relies upon the code in [the official github repository](https://github.com/dominikh/go-mode.el):
 
 ```lisp
     (require 'go-mode)
