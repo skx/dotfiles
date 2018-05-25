@@ -1,24 +1,27 @@
 # Emacs Initialization Functions
 
 This file contains the human-readable initialization configuration for emacs.
-
-When emacs launches it will attempt to load an init file looking for:
+When emacs launches it will attempt to load an init-file, and it will examine
+each of the following files:
 
 * `~/.emacs`
 * `~/.emacs.el`
 * `~/.emacs.d/init.el`
 
-I've created the file [emacs.d/init.el](init.el) which parses and executes
+I've created the file [~/.emacs.d/init.el](init.el) which parses and executes
 the contents of _this_ (markdown) file, allowing me to write my Emacs
 configuration in a somewhat literate form.
 
-Hopefully this is neat :)
+Hopefully this is neat, and allows my configuration to be self-documenting,
+and easily understood.
 
 
 ## Initial Functions
 
+Common Lisp is required by some other later things, more detail here would
+be nice but to get started we'll just require that library:
+
 ```lisp
-    ;; Common Lisp is required by some other later things.
     (require 'cl)
 ```
 
