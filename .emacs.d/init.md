@@ -450,8 +450,8 @@ I prefer to avoid menu-bars, tool-bars, and have a minimal look:
     (global-set-key (kbd "C--") 'text-scale-decrease)
 
     ;; Make sure our cursor doesn't get in the way.
-    (if window-system
-        (mouse-avoidance-mode 'cat-and-mouse))
+    (require 'avoid)
+    (mouse-avoidance-mode 'cat-and-mouse)
 ```
 
 Now we've tweaked the GUI we can setup the clipboard integration:
