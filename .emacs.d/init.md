@@ -199,24 +199,27 @@ Installation instead relies the code in [the official github repository](https:/
 
 The following hook ensures that code is formatted prior to being saved.
 
-If [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) is present it will be used, otherwise we'll fall back to the default formatter which uses `gofmt`:
-
-```lisp
-    ;; prefer goimports, if present
-    (if (executable-find "goimports")
-      (setq gofmt-command "goimports"))
-
-    (add-hook 'before-save-hook 'gofmt-before-save)
-```
+If [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) is present it will be used, otherwise we'll fall back to the default formatter which uses `gofmt`.
 
 Finally we can use [godef](github.com/rogpeppe/godef) to jump to method definitions, much like ctags:
 
+
 ```lisp
-  ; esc-space to jump to definition
-  (local-set-key (kbd "M- ") 'godef-jump)
-  ; escp-b to jump (b)ack
-  (local-set-key (kbd "M-b") 'pop-tag-mark)
+    (defun my-go-mode-hook ()
+      ;; prefer goimports, if present
+      (if (executable-find "goimports")
+        (setq gofmt-command "goimports"))
+
+      (add-hook 'before-save-hook 'gofmt-before-save)
+
+      ;; esc-space to jump to definition
+      (local-set-key (kbd "M-SPC") 'godef-jump)
+      ;; escp-b to jump (b)ack
+      (local-set-key (kbd "M-b") 'pop-tag-mark)
+    )
+    (add-hook 'go-mode-hook 'my-go-mode-hook)
 ```
+
 
 ### Language Modes - Utilities
 
