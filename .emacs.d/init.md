@@ -201,7 +201,7 @@ The following hook ensures that code is formatted prior to being saved.
 
 If [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) is present it will be used, otherwise we'll fall back to the default formatter which uses `gofmt`.
 
-Finally we can use [godef](github.com/rogpeppe/godef) to jump to method definitions, much like ctags:
+Finally we can use [godef](https://github.com/rogpeppe/godef) to jump to method definitions, much like ctags:
 
 
 ```lisp
