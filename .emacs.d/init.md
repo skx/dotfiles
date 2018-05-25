@@ -203,18 +203,20 @@ configuration file I have stored in my dotfiles:
 
 ### Language Modes - golang
 
-[golang](https://golang.org/) is a language I use a fair bit, but there isn't a mode for it included in the releases of Emacs as packaged for Debian GNU/Linux, so installation instead relies upon the code in [the official github repository](https://github.com/dominikh/go-mode.el):
+[golang](https://golang.org/) is a language I use a fair bit, but there isn't a mode for it included in the releases of Emacs as packaged for Debian GNU/Linux, so installation instead relies upon the code in [the official github repository](https://github.com/dominikh/go-mode.el).
+
+(Obviously my [dotfiles](https://github.com/skx/dotfiles/) contain a copy of the appropriate files.)
+
+Once installed we can now configure the basic setup, ensuring that the mode is loaded for the editing of `*.go` files:
 
 ```lisp
     (require 'go-mode)
     (add-to-list 'auto-mode-alist (cons "\\.go\\'" 'go-mode))
 ```
 
-The following hook ensures that code is formatted prior to being saved.
+More interestingly we can add a hook to ensure that code is formatted prior to being saved.  If [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) is present it will be used, otherwise we'll fall back to the default `gofmt`-based formatting.
 
-If [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) is present it will be used, otherwise we'll fall back to the default formatter which uses `gofmt`.
-
-Finally we can use [godef](https://github.com/rogpeppe/godef) to jump to method definitions, much like ctags:
+In this hook we'll also allow [godef](https://github.com/rogpeppe/godef) to be used to jump to method definitions, much like ctags:
 
 
 ```lisp
