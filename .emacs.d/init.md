@@ -218,6 +218,18 @@ configuration file I have stored in my dotfiles:
    t))
 ```
 
+Using the function we've just defined we can now make sure that we tidy
+our perl-buffers just prior to saving:
+
+```lisp
+    (defun cperl-add-perltidy-hook ()
+      (if (executable-find "perltidy")
+          (add-hook 'before-save-hook 'perltidy)))
+    (add-hook 'cperl-mode-hook 'cperl-add-perltidy-hook)
+```
+
+> **NOTE**: This is the second time we've added somethign to `cperl-mode-hook`.
+
 
 ### Language Modes - golang
 
