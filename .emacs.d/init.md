@@ -81,25 +81,39 @@ In addition to these _real_ programming languages I also use
 automation - so I load modes for those too.
 
 ```lisp
+    ;; Lua
     (with-feature (lua-mode)
         (setq auto-mode-alist
             (append '(("\\.lua$" . lua-mode)) auto-mode-alist))
         (setq interpreter-mode-alist
             (append '(("lua" . lua-mode)) interpreter-mode-alist)))
 
+    ;; Markdown
     (with-feature (markdown-mode)
         (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
         (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
 
+    ;; Puppet
     (with-feature (puppet-mode)
         (setq auto-mode-alist
             (append '(("\\.pp$" . puppet-mode)) auto-mode-alist)))
 
+    ;; Ruby
     (setq auto-mode-alist
         (append '(("\\.rb$" . ruby-mode)) auto-mode-alist))
     (setq interpreter-mode-alist
         (append interpreter-mode-alist '(("rb"   . ruby-mode))))
+```
 
+
+The monkey programming language was introduced (and implemented!)
+in the book "[Writing An Interpreter In Go](https://interpreterbook.com/).
+
+[My monkey implementation](https://github.com/skx/monkey/) implements
+several enhancements, and comes complete with an emacs mode which we'll
+load here:
+
+```lisp
     (with-feature (monkey)
         (setq auto-mode-alist
             (append '(("\\.mon$" . monkey-mode)) auto-mode-alist)))
