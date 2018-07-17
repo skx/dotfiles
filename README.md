@@ -1,7 +1,14 @@
 dotfiles
 ========
 
-Yet another dotfile-repository of shell files, and similar.
+This is my "dotfile" repository.  Visitors seem to most interested in the setup
+of GNU Emacs:
+
+* [.emacs.d/init.md](.emacs.d/init.md)
+  * This is a markdown file which contains all my emacs setup.
+* [.emacs.d/init.el](.emacs.d/init.el)
+  * This file is read at startup-time by Emacs, and executes the content of the markdown file.
+
 
 
 Using The Repository
