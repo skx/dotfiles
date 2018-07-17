@@ -107,7 +107,7 @@ automation - so I load modes for those too.
 
 
 The monkey programming language was introduced (and implemented!)
-in the book "[Writing An Interpreter In Go](https://interpreterbook.com/).
+in the book "[Writing An Interpreter In Go](https://interpreterbook.com/)".
 
 [My monkey implementation](https://github.com/skx/monkey/) implements
 several enhancements, and comes complete with an emacs mode which we'll
