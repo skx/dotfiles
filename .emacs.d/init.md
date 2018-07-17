@@ -100,6 +100,10 @@ automation - so I load modes for those too.
     (setq interpreter-mode-alist
         (append interpreter-mode-alist '(("rb"   . ruby-mode))))
 
+    (with-feature (monkey)
+        (setq auto-mode-alist
+            (append '(("\\.mon$" . monkey-mode)) auto-mode-alist)))
+
 ```
 
 "`*.ino`" files are used by the Arduino IDE to compile code, and
