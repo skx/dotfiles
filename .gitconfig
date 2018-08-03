@@ -1,7 +1,6 @@
 [user]
     name = Steve Kemp
     email = steve@steve.org.uk
-	signingkey = 0C626242
 
 [color]
     diff  = auto
@@ -19,3 +18,11 @@
 	quotepath = false
 [push]
 	default = matching
+
+
+#
+# We might have a .local configuration-file which will make changes
+# here - this is not tracked by git for obvious reasons.
+#
+[include]
+    path = .gitconfig.local
