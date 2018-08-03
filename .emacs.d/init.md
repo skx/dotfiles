@@ -37,7 +37,7 @@ to load:
             (add-to-list 'load-path d)))
 
     (mapc 'add-to-load-path
-        (directory-files "~/.emacs.d/" t "[a-z]*"))
+        (file-expand-wildcards "~/.emacs.d/*"))
 ```
 
 Now we define some utility-functions to load packages.
