@@ -22,4 +22,17 @@ if [ $XFRAMES = 0 ]; then
     EMACS="$EMACS -c"
 fi
 
-eval "$EMACS -n $@"
+# For each argument we received ensure that we launch emacs.
+#
+# We use a loop rather than just executing `eval $EMACS -n $@` to ensure that
+# we can cope when we're launched with multiple arguments, e.g:
+#
+#      e *.go
+#
+# Or:
+#
+#      e path\ with\ spaces.txt second.file.txt
+#
+for i in "$@" ; do
+    eval $EMACS -n "\"$i\""
+done
