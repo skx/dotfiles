@@ -140,8 +140,7 @@ Now we can configure basic formatting for C/C++:
 
 ```
 
-For C & C++ I also setup [code-folding](#code-folding) later in this file.
-
+I also setup [code-folding](#language-modes---code-folding) later in this file.
 
 
 ### Language Modes - Perl
@@ -223,6 +222,8 @@ our perl-buffers just prior to saving, if we have a `perltidy` executable:
 
 > **NOTE**: This is the second time we've added somethign to `cperl-mode-hook`.
 
+I also setup [code-folding](#language-modes---code-folding) later in this file.
+
 
 ### Language Modes - golang
 
@@ -258,6 +259,8 @@ In this hook we'll also allow [godef](https://github.com/rogpeppe/godef) to be u
     )
     (add-hook 'go-mode-hook 'my-go-mode-hook)
 ```
+
+I also setup [code-folding](#language-modes---code-folding) later in this file.
 
 
 ### Language Modes - Code Folding
