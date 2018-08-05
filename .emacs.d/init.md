@@ -212,13 +212,13 @@ configuration file I have stored in my dotfiles:
 ```
 
 Using the function we've just defined we can now make sure that we tidy
-our perl-buffers just prior to saving:
+our perl-buffers just prior to saving, if we have a `perltidy` executable:
 
 ```lisp
-    (defun cperl-add-perltidy-hook ()
-      (if (executable-find "perltidy")
-          (add-hook 'before-save-hook 'perltidy)))
-    (add-hook 'cperl-mode-hook 'cperl-add-perltidy-hook)
+    (add-hook 'cperl-mode-hook
+        (lambda ()
+            (if (executable-find "perltidy")
+                (add-hook 'before-save-hook 'perltidy nil t))))
 ```
 
 > **NOTE**: This is the second time we've added somethign to `cperl-mode-hook`.
