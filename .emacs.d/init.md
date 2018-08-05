@@ -128,26 +128,19 @@ this is really just C++ with magic-wrapping:
     (add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
 ```
 
+
 ### Language Modes - C / C++
 
-
-Now we can configure basic formatting, as well as setting up support
-for code-folding (which allows you to toggle the display of function
-bodies, etc).
+Now we can configure basic formatting for C/C++:
 
 ```lisp
     (setq c-default-style "linux")
     (setq c-basic-offset 4)
     (c-set-offset 'substatement-open 0)
 
-    (defun my-c-mode-hook ()
-      (hs-minor-mode 1))
-
-    (add-hook 'c++-mode-hook 'my-c-mode-hook t)
-    (add-hook 'c-mode-hook 'my-c-mode-hook t)
-
 ```
 
+For C & C++ I also setup [code-folding](#code-folding) later in this file.
 
 
 
@@ -255,6 +248,7 @@ In this hook we'll also allow [godef](https://github.com/rogpeppe/godef) to be u
       (if (executable-find "goimports")
         (setq gofmt-command "goimports"))
 
+      ;; Format code when we save
       (add-hook 'before-save-hook 'gofmt-before-save)
 
       ;; esc-space to jump to definition
@@ -263,6 +257,29 @@ In this hook we'll also allow [godef](https://github.com/rogpeppe/godef) to be u
       (local-set-key (kbd "M-b") 'pop-tag-mark)
     )
     (add-hook 'go-mode-hook 'my-go-mode-hook)
+```
+
+
+### Language Modes - Code Folding
+
+I define a hook which will setup the toggling of code-blocks via HideShow,
+this will be enabled for C, C++, Golang & Perl-modes.
+
+This also binds `Esc-TAB` to toggle the block under the point, and `Esc--`
+and `Esc-+` to hide/show all:
+
+```lisp
+    (defun enable-hs-mode-hook()
+      (hs-minor-mode 1)
+      (local-set-key (kbd "M-TAB") 'hs-toggle-hiding)
+      (local-set-key (kbd "M--") 'hs-hide-all)
+      (local-set-key (kbd "M-+") 'hs-show-all))
+
+    ;; Enable this code-folding for C, C++, Golang, and Perl
+    (add-hook 'c++-mode-hook 'enable-hs-mode-hook t)
+    (add-hook 'c-mode-hook 'enable-hs-mode-hook t)
+    (add-hook 'go-mode-hook 'enable-hs-mode-hook t)
+    (add-hook 'perl-mode-hook 'enable-hs-mode-hook t)
 ```
 
 
@@ -351,6 +368,7 @@ explicitly set them to pink, and configure the indentation too:
     (setq web-mode-code-indent-offset 2)
 
 ```
+
 
 ## System Administration
 
