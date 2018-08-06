@@ -344,6 +344,19 @@ following  allows that to be done neatly - select the region and run
 ```
 
 
+### Web Utilities - Markdown
+
+The following snippet is useful when you're working with large markdown-files:
+
+```lisp
+    (defun markdown-index()
+     "Show (clickable) headings in the current buffer"
+     (interactive)
+     (occur "^#+"))
+
+```
+
+
 ### Language Modes - Web Mode
 
 One of the annoyances with writing HTML is that often it contains
