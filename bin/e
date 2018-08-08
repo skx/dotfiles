@@ -22,6 +22,7 @@ if [ $XFRAMES = 0 ]; then
     EMACS="$EMACS -c"
 fi
 
+#
 # For each argument we received ensure that we launch emacs.
 #
 # We use a loop rather than just executing `eval $EMACS -n $@` to ensure that
@@ -33,6 +34,20 @@ fi
 #
 #      e path\ with\ spaces.txt second.file.txt
 #
-for i in "$@" ; do
-    eval $EMACS -n "\"$i\""
-done
+if [ "$#" -gt 0 ]; then
+    for i in "$@" ; do
+        echo "Loading in existing Emacs instance: $i"
+        eval $EMACS -n "\"$i\""
+    done
+    exit
+fi
+
+
+# If there is no frame then start one.
+if [ $XFRAMES = 0 ]; then
+    echo "Launching emacs - no files given on command-line."
+    emacsclient --alternate-editor="" -n -c "$@"
+else
+    echo "Raising existing emacs - no files given on command-line."
+    wmctrl -R emacs@
+fi
