@@ -283,6 +283,7 @@ and `Esc-+` to hide/show all:
     (add-hook 'c-mode-hook 'enable-hs-mode-hook t)
     (add-hook 'go-mode-hook 'enable-hs-mode-hook t)
     (add-hook 'perl-mode-hook 'enable-hs-mode-hook t)
+    (add-hook 'web-mode-hook 'enable-hs-mode-hook t)
 ```
 
 
@@ -353,7 +354,14 @@ The following snippet is useful when you're working with large markdown-files:
      "Show (clickable) headings in the current buffer"
      (interactive)
      (occur "^#+"))
+```
 
+Now we can ensure that this is bound to `M-i` when `markdown-mode` is active:
+
+```lisp
+    (add-hook 'markdown-mode-hook
+     (lambda ()
+      (local-set-key (kbd "M-i") 'markdown-index)))
 ```
 
 
