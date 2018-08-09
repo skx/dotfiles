@@ -105,7 +105,6 @@ automation - so I load modes for those too.
         (append interpreter-mode-alist '(("rb"   . ruby-mode))))
 ```
 
-
 The monkey programming language was introduced (and implemented!)
 in the book "[Writing An Interpreter In Go](https://interpreterbook.com/)".
 
@@ -121,7 +120,7 @@ load here:
 ```
 
 "`*.ino`" files are used by the Arduino IDE to compile code, and
-this is really just C++ with magic-wrapping:
+these files are C++ with magic-wrapping to make compilation happen:
 
 ```lisp
     ;; Arduino input-files.
@@ -140,7 +139,7 @@ Now we can configure basic formatting for C/C++:
 
 ```
 
-I also setup [code-folding](#language-modes---code-folding) later in this file.
+Note that I also setup [code-folding](#language-modes---code-folding) later in this file.
 
 
 ### Language Modes - Perl
@@ -220,9 +219,9 @@ our perl-buffers just prior to saving, if we have a `perltidy` executable:
                 (add-hook 'before-save-hook 'perltidy nil t))))
 ```
 
-> **NOTE**: This is the second time we've added somethign to `cperl-mode-hook`.
+> **NOTE**: This is the second time we've added something to `cperl-mode-hook`.
 
-I also setup [code-folding](#language-modes---code-folding) later in this file.
+Note that I also setup [code-folding](#language-modes---code-folding) later in this file.
 
 
 ### Language Modes - golang
@@ -260,7 +259,7 @@ In this hook we'll also allow [godef](https://github.com/rogpeppe/godef) to be u
     (add-hook 'go-mode-hook 'my-go-mode-hook)
 ```
 
-I also setup [code-folding](#language-modes---code-folding) later in this file.
+Note that I also setup [code-folding](#language-modes---code-folding) later in this file.
 
 
 ### Language Modes - Code Folding
@@ -532,8 +531,6 @@ Now we've tweaked the GUI we can setup the clipboard integration:
 ```lisp
     ;; Copying in emacs should allow pasting into gnome-terminal, etc.
     (setq x-select-enable-clipboard t)
-
-    ;;
     (setq x-select-enable-primary t)
     (setq mouse-drag-copy-region t)
 ```
@@ -585,7 +582,7 @@ the way that I prefer them.
     ; Ignore case when completing file names
     (setq read-file-name-completion-ignore-case 't)
 
-    ;; Show columns too
+    ;; Show column-numbers too
     (column-number-mode)
 
     ;; Show matching brackets easily.
@@ -594,7 +591,7 @@ the way that I prefer them.
     ;; Avoid the annoying startup message.
     (setq inhibit-startup-message t)
 
-    ;; Uncompress files.
+    ;; Uncompress files as they're loaded.
     (auto-compression-mode t)
 
     ;; Paste at point, not mouse position
@@ -629,9 +626,6 @@ the way that I prefer them.
 
     ; Text-mode is default mode
     (setq default-major-mode 'text-mode)
-
-    ; auto-formatting in text-mode
-    ;(add-hook 'text-mode-hook 'turn-on-auto-fill)
 ```
 
 
@@ -669,8 +663,8 @@ some I've grown accustomed to:
             (message "emacs quit aborted")))
 ```
 
-One thing that often catches me out is the backgrounding on `Ctrl-z`, so
-this is explicitly disabled here:
+One thing that often catches me out is the backgrounding behaviour on `Ctrl-z`,
+especially on a terminal, so this is explicitly disabled here:
 
 
 ```lisp
@@ -690,8 +684,8 @@ when they're saved, if they contain a valid shebang line:
 ```
 
 Finally we allow Emacs to control our music playback, which is supplied
-by [MPD](http://www.musicpd.org/).  There are several different MPD client-modes in Emacs, this
-is my own:
+by [MPD](http://www.musicpd.org/).  There are several different MPD
+client-modes in Emacs, this is my own:
 
 ```lisp
     (noerr-require 'mpc)
