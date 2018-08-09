@@ -1,6 +1,6 @@
 ;;; puppet-mode.el --- Major mode for Puppet manifests  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2013, 2014  Sebastian Wiesner <swiesner@lunaryorn.com>
+;; Copyright (C) 2013-2014, 2016  Sebastian Wiesner <swiesner@lunaryorn.com>
 ;; Copyright (C) 2013, 2014  Bozhidar Batsov <bozhidar@batsov.com>
 ;; Copyright (C) 2011  Puppet Labs Inc
 
@@ -9,7 +9,7 @@
 ;;     Russ Allbery <rra@stanford.edu>
 ;; Maintainer: Bozhidar Batsov <bozhidar@batsov.com>
 ;;     Sebastian Wiesner <swiesner@lunaryorn.com>
-;; URL: https://github.com/lunaryorn/puppet-mode
+;; URL: https://github.com/voxpupuli/puppet-mode
 ;; Keywords: languages
 ;; Version: 0.4-cvs
 ;; Package-Requires: ((emacs "24.1") (pkg-info "0.4"))
@@ -51,7 +51,7 @@
 ;; Provides syntax highlighting, indentation, alignment, movement, Imenu and
 ;; code checking.
 
-;; Syntax highlighting: Fontification upports all of Puppet 3 syntax, including
+;; Syntax highlighting: Fontification supports all of Puppet 3 syntax, including
 ;; variable expansion in strings.
 
 ;; Indentation: Indent expressions automatically.
@@ -71,9 +71,9 @@
 ;; with `puppet-lint' on C-c C-l.  Apply the current buffer with `puppet-apply'
 ;; on C-c C-c.
 
-;; Flymake: Flymake support is _not_ provided. See Flycheck at
-;; http://flycheck.readthedocs.org/en/latest/ for on-the-fly validation and
-;; liniting of Puppet manifests.
+;; Syntax checking: Flymake support is _not_ provided.  See Flycheck at
+;; http://www.flycheck.org for on-the-fly validation and liniting of Puppet
+;; manifests.
 
 ;;; Code:
 
@@ -105,6 +105,8 @@ buffer-local wherever it is set."
   (require 'rx))
 
 (require 'align)
+(require 'ansi-color)
+(require 'comint)
 
 
 ;;; Customization
@@ -112,7 +114,7 @@ buffer-local wherever it is set."
   "Puppet mastering in Emacs"
   :prefix "puppet-"
   :group 'languages
-  :link '(url-link :tag "Github" "https://github.com/lunaryorn/puppet-mode")
+  :link '(url-link :tag "Github" "https://github.com/voxpupuli/puppet-mode")
   :link '(emacs-commentary-link :tag "Commentary" "puppet-mode"))
 
 (defcustom puppet-indent-level 2
@@ -154,7 +156,7 @@ buffer-local wherever it is set."
 (defcustom puppet-lint-command
   (concat
    "puppet-lint --with-context "
-   "--log-format \"%{path}:%{linenumber}: %{kind}: %{message} (%{check})\"")
+   "--log-format \"%{path}:%{line}: %{kind}: %{message} (%{check})\"")
   "Command to lint a Puppet manifest."
   :type 'string
   :group 'puppet
@@ -165,6 +167,24 @@ buffer-local wherever it is set."
   :type 'string
   :group 'puppet
   :package-version '(puppet-mode . "0.3"))
+
+(defcustom puppet-repl-command "puppet debugger"
+  "The Puppet REPL command used to interact with code."
+  :type 'string
+  :group 'puppet
+  :package-version '(puppet-mode . "0.4"))
+
+(defcustom puppet-repl-args '()
+  "The arguments to pass to `puppet-repl-command' to start a REPL."
+  :group 'puppet
+  :type '(repeat string)
+  :package-version '(puppet-mode . "0.4"))
+
+(defcustom puppet-repl-buffer "*Puppet-REPL*"
+  "The name of the Puppet REPL buffer."
+  :group 'puppet
+  :type 'string
+  :package-version '(puppet-mode . "0.4"))
 
 (defface puppet-regular-expression-literal
   '((t :inherit font-lock-constant-face))
@@ -225,6 +245,53 @@ Return nil, if there is no special context at POS, or one of
   "Determine whether POS is inside a string or comment."
   (not (null (puppet-syntax-context pos))))
 
+(defun puppet-get-repl-proc ()
+  (unless (comint-check-proc puppet-repl-buffer)
+    (puppet-repl))
+  (get-buffer-process puppet-repl-buffer))
+
+(defun puppet-repl-send-region (start end)
+  "Send the current region to the inferior Puppet REPL process."
+  (interactive "r")
+  (deactivate-mark t)
+  (let* ((string (buffer-substring-no-properties start end))
+         (proc (puppet-get-repl-proc)))
+    (comint-simple-send proc string)))
+
+(defun puppet-repl-send-line ()
+  "Send the current line to the inferior Puppet REPL process."
+  (interactive)
+  (puppet-repl-send-region (line-beginning-position) (line-end-position)))
+
+(defun puppet-repl-send-buffer ()
+  "Send the current buffer to the inferior Puppet REPL process."
+  (interactive)
+  (puppet-repl-send-region (point-min) (point-max)))
+
+(defun puppet-comint-filter (string)
+  (ansi-color-apply string))
+
+(defun puppet-repl ()
+  "Launch a Puppet REPL using `puppet-repl-command' as an inferior mode."
+  (interactive)
+
+  ;; the command (at least for now) is 'puppet debugger'
+  ;; but really it is 'puppet' with args 'debugger' + puppet-repl-args
+  ;; Even if it changes, we need to not break on multi-word commands
+  (unless (comint-check-proc puppet-repl-buffer)
+    (let* ((command-list (split-string puppet-repl-command))
+           (real-puppet-repl-command (car command-list))
+           (real-puppet-repl-args (append (cdr command-list)
+                                          puppet-repl-args)))
+      (set-buffer
+       (apply 'make-comint "Puppet-REPL"
+              real-puppet-repl-command
+              nil
+              real-puppet-repl-args)))
+    ;; Workaround for ansi colors
+    (add-hook 'comint-preoutput-filter-functions 'puppet-comint-filter nil t))
+
+  (pop-to-buffer puppet-repl-buffer))
 
 ;;; Specialized rx
 
@@ -244,21 +311,27 @@ Return nil, if there is no special context at POS, or one of
                                ;; Any escaped character
                                (and "\\" not-newline)))))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#reserved-words
-      (keyword . ,(rx (or "and" "case" "class" "default" "define" "else" "elsif"
-                          "false" "if" "in" "import" "inherits" "node" "or"
-                          "true" "undef" "unless")))
+      (keyword . ,(rx (or "and" "application" "attr" "case" "class" "consumes"
+                          "default" "define" "else" "elsif" "environment"
+                          "false" "function" "if" "import" "in" "inherits"
+                          "node" "or" "private" "produces" "site" "true"
+                          "type" "undef" "unless")))
       ;; http://docs.puppetlabs.com/references/latest/function.html
-      (builtin-function . ,(rx (or "alert" "collect" "contain"
-                                   "create_resources" "crit" "debug" "defined"
-                                   "each" "emerg" "err" "extlookup" "fail"
-                                   "file" "filter" "fqdn_rand" "generate"
-                                   "hiera" "hiera_array" "hiera_hash"
-                                   "hiera_include" "include" "info"
-                                   "inline_template" "lookup" "map" "md5"
-                                   "notice" "realize" "reduce" "regsubst"
-                                   "require" "search" "select" "sha1"
-                                   "shellquote" "slice" "split" "sprintf" "tag"
-                                   "tagged" "template" "versioncmp" "warning")))
+      (builtin-function . ,(rx (or "alert" "assert_type" "binary_file" "break"
+                                   "contain" "create_resources" "crit" "debug"
+                                   "defined" "dig" "digest" "each" "emerg"
+                                   "epp" "err" "fail" "file" "filter"
+                                   "find_file" "fqdn_rand" "generate" "hiera"
+                                   "hiera_array" "hiera_hash" "hiera_include"
+                                   "include" "info" "inline_epp"
+                                   "inline_template" "lest" "lookup" "map"
+                                   "match" "md5" "new" "next" "notice"
+                                   "realize" "reduce" "regsubst" "require"
+                                   "return" "reverse_each" "scanf" "sha1"
+                                   "shellquote" "slice" "split" "sprintf"
+                                   "step" "strftime" "tag" "tagged" "template"
+                                   "then" "type" "versioncmp" "warning" "with"
+                                   )))
       ;; http://docs.puppetlabs.com/references/latest/type.html
       (builtin-type . ,(rx (or "augeas" "computer" "cron" "exec" "file"
                                "filebucket" "group" "host" "interface" "k5login"
@@ -280,11 +353,29 @@ Return nil, if there is no special context at POS, or one of
       ;; it got a mention in the docs, see
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_resources.html#ensure,
       ;; so we'll consider it as metaparameter anyway
-      (builtin-metaparam . ,(rx (or "alias" "audit" "before" "loglevel" "noop"
-                                    "notify" "require" "schedule" "stage"
-                                    "subscribe" "tag"
+      (builtin-metaparam . ,(rx (or "alias" "audit" "before" "consume" "export"
+                                    "loglevel" "noop" "notify" "require"
+                                    "schedule" "stage" "subscribe" "tag"
                                     ;; Because it's so common and important
                                     "ensure")))
+      ;; https://github.com/puppetlabs/puppet-specifications/blob/master/language/types_values_variables.md
+      (data-type . ,(rx (or
+                         ;; Data Types
+                         "Array" "Binary" "Hash"
+                         ;; Scalar Types
+                         "Boolean" "Float" "Integer" "Regexp" "SemVer" "String"
+                         "Timespan" "Timestamp"
+                         ;; Catalog Types
+                         "Class" "Resource"
+                         ;; Abstract Types
+                         "Any" "CatalogEntry" "Collection" "Data" "Enum"
+                         "Iterable" "Iterator" "NotUndef" "Numeric" "Optional"
+                         "Pattern" "RichData" "Scalar" "ScalarData"
+                         "SemVerRange" "Struct" "Tuple" "Variant"
+                         ;; Platform Types:
+                         "Callable" "Default" "Runtime" "Sensitive" "Type"
+                         "Undef"
+                         )))
       ;; http://docs.puppetlabs.com/puppet/latest/reference/lang_reserved.html#classes-and-types
       (resource-name . ,(rx
                          ;; Optional top-level scope
@@ -349,6 +440,9 @@ are available:
 
 `builtin-metaparam'
      Any built-in meta-parameter, and `ensure'
+
+`data-type'
+     Any Puppet data type
 
 `resource-name'
      Any valid resource name, including scopes
@@ -460,41 +554,34 @@ When called interactively, prompt for COMMAND."
 block (the line containing the opening brace).  Used to set the indentation
 of the closing brace of a block."
   (save-excursion
-    (save-match-data
-      (let ((opoint (point))
-            (apoint (search-backward "{" nil t)))
-        (when apoint
-          ;; This is a bit of a hack and doesn't allow for strings.  We really
-          ;; want to parse by sexps at some point.
-          (let ((close-braces (count-matches "}" apoint opoint))
-                (open-braces 0))
-            (while (and apoint (> close-braces open-braces))
-              (setq apoint (search-backward "{" nil t))
-              (when apoint
-                (setq close-braces (count-matches "}" apoint opoint))
-                (setq open-braces (1+ open-braces)))))
-          (if apoint
-              (current-indentation)
-            nil))))))
+    (let ((opoint (nth 1 (syntax-ppss))))
+      (when (and opoint
+                 (progn
+                   (goto-char opoint)
+                   (looking-at-p "{")))
+        (current-indentation)))))
+
+(defun puppet-in-argument-list ()
+  "If point is in an argument list, return the position of the opening '('.
+If point is not in an argument list, return nil."
+  (puppet--in-listlike "("))
 
 (defun puppet-in-array ()
   "If point is in an array, return the position of the opening '[' of
 that array, else return nil."
+  (puppet--in-listlike "\\["))
+
+(defun puppet--in-listlike (openstring)
+  "If point is in a listlike, return the position of the opening character of
+it, else return nil.
+OPENSTRING is a regexp string matching the opening character."
   (save-excursion
-    (save-match-data
-      (let ((opoint (point))
-            (apoint (search-backward "[" nil t)))
-        (when apoint
-          ;; This is a bit of a hack and doesn't allow for strings.  We really
-          ;; want to parse by sexps at some point.
-          (let ((close-brackets (count-matches "]" apoint opoint))
-                (open-brackets 0))
-            (while (and apoint (> close-brackets open-brackets))
-              (setq apoint (search-backward "[" nil t))
-              (when apoint
-                (setq close-brackets (count-matches "]" apoint opoint))
-                (setq open-brackets (1+ open-brackets)))))
-          apoint)))))
+    (let ((opoint (nth 1 (syntax-ppss))))
+      (when (and opoint
+                 (progn
+                   (goto-char opoint)
+                   (looking-at-p openstring)))
+        opoint))))
 
 (defun puppet-in-include ()
   "If point is in a continued list of include statements, return the position
@@ -516,6 +603,48 @@ of the initial include plus puppet-include-indent."
             (setq not-found nil))))
         include-column))))
 
+(defun puppet-indent-listlike (listtype closing-regex list-start)
+  ;; This line starts with an element from an array or parameter list.
+  ;; Indent to the same indentation as the first element of the list:
+  ;;
+  ;; $example = ['string1', 'string2',
+  ;;             'string3', 'string4']
+  ;; $example = example('string1',
+  ;;                    'string2')
+  (save-excursion
+    (if (looking-at closing-regex)
+        ;; Closing bracket on a line by itself. Align with opening bracket.
+        (progn
+          (goto-char list-start)
+          (if (or (save-excursion (forward-char) (eolp))
+                  ;; closing class parameter list:
+                  (and (eq listtype 'arglist)
+                       (save-excursion
+                         (backward-sexp 2)
+                         (looking-at "class.*"))))
+              (current-indentation)
+            (current-column)))
+      ;; Use normal indentation if the point is at the end of the line.
+      ;;
+      ;; $example => [
+      ;;   'foo',
+      ;;   'bar',
+      ;; ]
+      (goto-char list-start)
+      (forward-char 1)
+      (if (eolp)
+          (+ (current-indentation) puppet-indent-level)
+        ;; Otherwise, attempt to align as described above.
+        (re-search-forward "\\S-")
+        (forward-char -1)
+        (current-column)))))
+
+(defun puppet-indent-array (array-start)
+  (puppet-indent-listlike 'array "^\\s-*],*" array-start))
+
+(defun puppet-indent-arglist (arglist-start)
+  (puppet-indent-listlike 'arglist "^\\s-*),*" arglist-start))
+
 (defun puppet-indent-line ()
   "Indent current line as puppet code."
   (interactive)
@@ -523,49 +652,21 @@ of the initial include plus puppet-include-indent."
   (if (bobp)
       (indent-line-to 0)                ; First line is always non-indented
     (let ((not-indented t)
+          (arglist-start (puppet-in-argument-list))
           (array-start (puppet-in-array))
           (include-start (puppet-in-include))
           (block-indent (puppet-block-indent))
           cur-indent)
       (cond
-       (array-start
-        ;; This line probably starts with an element from an array.
-        ;; Indent the line to the same indentation as the first
-        ;; element in that array.  That is, this...
-        ;;
-        ;;    exec {
-        ;;      "add_puppetmaster_mongrel_startup_links":
-        ;;      command => "string1",
-        ;;      creates => [ "string2", "string3",
-        ;;      "string4", "string5",
-        ;;      "string6", "string7",
-        ;;      "string3" ],
-        ;;      refreshonly => true,
-        ;;    }
-        ;;
-        ;; ...should instead look like this:
-        ;;
-        ;;    exec {
-        ;;      "add_puppetmaster_mongrel_startup_links":
-        ;;      command => "string1",
-        ;;      creates => [ "string2", "string3",
-        ;;                   "string4", "string5",
-        ;;                   "string6", "string7",
-        ;;                   "string8" ],
-        ;;      refreshonly => true,
-        ;;    }
-        (save-excursion
-          (goto-char array-start)
-          (forward-char 1)
-          (re-search-forward "\\S-")
-          (forward-char -1)
-          (setq cur-indent (current-column))))
+       (array-start (setq cur-indent (puppet-indent-array array-start)))
+       (arglist-start (setq cur-indent (puppet-indent-arglist arglist-start)))
        (include-start
         (setq cur-indent include-start))
-       ((and (looking-at "^\\s-*},?\\s-*$") block-indent)
-        ;; This line contains a closing brace or a closing brace followed by a
-        ;; comma and we're at the inner block, so we should indent it matching
-        ;; the indentation of the opening brace of the block.
+
+       ((and (looking-at "^\\s-*}.*$") block-indent)
+        ;; This line contains a closing brace and we're at the inner
+        ;; block, so we should indent it matching the indentation of
+        ;; the opening brace of the block.
         (setq cur-indent block-indent))
        (t
         ;; Otherwise, we did not start on a block-ending-only line.
@@ -576,13 +677,24 @@ of the initial include plus puppet-include-indent."
             (cond
              ;; Comment lines are ignored unless we're at the start of the
              ;; buffer.
-             ((eq (puppet-syntax-context) 'comment)
+             ((or (eq (puppet-syntax-context) 'comment)
+                  (save-excursion (end-of-line)
+                                  (eq (puppet-syntax-context) 'comment)))
               (if (bobp)
                   (setq not-indented nil)))
 
-             ;; Brace or paren on a line by itself will already be indented to
-             ;; the right level, so we can cheat and stop there.
-             ((looking-at "^\\s-*[\)}]\\s-*")
+             ;; Closing paren. Use indentation based on start of
+             ;; argument list
+             ((or (looking-at "^\\s-*\)\\s-*$")
+                  (looking-at "^[^\n\(]*[\)],?\\s-*$"))
+              (goto-char (puppet-in-argument-list))
+              (setq cur-indent (current-indentation))
+              (setq not-indented nil))
+
+             ;; Brace (possibly followed by a comma) or paren on a
+             ;; line by itself will already be indented to the right
+             ;; level, so we can cheat and stop there.
+             ((looking-at "^\\s-*[\)}]\\(,\\|\\s-*[-~]>\\)?\\s-*\s?$")
               (setq cur-indent (current-indentation))
               (setq not-indented nil))
 
@@ -673,6 +785,8 @@ of the initial include plus puppet-include-indent."
   `(
     ;; Keywords
     (,(puppet-rx (symbol keyword)) 0 font-lock-keyword-face)
+    ;; Data Types
+    (,(puppet-rx (symbol data-type)) 0 font-lock-type-face)
     ;; Variables
     (,(puppet-rx "$" (symbol variable-name)) 0 font-lock-variable-name-face)
     ;; Class and type declarations
@@ -871,24 +985,30 @@ Used as `syntax-propertize-function' in Puppet Mode."
      (separate . entire)))
   "Align rules for Puppet Mode.")
 
+(defconst puppet-mode-align-exclude-rules
+  '((puppet-nested
+     (regexp . "\\s-*=>\\s-*\\({[^}]*}\\)")
+     (modes  . '(puppet-mode))
+     (separate . entire))
+    (puppet-comment
+     (regexp . "^\\s-*\#\\(.*\\)")
+     (modes . '(puppet-mode))))
+  "Rules for excluding lines from alignment for Puppet Mode.")
+
 (defun puppet-align-block ()
   "Align the current block."
   (interactive)
   (save-excursion
-    (save-match-data
-      (let ((beg (search-backward "{" nil 'no-error)))
-        ;; Skip backwards over strings and comments
-        (while (and beg (puppet-in-string-or-comment-p beg))
-          (setq beg (search-backward "{" nil 'no-error)))
-        (when beg
-          (forward-list)
-          (align beg (point)))))))
+    (backward-up-list)
+    (let ((beg (point)))
+      (forward-list)
+      (align beg (point)))))
 
 
 ;;; Dealing with strings
 (defun puppet-looking-around (back at)
   "Check if looking backwards at BACK and forward at AT."
-  (and (looking-at-p at) (looking-back back)))
+  (and (looking-at-p at) (looking-back back nil)))
 
 (defun puppet-string-at-point-p ()
   "Check if cursor is at a string or not."
@@ -1051,6 +1171,10 @@ for each entry."
     (define-key map (kbd "C-c C-j") #'imenu)
     ;; Apply manifests
     (define-key map (kbd "C-c C-c") #'puppet-apply)
+    ;; REPL stuff
+    (define-key map (kbd "C-c C-z") #'puppet-repl)
+    (define-key map (kbd "C-c C-r") #'puppet-repl-send-region)
+    (define-key map (kbd "C-c C-b") #'puppet-repl-send-buffer)
     ;; Linting and validation
     (define-key map (kbd "C-c C-v") #'puppet-validate)
     (define-key map (kbd "C-c C-l") #'puppet-lint)
@@ -1069,6 +1193,14 @@ for each entry."
          :help "Jump to a resource or variable"]
         "-"
         ["Apply manifest" puppet-apply :help "Apply a Puppet manifest"]
+        "-"
+        ["Puppet REPL" puppet-repl :help "Start the Puppet REPL"]
+        ["Send Region to REPL" puppet-repl-send-region
+         :help "Send this region to the the Puppet REPL"]
+        ["Send Line to REPL" puppet-repl-send-line
+         :help "Send this line to the the Puppet REPL"]
+        ["Send Buffer to REPL" puppet-repl-send-buffer
+         :help "Send this buffer to the the Puppet REPL"]
         "-"
         ["Validate file syntax" puppet-validate
          :help "Validate the syntax of this file"]
@@ -1103,6 +1235,7 @@ for each entry."
   (setq-local syntax-propertize-function #'puppet-syntax-propertize-function)
   ;; Alignment
   (setq align-mode-rules-list puppet-mode-align-rules)
+  (setq align-mode-exclude-rules-list puppet-mode-align-exclude-rules)
   ;; IMenu
   (setq imenu-create-index-function #'puppet-imenu-create-index))
 
