@@ -1,7 +1,13 @@
 #
 #  For working with the dotfiles repository
 #
-alias .DOTFILES='git --work-tree=$HOME --git-dir=$HOME/Repos/github.com/skx/dotfiles/.git'
+if [ -d ~/Repos/github.com/skx/dotfiles/ ]; then
+   alias .DOTFILES='git --work-tree=$HOME --git-dir=$HOME/Repos/github.com/skx/dotfiles/.git'
+elif [ -d ~/git/dotfiles.git ]; then
+   alias .DOTFILES='git --work-tree=$HOME --git-dir=$HOME/git/dotfiles.git'
+else
+   alias .DOTFILES='You have no dotfiles in ~/git/ or ~/Repos/github.com'
+fi
 
 
 #
