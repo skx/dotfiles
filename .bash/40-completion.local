@@ -34,3 +34,9 @@ if [ -e  /usr/share/bash-completion/completions/gitk ]; then
 fi
 
 
+#
+# If we have a local install of `pass` then enable the completion
+#
+if [ -e /opt/pass/completion/pass.bash-completion ]; then
+    . /opt/pass/completion/pass.bash-completion
+fi
