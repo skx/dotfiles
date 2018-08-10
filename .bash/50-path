@@ -45,7 +45,7 @@ fi
 #  Set the PATH to include ~/bin and ~/bin-$hostname if they exist.
 #
 for i in ~/bin ~/bin-$(hostname --short) ; do
-    [ -d $i ] && PATH=$i:${PATH}
+    add_to_path $i
 done
 
 
@@ -64,6 +64,6 @@ export PATH=$PATH:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
 
 #
-#  Remove duplicate entries.
+#  Remove any duplicated entries.
 #
 export PATH=$(echo "$PATH" | awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}')
