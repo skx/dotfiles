@@ -9,7 +9,7 @@ function! TextMode()            " Stolen from David Hand
     set comments=n:>,n:#,fn:-   " com: list of things to be treated as comments
     set textwidth=72            " tw:  wrap at 72 characters
     set formatoptions=tcrq      " fo:  word wrap, format comments
-    set dictionary+=/usr/local/dict/*  " dict:  dict for word completion
+    "    set dictionary+=/usr/local/dict/*  " dict:  dict for word completion
     set complete=.,w,b,u,t,i,k  " cpt:  complete words
 
 "
