@@ -12,3 +12,4 @@ function ModeChange()
 endfunction
 
 au BufWritePost * call ModeChange()
+set autoread
