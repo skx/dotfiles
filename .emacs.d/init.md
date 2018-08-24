@@ -673,6 +673,14 @@ especially on a terminal, so this is explicitly disabled here:
     (global-set-key "\C-x\C-z" 'nil)
 ```
 
+Finally since I'm in Finland I've found that I'm using foreign keyboard layouts a lot of the time.  One problem I have is the backtick character doesn't always work the way that I want - which is a particular problem in `markdown-mode`.
+
+```lisp
+   ;; Allow the backtick key to work as I expected.
+   (global-set-key [dead-grave] "`")
+```
+
+
 
 ## Unix-specific tweaks
 
