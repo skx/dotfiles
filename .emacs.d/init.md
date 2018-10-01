@@ -502,6 +502,17 @@ I'm annoyed by backups and similar.  So I disable them all:
 ```
 
 
+## Org-Mode
+
+I want to be able to evaluate shell-snippets inside Org-mode:
+
+```lisp
+    ;; Prevent the error:
+    ;;   No org-babel-execute function for sh!
+   (org-babel-do-load-languages
+     'org-babel-load-languages '((sh . t)))
+```
+
 
 ## User Interface Tweaks
 
@@ -544,7 +555,7 @@ the cursor:
     ;; If we can load the colour-theme library, choose a dark theme.
     (with-feature (color-theme)
         (color-theme-initialize)
-        (color-theme-charcoal-black))
+            (color-theme-ld-dark))
 
     ;; Change cursor color according to mode.
     ;;  read-only -> red
