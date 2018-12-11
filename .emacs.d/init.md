@@ -608,8 +608,11 @@ the way that I prefer them.
     (setq display-time-day-and-date t)
     (display-time)
 
-    ; Ignore case when completing file names
+    ; Ignore case when completing file names, buffer names,
+    ; and completions generally.
     (setq read-file-name-completion-ignore-case 't)
+    (setq read-buffer-completion-ignore-case 't)
+    (setq completion-ignore-case  t)
 
     ;; Show column-numbers too
     (column-number-mode)
