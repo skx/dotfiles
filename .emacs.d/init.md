@@ -70,6 +70,24 @@ The initial setup is now complete, such that we can start loading
 packages, making configuration-changes & etc.
 
 
+## File Handling
+
+Emacs has a built-in file/directory browser which is available via `M-x dired`, and which I use very often.
+
+One irritation is that by default "dotfiles" are shown, I usually prefer these to be hidden by default.  The following section does two things:
+
+* Hides dotfiles by default.
+* Allows them to be toggled via `M-TAB`.
+
+```lisp
+    (require 'dired-x)
+    (setq dired-omit-files "^\\...+$")
+    (add-hook 'dired-mode-hook (lambda ()
+      (local-set-key (kbd "M-TAB") 'dired-omit-mode)
+      (dired-omit-mode 1)))
+
+```
+
 
 ## Language Modes
 
