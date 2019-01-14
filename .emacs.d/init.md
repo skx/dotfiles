@@ -454,6 +454,15 @@ and can be invoked via `M-x uptime`.
          day (% hour 24) (% minute 60))))
 ```
 
+Since we're living in the future nowadays a lot of system-administration is moving
+towards a cloud-based setup.  One of the tools I use most frequently for that
+is Hashicorp terraform:
+
+```lisp
+    (require 'terraform-mode)
+```
+
+
 
 ## Whitespace Handling
 
