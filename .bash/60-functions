@@ -162,3 +162,13 @@ function cds () {
         cd $ORIGINAL_PWD
     fi
 }
+
+# Open a new firefox instance, with a temporary profile
+function firefox_temp() {
+   dir=$(mktemp -d)
+   echo "Profile directory: ${dir}"
+   firefox --new-instance --profile ${dir}
+   echo "Cleaning up .."
+   rm -rf ${dir}
+
+}
