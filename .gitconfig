@@ -1,23 +1,24 @@
 [user]
-    name = Steve Kemp
-    email = steve@steve.org.uk
+name = Steve Kemp
+email = steve@steve.org.uk
 
 [color]
-    diff  = auto
-    status= auto
-    branch= auto
-    interactive = true
+diff  = auto
+status= auto
+branch= auto
+interactive = true
 
 [alias]
-    ci = commit
-    di = diff --color-words
-    st = status
+ci = commit
+di = diff --color-words
+st = status
 
 [core]
-	editor = vim
-	quotepath = false
+editor = vim
+quotepath = false
+
 [push]
-	default = matching
+default = matching
 
 
 #
@@ -25,4 +26,4 @@
 # here - this is not tracked by git for obvious reasons.
 #
 [include]
-    path = .gitconfig.local
+path = .gitconfig.local
