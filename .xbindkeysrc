@@ -7,6 +7,9 @@
 "toggle-vertical"
   release+control+alt + r
 
+"xdg-screensaver lock"
+  release+control+alt + l
+
 "firefox"
   release+control+alt + f
 
