@@ -460,6 +460,7 @@ is Hashicorp terraform:
 
 ```lisp
     (require 'terraform-mode)
+    (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode)
 ```
 
 
