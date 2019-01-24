@@ -69,7 +69,11 @@ if [ -x ~/bin/e ] ;then
 fi
 
 
+#
+# Some git aliases
+#
 alias git-source='git config --get remote.origin.url'
+alias git-top='cd $(git rev-parse --show-toplevel)'
 
 #
 #  Configure password manager
