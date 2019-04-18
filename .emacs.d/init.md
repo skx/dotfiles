@@ -93,15 +93,17 @@ One irritation is that by default "dotfiles" are shown, I usually prefer these t
 
 Most of the time I spend in Emacs is for developing, and writing code.
 
-Code I write tends to be in some combination of Lua, Ruby, Perl, or C++.
-In addition to these _real_ programming languages I also use
-[CFEngine](http://cfengine.com/) and [Puppet](https://puppetlabs.com/) for
-automation - so I load modes for those too.
+Code I write tends to be in some combination of Lua, Ruby, Perl, Go, or C++.
+
+In addition to _real_ programming languages I also use [CFEngine](http://cfengine.com/) and [Puppet](https://puppetlabs.com/) for automation - so I load modes for those too.
+
+**Note** The updates to `auto-mode-alist` end with `\\'`, which matches the end of the string (i.e. filename).  You might expect to see that written as "`.txt$`", but that would not be exactly the same, for filenames that contain a newline.  (`$` would match the newline, but `'` would match the end of the filename itself).
+
 
 ```lisp
     ;; Lua
     (with-feature (lua-mode)
-        (add-to-list 'auto-mode-alist '("\\.lua" . lua-mode))
+        (add-to-list 'auto-mode-alist '("\\.lua\\'" . lua-mode))
         (add-to-list 'interpreter-mode-alist '(("lua"   . lua-mode))))
 
     ;; Markdown
@@ -109,12 +111,16 @@ automation - so I load modes for those too.
         (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
         (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
 
+    ;; CFEngine
+    (with-feature (cfengine)
+      (add-to-list 'auto-mode-alist '("\\.cf\\'" . cfengine-auto-mode)))
+
     ;; Puppet
     (with-feature (puppet-mode)
         (add-to-list 'auto-mode-alist '("\\.pp$" . puppet-mode)))
 
     ;; Ruby setup doesn't require loading a mode
-    (add-to-list 'auto-mode-alist '("\\.rb$" . ruby-mode))
+    (add-to-list 'auto-mode-alist '("\\.rb\\'" . ruby-mode))
     (add-to-list 'interpreter-mode-alist '(("rb"   . ruby-mode)))
 ```
 
