@@ -101,10 +101,8 @@ automation - so I load modes for those too.
 ```lisp
     ;; Lua
     (with-feature (lua-mode)
-        (setq auto-mode-alist
-            (append '(("\\.lua$" . lua-mode)) auto-mode-alist))
-        (setq interpreter-mode-alist
-            (append '(("lua" . lua-mode)) interpreter-mode-alist)))
+        (add-to-list 'auto-mode-alist '("\\.lua" . lua-mode))
+        (add-to-list 'interpreter-mode-alist '(("lua"   . lua-mode))))
 
     ;; Markdown
     (with-feature (markdown-mode)
@@ -113,14 +111,11 @@ automation - so I load modes for those too.
 
     ;; Puppet
     (with-feature (puppet-mode)
-        (setq auto-mode-alist
-            (append '(("\\.pp$" . puppet-mode)) auto-mode-alist)))
+        (add-to-list 'auto-mode-alist '("\\.pp$" . puppet-mode)))
 
-    ;; Ruby
-    (setq auto-mode-alist
-        (append '(("\\.rb$" . ruby-mode)) auto-mode-alist))
-    (setq interpreter-mode-alist
-        (append interpreter-mode-alist '(("rb"   . ruby-mode))))
+    ;; Ruby setup doesn't require loading a mode
+    (add-to-list 'auto-mode-alist '("\\.rb$" . ruby-mode))
+    (add-to-list 'interpreter-mode-alist '(("rb"   . ruby-mode)))
 ```
 
 The monkey programming language was introduced (and implemented!)
