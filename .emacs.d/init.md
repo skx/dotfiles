@@ -281,6 +281,15 @@ In this hook we'll also allow [godef](https://github.com/rogpeppe/godef) to be u
 Note that I also setup [code-folding](#language-modes---code-folding) later in this file.
 
 
+### Language Modes - Z80 Assembly
+
+I'm having fun doing "retro" things with a [Z80 processor](https://en.wikipedia.org/wiki/Zilog_Z80), so this mode loads the appropriate mode for that.
+
+```lisp
+    (require `z80-mode)
+    (add-to-list 'auto-mode-alist (cons "\\.z80\\'" 'z80-mode))
+```
+
 ### Language Modes - Code Folding
 
 I define a hook which will setup the toggling of code-blocks via HideShow,
