@@ -23,35 +23,6 @@
   "Balls-out highlighting in z80 mode")
 (defvar z80-font-lock-keywords z80-font-lock-keywords-3
   "Default highlighting expressions for z80 mode")
-(defun z80-indent-line ()
-  "Indent current line as z80 code"
-  (beginning-of-line)
-  (let ((not-indented t) cur-indent)
-    (if (looking-at "^\\w*:")
-   (setq cur-indent 0)
-      (if (looking-at "^[ \t]* [ \t]*")
-     (setq cur-indent (+ (current-indentation) default-tab-width))
-   (save-excursion
-     (while not-indented
-       (forward-line -1)
-       (when (bobp)
-         (setq not-indented nil)
-         (setq cur-indent default-tab-width))
-       (unless (or (looking-at "^[ \t]*$") (looking-at "^\\w*:")) ; Makes sure you aren't looking at blank lines or labels
-         (if (looking-at "^[ \t]*[pP][oO][pP][ \t]")
-        (progn
-          (setq cur-indent (- (current-indentation) default-tab-width))
-          (setq not-indented nil))
-      (if (looking-at "^[ \t]*[pP][uU][Ss][Hh][ \t]")
-          (progn
-            (setq cur-indent (+ (current-indentation) default-tab-width))
-            (setq not-indented nil))
-        (when (looking-at "^[ \t][ \t]*\\w")
-          (setq cur-indent (current-indentation))
-          (setq not-indented nil)))))))))
-    (if cur-indent
-   (indent-line-to cur-indent)
-      (indent-line-to 0)))) ; If we didn't see an indentation hint, then allow no indentation
 (defvar z80-mode-syntax-table
   (let ((st (make-syntax-table)))
     (modify-syntax-entry ?_ "w" st)
@@ -69,7 +40,6 @@
   (set-syntax-table z80-mode-syntax-table)
   (use-local-map z80-mode-map)
   (set (make-local-variable 'font-lock-defaults) '(z80-font-lock-keywords))
-  (set (make-local-variable 'indent-line-function) 'z80-indent-line)
   (setq major-mode 'z80-mode)
   (setq mode-name "Z80")
   (run-hooks 'z80-mode-hook))
