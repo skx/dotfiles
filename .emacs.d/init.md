@@ -88,6 +88,13 @@ One irritation is that by default "dotfiles" are shown, I usually prefer these t
 
 ```
 
+The `dired-git-info` package updates `dired` to allow you to view git commit information.  I bind that to `)`, which matches the toggling of detailed-information bound to `(` by default:
+
+```lisp
+     (with-feature (dired-git-info)
+       (add-hook 'dired-mode-hook (lambda ()
+         (local-set-key (kbd ")") 'dired-git-info-mode))))
+```
 
 ## Language Modes
 
