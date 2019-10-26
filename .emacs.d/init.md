@@ -381,7 +381,8 @@ following  allows that to be done neatly - select the region and run
 
 ### Web Utilities - Markdown
 
-The following snippet is useful when you're working with large markdown-files:
+The following snippet is useful when you're working with large markdown-files,
+although it is superceded somewhat by the inline menu which `imenu-list` provides, as noted later:
 
 ```lisp
     (defun markdown-index()
@@ -395,9 +396,9 @@ Now we can ensure that this is bound to `M-i` when `markdown-mode` is active:
 ```lisp
     (add-hook 'markdown-mode-hook
      (lambda ()
+      (local-set-key (kbd "C-'") 'imenu-list-smart-toggle)
       (local-set-key (kbd "M-i") 'markdown-index)))
 ```
-
 
 ### Language Modes - Web Mode
 
@@ -688,6 +689,18 @@ the way that I prefer them.
 ```
 
 
+## User Interface Sidebar
+
+There is a neat package `imenu-list` which allows you to view a sidebar in the current frame, containing index-entries.
+
+This is used in the markdown-mode setup earlier to show you a list of headings.  Load it here:
+
+```lisp
+    (with-feature (imenu-list)
+      (setq imenu-list-focus-after-activation t
+            imenu-list-auto-resize t
+            imenu-list-position 'left))
+```
 
 ## Keybindings
 
