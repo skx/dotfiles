@@ -396,7 +396,7 @@ Now we can ensure that this is bound to `M-i` when `markdown-mode` is active:
 ```lisp
     (add-hook 'markdown-mode-hook
      (lambda ()
-      (local-set-key (kbd "C-'") 'imenu-list-smart-toggle)
+      (local-set-key (kbd "M-'") 'imenu-list-smart-toggle)
       (local-set-key (kbd "M-i") 'markdown-index)))
 ```
 
