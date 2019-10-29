@@ -555,11 +555,11 @@ was handled with `org-sh`, but it now requires `org-shell` as a result of the or
 
 ```lisp
 ;; Old org
-(with-feature (org-sh)
+(with-feature (ob-sh)
               (org-babel-do-load-languages 'org-babel-load-languages '((sh . t))))
 
 ;; Modern org.
-(with-feature (org-shell)
+(with-feature (ob-shell)
               (org-babel-do-load-languages 'org-babel-load-languages '((shell . t))))
 ```
 
