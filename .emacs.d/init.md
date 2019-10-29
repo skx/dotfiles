@@ -550,13 +550,17 @@ I'm annoyed by backups and similar.  So I disable them all:
 
 ## Org-Mode
 
-I want to be able to evaluate shell-snippets inside Org-mode:
+I want to be able to evaluate shell-snippets inside Org-mode.  Note that previously this
+was handled with `org-sh`, but it now requires `org-shell` as a result of the org version 8.2:
 
 ```lisp
-    ;; Prevent the error:
-    ;;  No org-babel-execute function for shell!
-   (org-babel-do-load-languages
-     'org-babel-load-languages '((shell . t)))
+;; Old org
+(with-feature (org-sh)
+              (org-babel-do-load-languages 'org-babel-load-languages '((sh . t))))
+
+;; Modern org.
+(with-feature (org-shell)
+              (org-babel-do-load-languages 'org-babel-load-languages '((shell . t))))
 ```
 
 
