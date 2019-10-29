@@ -807,3 +807,44 @@ the regular expression `^#`.
         ;; Delete lines or make the "Buffer is read-only" error.
         (flush-lines regexp rstart rend interactive)))
 ```
+
+## WorkLog
+
+I maintain a log of what I do every day, which is saved in the file `~/Work.MD`.  This is a markdown file, as the suffix would suggest, and each day I create a new section for that days work.
+
+This utility function finds today's entry, or creates it by appending to the buffer:
+
+```lisp
+(defun worklog-today()
+  "If you have a work-log then move to today's date.  If it isn't found
+ then create it"
+  (interactive "*")
+  (beginning-of-buffer)
+  (if (not (search-forward (format-time-string "# %d-%m-%Y") nil t 1))
+      (progn
+        (end-of-buffer)
+        (insert (format-time-string "\n\n# %d-%m-%Y\n")))))
+```
+
+Now I need to execute that function every time I visit a file named `Work.MD`:
+
+```lisp
+(defun worklog_hook ()
+  (when (equalp (file-name-nondirectory (buffer-file-name)) "work.md")
+    (worklog-today)
+    )
+)
+
+(add-hook 'find-file-hook 'worklog_hook)
+```
+
+Finally here is a quick function to load the file which has a quick binding:
+
+```lisp
+(defun worklog()
+  (interactive "*")
+  (find-file "~/Work.MD"))
+
+(global-set-key (kbd "C-x w") 'worklog)
+
+```
