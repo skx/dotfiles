@@ -554,9 +554,9 @@ I want to be able to evaluate shell-snippets inside Org-mode:
 
 ```lisp
     ;; Prevent the error:
-    ;;   No org-babel-execute function for sh!
+    ;;  No org-babel-execute function for shell!
    (org-babel-do-load-languages
-     'org-babel-load-languages '((sh . t)))
+     'org-babel-load-languages '((shell . t)))
 ```
 
 
