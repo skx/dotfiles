@@ -430,6 +430,17 @@ explicitly set them to pink, and configure the indentation too:
 ```
 
 
+## Long Lines
+
+Using [column-enforce-mode](https://github.com/jordonbiondo/column-enforce-mode) we can view lines that are "too long", in a clear fashion:
+
+```lisp
+   (with-feature (column-enforce-mode)
+    (global-column-enforce-mode t))
+```
+
+
+
 ## System Administration
 
 The following snippet is useful for system-administration, allowing
