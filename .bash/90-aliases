@@ -30,14 +30,13 @@ fi
 alias ..='cd ..'
 
 #
-# Show free memory in Mb.
+#  Make passwords a little nicer:
+#     13 characters long
+#     10 generated each time
+#     -B Avoid ambigious characters
+#     -y Include symbols
 #
-alias free='free -m'
-
-#
-#  Make passwords a little nicer
-#
-[ -x /usr/bin/pwgen ] && alias pwgen='pwgen -B 12'
+[ -x /usr/bin/pwgen ] && alias pwgen='pwgen -B -y 13 10`
 
 #
 #  For Xine
