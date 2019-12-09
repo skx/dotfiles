@@ -36,7 +36,7 @@ alias ..='cd ..'
 #     -B Avoid ambigious characters
 #     -y Include symbols
 #
-[ -x /usr/bin/pwgen ] && alias pwgen='pwgen -B -y 13 10`
+[ -x /usr/bin/pwgen ] && alias pwgen='pwgen -B -y 13 10'
 
 #
 #  For Xine
