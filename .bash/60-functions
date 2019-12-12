@@ -179,5 +179,5 @@ function passphrase() {
         echo "/usr/share/dict/words is missing"
         return
     fi
-    sort --random-sort /usr/share/dict/words | head -n 4 | tr -d '\n'
+    sort --random-sort /usr/share/dict/words | head -n 4 | tr '\n' ' '
 }
