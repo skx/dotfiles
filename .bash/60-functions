@@ -172,3 +172,12 @@ function firefox_temp() {
    rm -rf ${dir}
 
 }
+
+# Generate a four-word pass-phrase
+function passphrase() {
+    if [ ! -e /usr/share/dict/words ]; then
+        echo "/usr/share/dict/words is missing"
+        return
+    fi
+    sort --random-sort /usr/share/dict/words | head -n 4 | tr -d '\n'
+}
