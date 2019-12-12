@@ -197,8 +197,10 @@ function passphrase() {
         #
         # Otherwise we rely upon the loop to try again :)
         #
-        if ( ! echo ${out} | grep -- - 2>/dev/null >/dev/null) ; then
-            echo "${out}"
+        if ( ! echo ${out} | grep -E -- "[-']" 2>/dev/null >/dev/null) ; then
+
+            # convert to lower-case.
+            echo "${out,,}"
             return
         fi
     done
