@@ -435,10 +435,12 @@ explicitly set them to pink, and configure the indentation too:
 Using [column-enforce-mode](https://github.com/jordonbiondo/column-enforce-mode) we can view lines that are "too long", in a clear fashion:
 
 ```lisp
-   (with-feature (column-enforce-mode)
-    (global-column-enforce-mode t))
+   (unless (string= system-name "localhost.localdomain")
+    (with-feature (column-enforce-mode)
+        (global-column-enforce-mode t)))
 ```
 
+The above section is enabled for all hosts, except the one system I have which has a hostname of `localhost.localdomain` - this is a system which is not configured for _real_ use..
 
 
 ## System Administration
