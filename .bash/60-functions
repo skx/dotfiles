@@ -175,9 +175,32 @@ function firefox_temp() {
 
 # Generate a four-word pass-phrase
 function passphrase() {
+
     if [ ! -e /usr/share/dict/words ]; then
         echo "/usr/share/dict/words is missing"
         return
     fi
-    sort --random-sort /usr/share/dict/words | head -n 4 | tr '\n' ' '
+
+    # loop forever
+    while true; do
+
+        # Generate the random passphrase.
+        #
+        # Note: Using `shuf -n4 $file` is way faster
+        # than `sort --random-sort $file`.
+        #
+        out=$(shuf -n4 /usr/share/dict/words | tr '\n' ' ')
+
+        #
+        # If the output DOES NOT contain `-` then we show
+        # it, and return.
+        #
+        # Otherwise we rely upon the loop to try again :)
+        #
+        if ( ! echo ${out} | grep -- - 2>/dev/null >/dev/null) ; then
+            echo "${out}"
+            return
+        fi
+    done
+
 }
