@@ -318,6 +318,7 @@ and `Esc-+` to hide/show all:
     (add-hook 'go-mode-hook 'enable-hs-mode-hook t)
     (add-hook 'perl-mode-hook 'enable-hs-mode-hook t)
     (add-hook 'web-mode-hook 'enable-hs-mode-hook t)
+    (add-hook 'python-hook 'enable-hs-mode-hook t)
 ```
 
 
