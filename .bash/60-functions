@@ -6,6 +6,11 @@ function lsd
     ls -1F $* | grep '/$'
 }
 
+# ls for files - or at least non-directories
+function lsf
+{
+    ls -l $* | grep -E -v '^(d|total)' | awk '{print $NF}'
+}
 
 #
 #  ssh + scp without storing or prompting for keys.
