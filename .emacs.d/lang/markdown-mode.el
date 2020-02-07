@@ -578,7 +578,7 @@ requires Emacs to be built with ImageMagick support."
                         (const :tag "No maximum height" nil)))))
 
 
-;;; Markdown-Specific `rx' Macro
+;;; Markdown-Specific `rx' Macro ==============================================
 
 ;; Based on python-rx from python.el.
 (eval-and-compile
@@ -1559,11 +1559,13 @@ start which was previously propertized."
   (save-excursion
     (goto-char start)
     (while (re-search-forward markdown-regex-hr end t)
-      (unless (or (markdown-on-heading-p)
-                  (markdown-code-block-at-point-p))
-        (put-text-property (match-beginning 0) (match-end 0)
-                           'markdown-hr
-                           (match-data t))))))
+      (let ((beg (match-beginning 0))
+            (end (match-end 0)))
+        (goto-char beg)
+        (unless (or (markdown-on-heading-p)
+                    (markdown-code-block-at-point-p))
+          (put-text-property beg end 'markdown-hr (match-data t)))
+        (goto-char end)))))
 
 (defun markdown-syntax-propertize-yaml-metadata (start end)
   "Propertize elements inside YAML metadata blocks from START to END.
@@ -1601,7 +1603,8 @@ region of a YAML metadata block as propertized by
 
 (defun markdown-syntax-propertize-comments (start end)
   "Match HTML comments from the START to END."
-  (let* ((in-comment (nth 4 (syntax-ppss))))
+  (let* ((in-comment (nth 4 (syntax-ppss)))
+         (comment-begin (nth 8 (syntax-ppss))))
     (goto-char start)
     (cond
      ;; Comment start
@@ -1615,10 +1618,9 @@ region of a YAML metadata block as propertized by
         (markdown-syntax-propertize-comments
          (min (1+ (match-end 0)) end (point-max)) end)))
      ;; Comment end
-     ((and in-comment
+     ((and in-comment comment-begin
            (re-search-forward markdown-regex-comment-end end t))
-      (let ((comment-end (match-end 0))
-            (comment-begin (nth 8 (syntax-ppss))))
+      (let ((comment-end (match-end 0)))
         (put-text-property (1- comment-end) comment-end
                            'syntax-table (string-to-syntax ">"))
         ;; Remove any other text properties inside the comment
@@ -1646,7 +1648,7 @@ START and END delimit region to propertize."
       (markdown-syntax-propertize-comments start end))))
 
 
-;;; Markup Hiding
+;;; Markup Hiding =============================================================
 
 (defconst markdown-markup-properties
   '(face markdown-markup-face invisible markdown-markup)
@@ -2120,6 +2122,14 @@ Depending on your font, some reasonable choices are:
          ,@(when markdown-hide-markup
              `(display ,markdown-footnote-display))))
 
+(define-obsolete-variable-alias
+ 'gfm-font-lock-keywords
+ 'markdown-mode-font-lock-keywords "v2.4")
+
+(define-obsolete-variable-alias
+ 'markdown-mode-font-lock-keywords-basic
+ 'markdown-mode-font-lock-keywords "v2.4")
+
 (defvar markdown-mode-font-lock-keywords
   `((markdown-match-yaml-metadata-begin . ((1 'markdown-markup-face)))
     (markdown-match-yaml-metadata-end . ((1 'markdown-markup-face)))
@@ -2225,10 +2235,6 @@ Depending on your font, some reasonable choices are:
     (markdown-match-wiki-link . ((0 'markdown-link-face prepend))))
   "Syntax highlighting for Markdown files.")
 
-(define-obsolete-variable-alias
- 'markdown-mode-font-lock-keywords-basic
- 'markdown-mode-font-lock-keywords "v2.4")
-
 ;; Footnotes
 (defvar markdown-footnote-counter 0
   "Counter for footnote numbers.")
@@ -2246,7 +2252,7 @@ Depending on your font, some reasonable choices are:
 ;;; Compatibility =============================================================
 
 (defun markdown-replace-regexp-in-string (regexp rep string)
-  "Replace ocurrences of REGEXP with REP in STRING.
+  "Replace occurrences of REGEXP with REP in STRING.
 This is a compatibility wrapper to provide `replace-regexp-in-string'
 in XEmacs 21."
   (if (featurep 'xemacs)
@@ -2849,12 +2855,12 @@ Like `markdown-inline-code-at-pos`, but preserves match data."
 See `markdown-inline-code-at-pos' for details."
   (markdown-inline-code-at-pos (point)))
 
-(defun markdown-inline-code-at-point-p ()
-  "Return non-nil if there is inline code at the point.
+(defun markdown-inline-code-at-point-p (&optional pos)
+  "Return non-nil if there is inline code at the POS.
 This is a predicate function counterpart to
 `markdown-inline-code-at-point' which does not modify the match
 data.  See `markdown-code-block-at-point-p' for code blocks."
-  (save-match-data (markdown-inline-code-at-pos (point))))
+  (save-match-data (markdown-inline-code-at-pos (or pos (point)))))
 
 (make-obsolete 'markdown-code-at-point-p 'markdown-inline-code-at-point-p "v2.2")
 
@@ -2863,29 +2869,30 @@ data.  See `markdown-code-block-at-point-p' for code blocks."
 Uses text properties at the beginning of the line position.
 This includes pre blocks, tilde-fenced code blocks, and GFM
 quoted code blocks.  Return nil otherwise."
-  (setq pos (save-excursion (goto-char pos) (point-at-bol)))
-  (or (get-text-property pos 'markdown-pre)
-      (markdown-get-enclosing-fenced-block-construct pos)
-      ;; polymode removes text properties set by markdown-mode, so
-      ;; check if `poly-markdown-mode' is active and whether the
-      ;; `chunkmode' property is non-nil at POS.
-      (and (bound-and-true-p poly-markdown-mode)
-           (get-text-property pos 'chunkmode))))
+  (let ((bol (save-excursion (goto-char pos) (point-at-bol))))
+    (or (get-text-property bol 'markdown-pre)
+        (let* ((bounds (markdown-get-enclosing-fenced-block-construct pos))
+               (second (cl-second bounds)))
+          (if second
+              ;; chunks are right open
+              (when (< pos second)
+                bounds)
+            bounds)))))
 
 ;; Function was renamed to emphasize that it does not modify match-data.
 (defalias 'markdown-code-block-at-point 'markdown-code-block-at-point-p)
 
-(defun markdown-code-block-at-point-p ()
-  "Return non-nil if there is a code block at the point.
+(defun markdown-code-block-at-point-p (&optional pos)
+  "Return non-nil if there is a code block at the POS.
 This includes pre blocks, tilde-fenced code blocks, and GFM
 quoted code blocks.  This function does not modify the match
 data.  See `markdown-inline-code-at-point-p' for inline code."
-  (save-match-data (markdown-code-block-at-pos (point))))
+  (save-match-data (markdown-code-block-at-pos (or pos (point)))))
 
-(defun markdown-heading-at-point ()
-  "Return non-nil if there is a heading at the point.
+(defun markdown-heading-at-point (&optional pos)
+  "Return non-nil if there is a heading at the POS.
 Set match data for `markdown-regex-header'."
-  (let ((match-data (get-text-property (point) 'markdown-heading)))
+  (let ((match-data (get-text-property (or pos (point)) 'markdown-heading)))
     (when match-data
       (set-match-data match-data)
       t)))
@@ -3071,7 +3078,8 @@ Restore match data previously stored in PROPERTY."
         pos)
     (unless saved
       (setq pos (next-single-property-change (point) property nil last))
-      (setq saved (get-text-property pos property)))
+      (unless (= pos last)
+        (setq saved (get-text-property pos property))))
     (when saved
       (set-match-data saved)
       ;; Step at least one character beyond point. Otherwise
@@ -3677,7 +3685,7 @@ Return a cons cell containing updated bounds for the region."
       (cons beg (- end removed)))))
 
 (defun markdown-insert-hr (arg)
-  "Insert or replace a horizonal rule.
+  "Insert or replace a horizontal rule.
 By default, use the first element of `markdown-hr-strings'.  When
 ARG is non-nil, as when given a prefix, select a different
 element as follows.  When prefixed with \\[universal-argument],
@@ -4512,7 +4520,7 @@ at the beginning of the block."
                  (goto-char (next-single-property-change (point) prop)))))))
 
 
-;;; Footnotes ==================================================================
+;;; Footnotes =================================================================
 
 (defun markdown-footnote-counter-inc ()
   "Increment `markdown-footnote-counter' and return the new value."
@@ -4740,7 +4748,7 @@ Then the returned list is: ((\"^1\" . 478) (\"^marker\" . 475))"
 (defun markdown-kill-thing-at-point ()
   "Kill thing at point and add important text, without markup, to kill ring.
 Possible things to kill include (roughly in order of precedence):
-inline code, headers, horizonal rules, links (add link text to
+inline code, headers, horizontal rules, links (add link text to
 kill ring), images (add alt text to kill ring), angle uri, email
 addresses, bold, italics, reference definition (add URI to kill
 ring), footnote markers and text (kill both marker and text, add
@@ -4760,7 +4768,7 @@ text to kill ring), and list items."
      ((thing-at-point-looking-at markdown-regex-header-setext)
       (kill-new (match-string 1))
       (delete-region (match-beginning 0) (match-end 0)))
-     ;; Horizonal rule
+     ;; Horizontal rule
      ((thing-at-point-looking-at markdown-regex-hr)
       (kill-new (match-string 0))
       (delete-region (match-beginning 0) (match-end 0)))
@@ -4813,8 +4821,22 @@ text to kill ring), and list items."
      (t
       (user-error "Nothing found at point to kill")))))
 
+(defun markdown-kill-outline ()
+  "Kill visible heading and add it to `kill-ring'."
+  (interactive)
+  (save-excursion
+    (markdown-outline-previous)
+    (kill-region (point) (progn (markdown-outline-next) (point)))))
+
+(defun markdown-kill-block ()
+  "Kill visible code block, list item, or blockquote and add it to `kill-ring'."
+  (interactive)
+  (save-excursion
+    (markdown-backward-block)
+    (kill-region (point) (progn (markdown-forward-block) (point)))))
+
 
-;;; Indentation ====================================================================
+;;; Indentation ===============================================================
 
 (defun markdown-indent-find-next-position (cur-pos positions)
   "Return the position after the index of CUR-POS in POSITIONS.
@@ -4889,7 +4911,7 @@ duplicate positions, which are handled up by calling functions."
     (if (and prev-line-pos (> prev-line-pos tab-width))
         (setq positions (cons (- prev-line-pos tab-width) positions)))
 
-    ;; Indentation of all preceeding list markers (when in a list)
+    ;; Indentation of all preceding list markers (when in a list)
     (when (setq pos (markdown-calculate-list-levels))
       (setq positions (append pos positions)))
 
@@ -5279,6 +5301,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "P") 'markdown-pre-region)
     (define-key map (kbd "q") 'markdown-insert-blockquote)
     (define-key map (kbd "s") 'markdown-insert-strike-through)
+    (define-key map (kbd "t") 'markdown-insert-table)
     (define-key map (kbd "Q") 'markdown-blockquote-region)
     (define-key map (kbd "w") 'markdown-insert-wiki-link)
     (define-key map (kbd "-") 'markdown-insert-hr)
@@ -5423,7 +5446,7 @@ Assumes match data is available for `markdown-regex-italic'."
 See also `markdown-mode-map'.")
 
 
-;;; Menu ==================================================================
+;;; Menu ======================================================================
 
 (easy-menu-define markdown-mode-menu markdown-mode-map
   "Menu for Markdown mode"
@@ -5524,6 +5547,7 @@ See also `markdown-mode-map'.")
       :enable (markdown-table-at-point-p)]
      ["Insert Column" markdown-table-insert-column
       :enable (markdown-table-at-point-p)]
+     ["Insert Table" markdown-insert-table]
      "--"
      ["Convert Region to Table" markdown-table-convert-region]
      ["Sort Table Lines" markdown-table-sort-lines
@@ -5683,7 +5707,7 @@ See `imenu-create-index-function' and `imenu--index-alist' for details."
       ;; Headings
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-header (point-max) t)
-        (when (and (not (markdown-code-block-at-point-p))
+        (when (and (not (markdown-code-block-at-point-p (point-at-bol)))
                    (not (markdown-text-property-at-point 'markdown-yaml-metadata-begin)))
           (cond
            ((setq heading (match-string-no-properties 1))
@@ -7161,7 +7185,7 @@ markup."
      ;; Promote setext heading
      ((thing-at-point-looking-at markdown-regex-header-setext)
       (markdown-cycle-setext -1))
-     ;; Promote horizonal rule
+     ;; Promote horizontal rule
      ((thing-at-point-looking-at markdown-regex-hr)
       (markdown-cycle-hr -1))
      ;; Promote list item
@@ -7193,7 +7217,7 @@ or remove markup."
      ;; Demote setext heading
      ((thing-at-point-looking-at markdown-regex-header-setext)
       (markdown-cycle-setext 1))
-     ;; Demote horizonal rule
+     ;; Demote horizontal rule
      ((thing-at-point-looking-at markdown-regex-hr)
       (markdown-cycle-hr 1))
      ;; Demote list item
@@ -8144,7 +8168,7 @@ This is an exact copy of `line-number-at-pos' for use in emacs21."
     (thing-at-point-looking-at (markdown-make-regex-link-generic))))
 
 (defun markdown-line-is-reference-definition-p ()
-  "Return whether the current line is a (non-footnote) reference defition."
+  "Return whether the current line is a (non-footnote) reference definition."
   (save-excursion
     (move-beginning-of-line 1)
     (and (looking-at-p markdown-regex-reference-definition)
@@ -8416,7 +8440,7 @@ BEG and END are the limits of scanned region."
       (remove-overlays nil nil 'face 'markdown-gfm-checkbox-face))))
 
 
-;;; Display inline image =================================================
+;;; Display inline image ======================================================
 
 (defvar markdown-inline-image-overlays nil)
 (make-variable-buffer-local 'markdown-inline-image-overlays)
@@ -8428,6 +8452,33 @@ or \\[markdown-toggle-inline-images]."
   (interactive)
   (mapc #'delete-overlay markdown-inline-image-overlays)
   (setq markdown-inline-image-overlays nil))
+
+(defcustom markdown-display-remote-images nil
+  "If non-nil, download and display remote images.
+See also `markdown-inline-image-overlays'.
+
+Only image URLs specified with a protocol listed in
+`markdown-remote-image-protocols' are displayed."
+  :group 'markdown
+  :type 'boolean)
+
+(defcustom markdown-remote-image-protocols '("https")
+  "List of protocols to use to download remote images.
+See also `markdown-display-remote-images'."
+  :group 'markdown
+  :type '(repeat string))
+
+(defvar markdown--remote-image-cache
+  (make-hash-table :test 'equal)
+  "A map from URLs to image paths.")
+
+(defun markdown--get-remote-image (url)
+  "Retrieve the image path for a given URL."
+  (or (gethash url markdown--remote-image-cache)
+      (let ((dl-path (make-temp-file "markdown-mode--image")))
+        (require 'url)
+        (url-copy-file url dl-path t)
+        (puthash url dl-path markdown--remote-image-cache))))
 
 (defun markdown-display-inline-images ()
   "Add inline image overlays to image links in the buffer.
@@ -8446,24 +8497,29 @@ or \\[markdown-toggle-inline-images]."
               (end (match-end 0))
               (file (match-string-no-properties 6)))
           (when (and imagep
-                     (not (zerop (length file)))
-		     (file-exists-p file))
-            (let* ((abspath (if (file-name-absolute-p file)
-                                file
-                              (concat default-directory file)))
-                   (image
-                    (if (and markdown-max-image-size
-                             (image-type-available-p 'imagemagick))
-                        (create-image
-                         abspath 'imagemagick nil
-                         :max-width (car markdown-max-image-size)
-                         :max-height (cdr markdown-max-image-size))
-                      (create-image abspath))))
-              (when image
-                (let ((ov (make-overlay start end)))
-                  (overlay-put ov 'display image)
-                  (overlay-put ov 'face 'default)
-                  (push ov markdown-inline-image-overlays))))))))))
+                     (not (zerop (length file))))
+            (unless (file-exists-p file)
+              (when (and markdown-display-remote-images
+                         (member (downcase (url-type (url-generic-parse-url file)))
+                                 markdown-remote-image-protocols))
+                (setq file (markdown--get-remote-image file))))
+            (when (file-exists-p file)
+              (let* ((abspath (if (file-name-absolute-p file)
+                                  file
+                                (concat default-directory file)))
+                     (image
+                      (if (and markdown-max-image-size
+                               (image-type-available-p 'imagemagick))
+                          (create-image
+                           abspath 'imagemagick nil
+                           :max-width (car markdown-max-image-size)
+                           :max-height (cdr markdown-max-image-size))
+                        (create-image abspath))))
+                (when image
+                  (let ((ov (make-overlay start end)))
+                    (overlay-put ov 'display image)
+                    (overlay-put ov 'face 'default)
+                    (push ov markdown-inline-image-overlays)))))))))))
 
 (defun markdown-toggle-inline-images ()
   "Toggle inline image overlays in the buffer."
@@ -8644,7 +8700,7 @@ position."
                (markdown-edit-code-block))))))
 
 
-;;; Table Editing
+;;; Table Editing =============================================================
 
 ;; These functions were originally adapted from `org-table.el'.
 
@@ -8799,7 +8855,8 @@ This function assumes point is on a table."
     (while (and (not (bobp))
                 (markdown-table-at-point-p))
       (forward-line -1))
-    (unless (eobp)
+    (unless (or (eobp)
+                (markdown-table-at-point-p))
       (forward-line 1))
     (point)))
 
@@ -9331,8 +9388,39 @@ spaces, or alternatively a TAB should be used as the separator."
     (goto-char begin)
     (markdown-table-align)))
 
+(defun markdown-insert-table (&optional rows columns align)
+  "Insert an empty pipe table.
+Optional arguments ROWS, COLUMNS, and ALIGN specify number of
+rows and columns and the column alignment."
+  (interactive)
+  (let* ((rows (or rows (string-to-number (read-string "Row size: "))))
+         (columns (or columns (string-to-number (read-string "Column size: "))))
+         (align (or align (read-string "Alignment ([l]eft, [r]ight, [c]enter, or RET for default): ")))
+         (align (cond ((equal align "l") ":--")
+                      ((equal align "r") "--:")
+                      ((equal align "c") ":-:")
+                      (t "---")))
+         (pos (point))
+         (indent (make-string (current-column) ?\ ))
+         (line (concat
+                (apply 'concat indent "|"
+                       (make-list columns "   |")) "\n"))
+         (hline (apply 'concat indent "|"
+                       (make-list columns (concat align "|")))))
+    (if (string-match
+         "^[ \t]*$" (buffer-substring-no-properties
+                     (point-at-bol) (point)))
+        (beginning-of-line 1)
+      (newline))
+    (dotimes (_ rows) (insert line))
+    (goto-char pos)
+    (if (> rows 1)
+        (progn
+          (end-of-line 1) (insert (concat "\n" hline)) (goto-char pos)))
+    (markdown-table-forward-cell)))
+
 
-;;; ElDoc Support
+;;; ElDoc Support =============================================================
 
 (defun markdown-eldoc-function ()
   "Return a helpful string when appropriate based on context.
@@ -9543,12 +9631,8 @@ spaces, or alternatively a TAB should be used as the separator."
   (setq-local markdown-table-at-point-p-function 'gfm--table-at-point-p)
   (markdown-gfm-parse-buffer-for-languages))
 
-(define-obsolete-variable-alias
- 'gfm-font-lock-keywords
- 'markdown-mode-font-lock-keywords "v2.4")
-
 
-;;; Viewing modes
+;;; Viewing modes =============================================================
 
 (defcustom markdown-hide-markup-in-view-modes t
   "Enable hidden markup mode in `markdown-view-mode' and `gfm-view-mode'."
@@ -9589,7 +9673,7 @@ spaces, or alternatively a TAB should be used as the separator."
   (read-only-mode 1))
 
 
-;;; Live Preview Mode  ============================================
+;;; Live Preview Mode  ========================================================
 ;;;###autoload
 (define-minor-mode markdown-live-preview-mode
   "Toggle native previewing on save for a specific markdown file."
