@@ -1,0 +1,13 @@
+#!/bin/sh
+
+
+PATTERN='.*\.\(c\|h\|hpp\|cc\|cpp\|py\|el\)'
+
+if [ -e /usr/bin/etags ]; then
+   find -regex "${PATTERN}" -print | xargs etags
+   exit 0
+fi
+
+# ctags
+echo ${FIND}
+find -regex "${PATTERN}" -print | xargs ctags -e
