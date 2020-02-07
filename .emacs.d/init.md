@@ -265,7 +265,7 @@ Once installed we can now configure the basic setup, ensuring that the mode is l
 
 More interestingly we can add a hook to ensure that code is formatted prior to being saved.  If [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) is present it will be used, otherwise we'll fall back to the default `gofmt`-based formatting.
 
-In this hook we'll also allow [godef](https://github.com/rogpeppe/godef) to be used to jump to method definitions, much like ctags:
+In this hook we'll also allow [godef](https://github.com/rogpeppe/godef) to be used to jump to method definitions, via `M-Space` much like you'd expect with CTAGS (see the later note on using [using tags](#tags-support) directly):
 
 
 ```lisp
@@ -497,6 +497,42 @@ is Hashicorp terraform:
 
 
 
+
+## Tags Support
+
+Many lanagues have support for tags/etags/ctags
+
+For example on a Python project you might run something like this to create/update a `TAGS` file:
+
+      $ find . -name "*.py" | xargs ctags -e
+
+If you don't have `ctags` then `etags` with no arguments will also do the right thing:
+
+      $ find . -name '*.el' | xargs etags
+
+```lisp
+;; Default (fedora)
+(setq ctags-cmd "/usr/bin/ctags -e")
+
+;; Debian
+(if (file-exists-p "/usr/bin/etags")
+    (setq ctags-cmd "/usr/bin/etags"))
+
+(defun create-tags (dir-name)
+  "Create tags file"
+  (interactive "DDirectory: ")
+  (shell-command (format "/bin/sh -c \"cd %s && %s\"" dir-name ctags-cmd)))
+```
+Once you've done that the following will allow the `TAGS`-file to be located, walking up to 10 directories above the location of your currently-open file:
+
+```lisp
+    (require 'etags-table)
+    (setq etags-table-search-up-depth 10)
+```
+
+Finally you should now be able to use `M-.` to take you to the definition of the _thing_ under the point.
+
+
 ## Whitespace Handling
 
 We like to remove trailing whitespace, and define a function to
@@ -604,11 +640,20 @@ To use this define a block like so in your org-mode files, and you'll be prompte
 #+END_SRC
 ```
 
-Finally if you wish to allow internal-links to find headlines based upon substring-matches, rather than literal matches this will ensure it works:
+If you wish to allow internal-links to find headlines based upon substring-matches, rather than literal matches this will ensure it works:
 
 ```lisp
 (setq org-link-search-must-match-exact-headline nil)
 ```
+
+The final tweak is to enable line-wrapping:
+
+```lisp
+(add-hook 'org-mode-hook
+    (lambda()
+      (toggle-truncate-lines)))
+```
+
 
 ## User Interface Tweaks
 
