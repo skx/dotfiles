@@ -598,6 +598,78 @@ I'm annoyed by backups and similar.  So I disable them all:
 ```
 
 
+## Org-Mode
+
+`org-mode` is a wonderful thing which allows Emacs to hold tables, TODO-lists, and much much more.  For the moment I'm keeping document-specific lisp and configuration within the appropriate document, but there are some things that make working with `org-mode` nicer which will live _here_.
+
+One of the nice things about org-mode is that it lets you contain embedded snippets of various programming languages, in blocks, which can be evaluated, executed and otherwise processed.  The following snippets ensure that these blocks can be highlighted and indented as expected:
+
+```lisp
+  (setq org-src-tab-acts-natively t)
+  (setq org-src-fontify-natively t)
+```
+
+The next thing that is globally useful is to allow searches for internal links to match sub-strings of headlines, rather than requiring complete matches:
+
+```lisp
+  (setq org-link-search-must-match-exact-headline nil)
+```
+
+As noted above it is possible to evaluated blocks of script from within `org-mode`, but shell-scripting is disabled by default so we need to enable this explicitly:
+
+```lisp
+;; This works with the older-version of org-mode, as installed
+;; upon frodo.home
+(with-feature (ob-sh)
+              (org-babel-do-load-languages 'org-babel-load-languages '((sh . t))))
+
+;; This is the preferred approach, which works on modern release of
+;; emacs and org-mode.
+(with-feature (ob-shell)
+              (org-babel-do-load-languages 'org-babel-load-languages '((shell . t))))
+```
+
+The second useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block.
+
+```lisp
+(defun org-eval-skx-startblock ()
+  (interactive "*")
+  (if (member "skx-startblock" (org-babel-src-block-names))
+      (save-excursion
+      (save-restriction
+        (org-babel-goto-named-src-block "skx-startblock")
+        (org-babel-execute-src-block)))
+    nil
+    )
+  )
+(add-hook 'org-mode-hook 'org-eval-skx-startblock)
+```
+
+To use this define a block like so in your org-mode files, and you'll be prompted to evaluate it when you load the file:
+
+```
+#+NAME: skx-startblock
+#+BEGIN_SRC emacs-lisp
+  (message "I like cakes")
+  (message "So do you?")
+#+END_SRC
+```
+
+If you wish to allow internal-links to find headlines based upon substring-matches, rather than literal matches this will ensure it works:
+
+```lisp
+(setq org-link-search-must-match-exact-headline nil)
+```
+
+The final tweak is to enable line-wrapping:
+
+```lisp
+(add-hook 'org-mode-hook
+    (lambda()
+      (toggle-truncate-lines)))
+```
+
+
 ## User Interface Tweaks
 
 I prefer to avoid menu-bars, tool-bars, and have a minimal look:
