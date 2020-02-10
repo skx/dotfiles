@@ -598,63 +598,6 @@ I'm annoyed by backups and similar.  So I disable them all:
 ```
 
 
-## Org-Mode
-
-I want to be able to evaluate shell-snippets inside Org-mode.  Note that previously this was handled with `org-sh`, but it now requires `org-shell` as a result of the org version 8.2:
-
-```lisp
-;; Old org
-(with-feature (ob-sh)
-              (org-babel-do-load-languages 'org-babel-load-languages '((sh . t))))
-
-;; Modern org.
-(with-feature (ob-shell)
-              (org-babel-do-load-languages 'org-babel-load-languages '((shell . t))))
-```
-
-The second useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block.
-
-In my case I've changed the default from `startblock` to `skx-startblock`.
-
-```lisp
-(defun org-eval-skx-startblock ()
-  (interactive "*")
-  (if (member "skx-startblock" (org-babel-src-block-names))
-      (save-excursion
-      (save-restriction
-        (org-babel-goto-named-src-block "skx-startblock")
-        (org-babel-execute-src-block)))
-    nil
-    )
-  )
-(add-hook 'org-mode-hook 'org-eval-skx-startblock)
-```
-
-To use this define a block like so in your org-mode files, and you'll be prompted to evaluate it when you load the file:
-
-```
-#+NAME: skx-startblock
-#+BEGIN_SRC emacs-lisp
-  (message "I like cakes")
-  (message "So do you?")
-#+END_SRC
-```
-
-If you wish to allow internal-links to find headlines based upon substring-matches, rather than literal matches this will ensure it works:
-
-```lisp
-(setq org-link-search-must-match-exact-headline nil)
-```
-
-The final tweak is to enable line-wrapping:
-
-```lisp
-(add-hook 'org-mode-hook
-    (lambda()
-      (toggle-truncate-lines)))
-```
-
-
 ## User Interface Tweaks
 
 I prefer to avoid menu-bars, tool-bars, and have a minimal look:
