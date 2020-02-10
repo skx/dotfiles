@@ -91,6 +91,6 @@ parsing and executing inline code-blocks"
 ;;   ~/.emacs.d/init.$(hostname).org  - Optional.
 ;;   ~/.emacs.d/init.local.org        - Optional - never under revision control
 ;;
-(load-org-init "~/.emacs.d/README.org")
+(load-org-init "~/.emacs.d/init.org")
 (load-org-init (format "~/.emacs.d/init.%s.org" (hostname)))
 (load-org-init "~/.emacs.d/init.local.org")
