@@ -9,5 +9,4 @@ if [ -e /usr/bin/etags ]; then
 fi
 
 # ctags
-echo ${FIND}
 find -regex "${PATTERN}" -print | xargs ctags -e
