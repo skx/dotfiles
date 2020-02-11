@@ -632,17 +632,27 @@ As noted above it is possible to evaluated blocks of script from within `org-mod
 The second useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block.
 
 ```lisp
-(defun org-eval-skx-startblock ()
+(defvar safe-skx-org-eval-startblock '("/home/skx/Repos/git.steve.fi/" "/home/skx/Repos/git.steve.org.uk/" )
+ "A list of filename patterns which can be permitted to evaluate org-blocks
+ when the file is loaded.")
+
+(defun regexp-match-list(regexp list)
+  "Return nil unless the regexp matches at least one of the list items"
+  (delq nil (mapcar (lambda(x) (string-match x regexp )) list)))
+
+(defun skx-org-eval-startblock ()
   (interactive "*")
   (if (member "skx-startblock" (org-babel-src-block-names))
       (save-excursion
       (save-restriction
+        (if (regexp-match-list (buffer-file-name) safe-skx-org-eval-startblock)
+            (setq-local org-confirm-babel-evaluate nil))
         (org-babel-goto-named-src-block "skx-startblock")
         (org-babel-execute-src-block)))
     nil
     )
   )
-(add-hook 'org-mode-hook 'org-eval-skx-startblock)
+(add-hook 'org-mode-hook 'skx-org-eval-startblock)
 ```
 
 To use this define a block like so in your org-mode files, and you'll be prompted to evaluate it when you load the file:
