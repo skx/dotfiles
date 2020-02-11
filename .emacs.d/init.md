@@ -588,11 +588,11 @@ I'm annoyed by backups and similar.  So I disable them all:
     (setq savehist-file (concat (expand-file-name "~/.trash.d/emacs.history/") "emacs." (getenv "USER")))
     (savehist-mode 1)
 
-    ;disable backups
+    ;; Disable backups
     (setq backup-inhibited t)
     (setq make-backup-files nil)
 
-    ;disable auto-save
+    ;; Disable auto-save
     (setq auto-save-default nil)
     (setq auto-save-interval (* 60 60 24))
 ```
@@ -629,19 +629,19 @@ As noted above it is possible to evaluated blocks of script from within `org-mod
               (org-babel-do-load-languages 'org-babel-load-languages '((shell . t))))
 ```
 
-The second useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block.
+The second useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block when a file is loaded.
+
+The following match allows the contents of a block named `skx-startblock` to be executed when the file is loaded.
 
 ```lisp
 (defvar safe-skx-org-eval-startblock '("/home/skx/Repos/git.steve.fi/" "/home/skx/Repos/git.steve.org.uk/" )
- "A list of filename patterns which can be permitted to evaluate org-blocks
- when the file is loaded.")
+ "A list of filename patterns which will have their contents evaluated with no propmting.")
 
 (defun regexp-match-list(regexp list)
   "Return nil unless the regexp matches at least one of the list items"
   (delq nil (mapcar (lambda(x) (string-match x regexp )) list)))
 
 (defun skx-org-eval-startblock ()
-  (interactive "*")
   (if (member "skx-startblock" (org-babel-src-block-names))
       (save-excursion
       (save-restriction
@@ -649,13 +649,11 @@ The second useful change to org-mode is allowing the ability to execute the Emac
             (setq-local org-confirm-babel-evaluate nil))
         (org-babel-goto-named-src-block "skx-startblock")
         (org-babel-execute-src-block)))
-    nil
-    )
-  )
+    nil))
 (add-hook 'org-mode-hook 'skx-org-eval-startblock)
 ```
 
-To use this define a block like so in your org-mode files, and you'll be prompted to evaluate it when you load the file:
+To use this define a block like so in your org-mode files, and you'll be prompted to evaluate it when you load the file, unless the filename matches the paths contained on the `safe-skx-org-eval-startblock` list:
 
 ```
 #+NAME: skx-startblock
@@ -663,12 +661,6 @@ To use this define a block like so in your org-mode files, and you'll be prompte
   (message "I like cakes")
   (message "So do you?")
 #+END_SRC
-```
-
-If you wish to allow internal-links to find headlines based upon substring-matches, rather than literal matches this will ensure it works:
-
-```lisp
-(setq org-link-search-must-match-exact-headline nil)
 ```
 
 The final tweak is to enable line-wrapping:
