@@ -1,5 +1,0 @@
-Steve
--- 
-Debian GNU/Linux System Administration
-https://www.debian-administration.org/
-
