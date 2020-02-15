@@ -3,24 +3,30 @@
 #+EMAIL:   steve@steve.fi
 #+OPTIONS: num:nil html-postamble:nil
 
+This is an initialization file which is loaded when we start, it is designed to allow me to easily resync the contents of some of our local packages with their remote/upstream sources.
+
 * Easily Updating Emacs Lisp Libraries
 
-The following table contains a list of links to source-code, we fetch the remote URL and save it to the named file.  Emacs does have a concept of a package-registry these days, but a lot of the packages I use aren't contained in that registry.
+Emacs has a concept of a package-registry but the random packages I use aren't contained within that registry, instead they come from Github repositories.
 
-Instead I need to semi-regularly sync packages from their upstream location.
+To allow me to easily fetch the latest version of those packages I've defined a table containing the remote URL to the file, and the destination to which it should be written beneath this directory.
+
+To resync all the files place the cursor on the bottom-row of the table and execute `C-c C-c` to run =org-ctrl-c-ctrl-c=, which will apply the formulate to each table-row, invoking the custom =download= function in the process.
 
 This is a bit terrible, but also a bit awesome.
 
 #+NAME: github-urls
-| Destination                      | Link                                                                             | Result |
-|----------------------------------+----------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/lua-mode.el      | https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el            | OK     |
-| ~/.emacs.d/lang/markdown-mode.el | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el | OK     |
-| ~/.emacs.d/lang/monkey.el        | https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el              | OK     |
-| ~/.emacs.d/lang/puppet-mode.el   | https://raw.githubusercontent.com/voxpupuli/puppet-mode/master/puppet-mode.el    | OK     |
-| ~/.emacs.d/lang/web-mode.el      | https://github.com/fxbois/web-mode/raw/master/web-mode.el                        | OK     |
-| ~/.emacs.d/lang/cfengine.el      | https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el       | OK     |
-#+TBLFM: $3='(download $2 $1)
+| Destination                       | Link                                                                                   | Result |
+|-----------------------------------+----------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/cfengine.el       | https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el             | OK     |
+| ~/.emacs.d/lang/go-mode.el        | https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode.el                | OK     |
+| ~/.emacs.d/lang/lua-mode.el       | https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el                  | OK     |
+| ~/.emacs.d/lang/markdown-mode.el  | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el       | OK     |
+| ~/.emacs.d/lang/monkey.el         | https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el                    | OK     |
+| ~/.emacs.d/lang/puppet-mode.el    | https://raw.githubusercontent.com/voxpupuli/puppet-mode/master/puppet-mode.el          | OK     |
+| ~/.emacs.d/lang/terraform-mode.el | https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el | OK     |
+| ~/.emacs.d/lang/web-mode.el       | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                   | OK     |
+#+TBLFM: $3y='(download $2 $1)
 
 
 #+BEGIN_SRC emacs-lisp :results output silent
