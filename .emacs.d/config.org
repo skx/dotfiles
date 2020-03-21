@@ -26,7 +26,7 @@ This is a bit terrible, but also a bit awesome.
 | ~/.emacs.d/lang/puppet-mode.el    | https://raw.githubusercontent.com/voxpupuli/puppet-mode/master/puppet-mode.el          | OK     |
 | ~/.emacs.d/lang/terraform-mode.el | https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el | OK     |
 | ~/.emacs.d/lang/web-mode.el       | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                   | OK     |
-#+TBLFM: $3y='(download $2 $1)
+#+TBLFM: $3='(download $2 $1)
 
 
 #+BEGIN_SRC emacs-lisp :results output silent
