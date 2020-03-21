@@ -735,7 +735,7 @@ The following section helper ensures that files are given `+x` permissions
 when they're saved, if they contain a valid shebang line:
 
 ```lisp
-    (noerr-require 'shebang)
+    (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 ```
 
 Finally we allow Emacs to control our music playback, which is supplied
