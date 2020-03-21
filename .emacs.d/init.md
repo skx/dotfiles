@@ -68,6 +68,18 @@ successfully loaded we can then conditionally execute some code:
 The initial setup is now complete, so we can start loading packages, making
 configuration-changes & etc.
 
+Finally for interactive evaluation this is a handy function to evaluate
+either the current expression, or the current selection:
+
+```lisp
+(defun eval-region-or-last-sexp ()
+  (interactive)
+  (if (region-active-p) (call-interactively 'eval-region)
+    (call-interactively 'eval-last-sexp)))
+```
+
+We'll bind this to a key, later.
+
 
 ## Backup Files
 
@@ -1008,6 +1020,7 @@ some I've grown accustomed to:
     (global-set-key "\M-g" 'goto-line)
     (global-set-key "\C-s" 'isearch-forward-regexp)
     (global-set-key "\C-r" 'isearch-backward-regexp)
+    (global-set-key "\M-e" 'eval-region-or-last-sexp)
 
     ;; kill the current-buffer with no prompting.
     (global-set-key "\C-xk"
