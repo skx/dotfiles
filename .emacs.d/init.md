@@ -468,7 +468,6 @@ Now we can ensure that this is bound to `M-i` when `markdown-mode` is active:
 ```lisp
     (add-hook 'markdown-mode-hook
      (lambda ()
-      (local-set-key (kbd "M-'") 'imenu-list-smart-toggle)
       (local-set-key (kbd "M-i") 'markdown-index)))
 ```
 
@@ -1021,6 +1020,7 @@ some I've grown accustomed to:
     (global-set-key "\C-s" 'isearch-forward-regexp)
     (global-set-key "\C-r" 'isearch-backward-regexp)
     (global-set-key "\M-e" 'eval-region-or-last-sexp)
+    (global-set-key "\M-'" 'imenu-list-smart-toggle)   ;; org/markdown sidebar
 
     ;; kill the current-buffer with no prompting.
     (global-set-key "\C-xk"
