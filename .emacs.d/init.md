@@ -107,6 +107,17 @@ I'm annoyed by backups and similar.  So I disable them all:
 ```
 
 
+## Docker
+
+There is a handy [dockerfile-mode](https://github.com/spotify/dockerfile-mode) which allows highlighting docker-files.
+
+Here we load it, and we can use `C-x C-b` to build the Dockerfile in the current buffer.
+
+```lisp
+(require 'dockerfile-mode)
+```
+
+
 ## File Handling
 
 Emacs has a built-in file/directory browser which is available via `M-x dired`, and which I use very often.
