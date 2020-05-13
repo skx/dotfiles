@@ -315,6 +315,7 @@ configuration file I have stored in my dotfiles:
 (defun perltidy()
   "Tidy the contents of the current buffer via `perltidy'"
   (interactive)
+  (setq temp-point (point))
   (shell-command-on-region
    ;; beginning and end of buffer
    (point-min)
@@ -328,7 +329,8 @@ configuration file I have stored in my dotfiles:
    ;; name of the error buffer
    "*Error Buffer*"
    ;; show error buffer?
-   t))
+   t)
+  (goto-char temp-point))
 ```
 
 Using the function we've just defined we can now make sure that we tidy
