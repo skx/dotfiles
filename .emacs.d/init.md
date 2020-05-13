@@ -408,6 +408,20 @@ and `Esc-+` to hide/show all:
 ```
 
 
+### Language Mode Helpers - Templates
+
+It is often useful to auto-insert content when visiting a particular kind of file, for example when creating a perl-file it would be good to ensure good practice by inserting:
+
+```
+     use strict;
+     use warnings;
+```
+
+The `skx-template` package allows that to be done in a simple fashion; when visiting a file for the first time it will insert a snippet if it exists.
+
+```lisp
+(require 'skx-template)
+```
 
 ### Language Mode Helpers - Utilities
 
