@@ -532,7 +532,7 @@ Another useful change to org-mode is allowing the ability to execute the Emacs l
 The following configuration enables the contents of a block named `skx-startblock` to be executed automatically when the file is loaded:
 
 ```lisp
-(defvar safe-skx-org-eval-startblock (list (concat (getenv "HOME") "/Repos/git.steve.fi/") (concat (getenv "HOME") "/Repos/git.steve.org.uk/") (concat (getenv "HOME") "/Org") )
+(defvar safe-skx-org-eval-startblock (list (concat (getenv "HOME") "/Repos/git.steve.fi/") (concat (getenv "HOME") "/Repos/git.steve.org.uk/") (concat (getenv "HOME") "/Org") (concat (getenv "HOME") "/WorkLogs") )
  "A list of filename patterns which will have their contents evaluated with no prompting.")
 
 (defun regexp-match-list(regexp list)
