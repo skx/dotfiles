@@ -40,3 +40,12 @@ fi
 if [ -e /opt/pass/completion/pass.bash-completion ]; then
     . /opt/pass/completion/pass.bash-completion
 fi
+
+#
+# sysbox is a collection of scripting/sysadmin utilities
+#
+# https://github.com/skx/sysbox
+#
+test -x ~/go/bin/sysbox 2>/dev/null >/dev/null && \
+    source <(~/go/bin/sysbox bash-completion) || \
+       echo "sysbox is not installed"
