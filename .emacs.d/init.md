@@ -582,10 +582,16 @@ Now we're done with the general setup so we'll handle the more specific things h
 
 ```lisp
 
-;; Store our org-files beneath ~/Org.  Scan all of them for agenda-items & etc.
-(custom-set-variables
-  '(org-directory "~/Org")
-  '(org-agenda-files (list org-directory)))
+;; Store our org-files beneath ~/Org.
+(custom-set-variables  '(org-directory "~/Org"))
+
+;; load all files for the agenda
+(setq org-agenda-files (apply 'append
+			      (mapcar
+			       (lambda (directory)
+				 (directory-files-recursively
+				  directory org-agenda-file-regexp))
+			       '("~/Org" "~/WorkLogs"))))
 
 ;; Log when we're completing things.
 (setq org-log-done t)
