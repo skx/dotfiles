@@ -593,6 +593,9 @@ Now we're done with the general setup so we'll handle the more specific things h
 			   (directory-files-recursively directory org-agenda-file-regexp)))
 			       '("~/Org" "~/WorkLogs"))))
 
+;; RETURN will follow links in org-mode files
+(setq org-return-follows-link  t)
+
 ;; Log when we're completing things.
 (setq org-log-done t)
 
