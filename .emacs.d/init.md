@@ -587,10 +587,10 @@ Now we're done with the general setup so we'll handle the more specific things h
 
 ;; load all files for the agenda
 (setq org-agenda-files (apply 'append
-			      (mapcar
-			       (lambda (directory)
-				 (directory-files-recursively
-				  directory org-agenda-file-regexp))
+	(mapcar
+		(lambda (directory)
+			(if (file-directory-p directory )
+			   (directory-files-recursively directory org-agenda-file-regexp)))
 			       '("~/Org" "~/WorkLogs"))))
 
 ;; Log when we're completing things.
@@ -798,8 +798,7 @@ I prefer to avoid menu-bars, tool-bars, and have a minimal look:
 ```lisp
     ;; Disable the scroll-bars, tool-bar, and menu-bar
     (dolist (mode
-        '(scroll-bar-mode
-          tool-bar-mode
+        '(tool-bar-mode
           menu-bar-mode))
      (funcall mode 0))
 
