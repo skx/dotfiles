@@ -1096,6 +1096,20 @@ Finally since I'm in Finland I've found that I'm using foreign keyboard layouts 
 ```
 
 
+## XXX - Startup
+
+Finally we ensure we show our TODO-list when we start.
+
+Here we check that the org-files are not empty, because if they aren't present then this is obviously a host upon which I don't use `org-mode`, and showing an empty TODO-list is pointless.
+
+
+```lisp
+(if org-agenda-files
+    (setq initial-buffer-choice (lambda ()
+        (org-todo-list 1)
+        (get-buffer "*Org Agenda*"))))
+```
+
 
 ## XXXX - TODO
 
