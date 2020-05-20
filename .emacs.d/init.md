@@ -796,9 +796,12 @@ client-modes in Emacs, this is my own:
 I prefer to avoid menu-bars, tool-bars, and have a minimal look:
 
 ```lisp
+    (require 'scroll-bar)
+
     ;; Disable the scroll-bars, tool-bar, and menu-bar
     (dolist (mode
-        '(tool-bar-mode
+        '(scroll-bar-mode
+          tool-bar-mode
           menu-bar-mode))
      (funcall mode 0))
 
