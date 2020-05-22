@@ -600,8 +600,10 @@ Now we're done with the general setup so we'll handle the more specific things h
 (setq org-log-done t)
 
 ;; Setup TODO-workflow, and colouring.
-(setq org-todo-keywords '((sequence "TODO" "INPROGRESS" "DONE"))
-      org-todo-keyword-faces '(("INPROGRESS" . (:foreground "blue" :weight bold))))
+(setq org-todo-keywords '((sequence "TODO" "INPROGRESS" "|" "CANCELED" "DONE")))
+(setq org-todo-keyword-faces '(("INPROGRESS" . (:foreground "blue" :weight bold))
+    ("CANCELED" . (:foreground "pink" :weight bold))))
+
 
 ;; Indentation in org-buffers matches the header-level
 (setq org-startup-indented 'f)
