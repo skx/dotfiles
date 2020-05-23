@@ -1,5 +1,5 @@
 ;;
-;; ~/.emacs.d/init.md
+;; ~/.emacs.d/init.el
 ;;
 ;; This is the driver which attempts to load, parse, and evaluate the
 ;; content of my main Markdown init-file "init.md" from beneath ~/.emacs.d/
@@ -17,18 +17,6 @@
 (defun hostname()
   "Return the (unqualified) hostname for this system."
   (car (split-string (system-name) "\\." )))
-
-;; Helper function.
-(defun domainname()
-  "Return the domain-name for this system, if it is possible to do so."
-  (let ((name (cdr (split-string (system-name) "\\.")))
-        (res nil))
-    (dolist (item name)
-       (if res
-           (setq res (concat res "." (format "%s" item)))
-         (setq res (concat res (format "%s" item)))))
-    res))
-
 
 (defun load-markdown-init (path)
   "If the specified file exists then attempt to load it.
