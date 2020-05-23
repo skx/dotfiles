@@ -91,6 +91,10 @@ constant is changed.")
                                go-identifier-regexp
                                "\\)("))
 
+(defconst go--comment-start-regexp "[[:space:]]*\\(?:/[/*]\\)")
+(defconst go--case-regexp "\\([[:space:]]*case\\([[:space:]]\\|$\\)\\)")
+(defconst go--case-or-default-regexp (concat "\\(" go--case-regexp "\\|"  "[[:space:]]*default:\\)"))
+
 (defconst go-builtins
   '("append" "cap"   "close"   "complex" "copy"
     "delete" "imag"  "len"     "make"    "new"
@@ -410,6 +414,20 @@ For mode=set, all covered lines will have this weight."
 (defvar go--default-face 'default
   "A variable to refer to `default' face for use in font lock rules.")
 
+(defun go--fontify-type-switch-case-pre ()
+  "Move point to line following the end of case statement.
+
+This is used as an anchored font lock keyword PRE-MATCH-FORM. We
+expand the font lock region to include multiline type switch case
+statements."
+  (save-excursion
+    (beginning-of-line)
+    (while (or (looking-at "[[:space:]]*\\($\\|//\\)") (go--line-suffix-p ","))
+      (forward-line))
+    (when (go--line-suffix-p ":")
+      (forward-line))
+    (point)))
+
 (defun go--build-font-lock-keywords ()
   ;; we cannot use 'symbols in regexp-opt because GNU Emacs <24
   ;; doesn't understand that
@@ -440,7 +458,11 @@ For mode=set, all covered lines will have this weight."
      (go--match-ident-type-pair 2 font-lock-type-face)
 
      ;; An anchored matcher for type switch case clauses.
-     (go--match-type-switch-case (go--fontify-type-switch-case nil nil (1 font-lock-type-face)))
+     (go--match-type-switch-case
+      (go--fontify-type-switch-case
+       (go--fontify-type-switch-case-pre)
+       nil
+       (1 font-lock-type-face)))
 
      ;; Match variable names in var decls, constant names in const
      ;; decls, and type names in type decls.
@@ -994,17 +1016,15 @@ is done."
           indent
         (+ indent (current-indentation))))))
 
-(defconst go--operator-chars "*/%<>&\\^+\\-|=!,"
+(defconst go--operator-chars "*/%<>&\\^+\\-|=!,."
   "Individual characters that appear in operators.
-Comma is included because it is sometimes a dangling operator, so
-needs to be considered by `go--continuation-line-indents-p'")
+Comma and period are included because they can be dangling operators, so
+they need to be considered by `go--continuation-line-indents-p'")
 
 (defun go--operator-precedence (op)
-  "Go operator precedence (higher binds tighter).
-
-Comma gets the default 0 precedence which is appropriate because commas
-are loose binding expression separators."
+  "Go operator precedence (higher binds tighter)."
   (cl-case (intern op)
+    (\. 7) ; "." in "foo.bar", binds tightest
     (! 6)
     ((* / % << >> & &^) 5)
     ((+ - | ^) 4)
@@ -1165,8 +1185,6 @@ Return non-nil if point changed lines."
       (setq count (if (and count (< count 0 )) -1 1)))
     moved))
 
-(defconst go--comment-start-regexp "[[:space:]]*\\(?:/[/*]\\)")
-
 (defun go--case-comment-p (indent)
   "Return non-nil if looking at a comment attached to a case statement.
 
@@ -1221,9 +1239,6 @@ INDENT is the normal indent of this line, i.e. that of the case body."
         ;; other cases are ambiguous, so if comment is currently
         ;; aligned with "case", leave it that way
         (= (current-indentation) (- indent tab-width)))))))
-
-(defconst go--case-regexp "\\([[:space:]]*case\\([[:space:]]\\|$\\)\\)")
-(defconst go--case-or-default-regexp (concat "\\(" go--case-regexp "\\|"  "[[:space:]]*default:\\)"))
 
 (defun go-mode-indent-line ()
   (interactive)
@@ -1469,7 +1484,7 @@ comma, it stops at it. Return non-nil if comma was found."
     ;; Loop until we find a match because we must skip types we don't
     ;; handle, such as "interface { foo() }".
     (while (and (not found-match) (not done))
-      (when (looking-at (concat "[[:space:]\n]*" go-type-name-regexp "[[:space:]]*[,:]"))
+      (when (looking-at (concat "\\(?:[[:space:]]*\\|//.*\\|\n\\)*" go-type-name-regexp "[[:space:]]*[,:]"))
         (goto-char (match-end 1))
         (unless (member (match-string 1) go-constants)
           (setq found-match t)))
@@ -1827,7 +1842,7 @@ with goflymake (see URL `https://github.com/dougm/goflymake'), gocode
              (boundp 'compilation-error-regexp-alist-alist))
     (add-to-list 'compilation-error-regexp-alist 'go-test)
     (add-to-list 'compilation-error-regexp-alist-alist
-                 '(go-test . ("^\t+\\([^()\t\n]+\\):\\([0-9]+\\):? .*$" 1 2)) t)))
+                 '(go-test . ("^\\s-+\\([^()\t\n]+\\):\\([0-9]+\\):? .*$" 1 2)) t)))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist (cons "\\.go\\'" 'go-mode))
@@ -2338,6 +2353,7 @@ description at POINT."
 (defun godef--successful-p (output)
   (not (or (string= "-" output)
            (string= "godef: no identifier found" output)
+           (string= "godef: no object" output)
            (go--string-prefix-p "godef: no declaration found for " output)
            (go--string-prefix-p "error finding import path for " output))))
 
