@@ -107,6 +107,15 @@ I'm annoyed by backups and similar.  So I disable them all:
 ```
 
 
+## Buffers
+
+If multiple buffers use the same filename we'll prefix with the parent directory:
+
+```lisp
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+```
+
 ## Docker
 
 There is a handy [dockerfile-mode](https://github.com/spotify/dockerfile-mode) which allows highlighting docker-files.
@@ -593,6 +602,9 @@ Now we're done with the general setup so we'll handle the more specific things h
 			   (directory-files-recursively directory org-agenda-file-regexp)))
 			       '("~/Org" "~/WorkLogs"))))
 
+;; Our agenda-view will span two weeks by default.
+(setq org-agenda-span 14)
+
 ;; RETURN will follow links in org-mode files
 (setq org-return-follows-link  t)
 
@@ -600,9 +612,10 @@ Now we're done with the general setup so we'll handle the more specific things h
 (setq org-log-done t)
 
 ;; Setup TODO-workflow, and colouring.
-(setq org-todo-keywords '((sequence "TODO" "INPROGRESS" "|" "CANCELED" "DONE")))
-(setq org-todo-keyword-faces '(("INPROGRESS" . (:foreground "blue" :weight bold))
-    ("CANCELED" . (:foreground "pink" :weight bold))))
+(setq org-todo-keywords '((sequence "TODO" "INPROGRESS" "|" "DONE" "CANCELED")))
+(setq org-todo-keyword-faces '(
+    ("INPROGRESS" . (:foreground "blue" :weight bold))
+    ("CANCELED"   . (:foreground "pink" :weight bold))))
 
 
 ;; Indentation in org-buffers matches the header-level
@@ -615,6 +628,25 @@ Now we're done with the general setup so we'll handle the more specific things h
 ;; Bring up the agenda.
 (global-set-key "\C-ca" 'org-agenda)
 
+```
+
+
+### Org-Mode LaTex & PDF Export
+
+When exporting `org-mode` files to PDF it is nicer if new sections start on a new page.  To do that I insert a faux `\\clearpage` section before all headlines:
+
+```lisp
+(defun org/get-headline-string-element  (headline backend info)
+  (let ((prop-point (next-property-change 0 headline)))
+    (if prop-point (plist-get (text-properties-at prop-point headline) :parent))))
+
+(defun org/ensure-latex-clearpage (headline backend info)
+  (when (org-export-derived-backend-p backend 'latex)
+    (let ((elmnt (org/get-headline-string-element headline backend info)))
+        (concat "\\clearpage\n" headline))))
+
+(eval-after-load 'ox '(add-to-list 'org-export-filter-headline-functions
+             'org/ensure-latex-clearpage))
 ```
 
 
@@ -837,7 +869,8 @@ the cursor:
     ;; If we can load the colour-theme library, choose a dark theme.
     (with-feature (color-theme)
         (color-theme-initialize)
-            (color-theme-ld-dark))
+            (load-theme 'leuven t)
+    )
 
     ;; Change cursor color according to mode.
     ;;  read-only -> red
