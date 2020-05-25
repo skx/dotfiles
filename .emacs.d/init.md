@@ -556,14 +556,14 @@ The following configuration enables the contents of a block named `skx-startbloc
   unless the buffer is associated with a filename matching any
   of the patterns inside the list safe-skx-org-eval-startblock.
   "
-  (if (member "skx-startblock" (org-babel-src-block-names))
-      (save-excursion
-      (save-restriction
+  (save-excursion
+    (org-save-outline-visibility t
+      (if (member "skx-startblock" (org-babel-src-block-names))
         (if (regexp-match-list (buffer-file-name) safe-skx-org-eval-startblock)
-            (setq-local org-confirm-babel-evaluate nil))
-        (org-babel-goto-named-src-block "skx-startblock")
-        (org-babel-execute-src-block)))
-    nil))
+            (setq-local org-confirm-babel-evaluate nil)))
+      (org-babel-goto-named-src-block "skx-startblock")
+      (org-babel-execute-src-block))))
+
 (add-hook 'org-mode-hook 'skx-org-eval-startblock)
 ```
 
@@ -608,6 +608,12 @@ Now we're done with the general setup so we'll handle the more specific things h
 ;; RETURN will follow links in org-mode files
 (setq org-return-follows-link  t)
 
+;; When exporting code then we get highlighting
+(setq org-latex-listings t)
+
+;; Don't hide leading stars
+(setq org-hide-leading-stars nil)
+
 ;; Log when we're completing things.
 (setq org-log-done t)
 
@@ -619,7 +625,7 @@ Now we're done with the general setup so we'll handle the more specific things h
 
 
 ;; Indentation in org-buffers matches the header-level
-(setq org-startup-indented 'f)
+(setq org-startup-indented t)
 
 ;; Ctrl-a & Ctrl-e (for start/end of line) behave "magically" inside headlines
 ;; this is what I think most people would expect
@@ -630,24 +636,63 @@ Now we're done with the general setup so we'll handle the more specific things h
 
 ```
 
+### Org-Mode and Blank Lines
+
+Blank lines keep getting inserted in between headlines and I don't want to see them in collapsed (contents) views. When I use TAB to fold (cycle) tasks I don't want to see any blank lines between headings.
+
+The following setting hides blank lines between headings which keeps folded view nice and compact.
+
+```lisp
+(setq org-cycle-separator-lines 0)
+```
+
+I find extra blank lines in lists and headings a bit of a nuisance. To get a body after a list you need to include a blank line between the list entry and the body – and indent the body appropriately. Most of my lists have no body detail so I like the look of collapsed lists with no blank lines better.
+
+The following setting prevents creating blank lines before headings but allows list items to adapt to existing blank lines around the items:
+
+```lisp
+(setq org-blank-before-new-entry (quote ((heading)
+    (plain-list-item . auto))))
+```
+
+The following setting prevents accidentally editing hidden text when the point is inside a folded region. This can happen if you are in the body of a heading and globally fold the org-file with S-TAB
+
+```lisp
+(setq org-catch-invisible-edits 'error)
+```
+
+
 
 ### Org-Mode LaTex & PDF Export
 
-When exporting `org-mode` files to PDF it is nicer if new sections start on a new page.  To do that I insert a faux `\\clearpage` section before all headlines:
+When exporting `org-mode` files to PDF it is nicer if new sections start on a new page.  To do that I insert a faux `\\clearpage` section before all top-level headlines:
 
 ```lisp
-(defun org/get-headline-string-element  (headline backend info)
-  (let ((prop-point (next-property-change 0 headline)))
-    (if prop-point (plist-get (text-properties-at prop-point headline) :parent))))
+  (defun skx/pdf-add-clearpage (backend)
+    (when (org-export-derived-backend-p backend 'latex)
+        (save-excursion
+            (outline-show-all)
+            (goto-line 0)
 
-(defun org/ensure-latex-clearpage (headline backend info)
-  (when (org-export-derived-backend-p backend 'latex)
-    (let ((elmnt (org/get-headline-string-element headline backend info)))
-        (concat "\\clearpage\n" headline))))
+            ;; search for "* XXXXXX"
+            (while (re-search-forward "^\\(\\* .*$\\)" nil t)
+                (replace-match "\n\\\\clearpage\n\\1"))
+            )))
 
-(eval-after-load 'ox '(add-to-list 'org-export-filter-headline-functions
-             'org/ensure-latex-clearpage))
+  (add-hook 'org-export-before-parsing-hook 'skx/pdf-add-clearpage)
+
 ```
+
+
+### Org-Mode UTF
+
+```lisp
+(setq org-export-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+(set-charset-priority 'unicode)
+(setq default-process-coding-system '(utf-8-unix . utf-8-unix))
+```
+
 
 
 ## Spell-Checking
@@ -869,8 +914,8 @@ the cursor:
     ;; If we can load the colour-theme library, choose a dark theme.
     (with-feature (color-theme)
         (color-theme-initialize)
-            (load-theme 'leuven t)
-    )
+        (setq color-theme-is-global t)
+        (color-theme-dark-blue))
 
     ;; Change cursor color according to mode.
     ;;  read-only -> red
@@ -1146,6 +1191,7 @@ Here we check that the org-files are not empty, because if they aren't present t
 ```lisp
 (if org-agenda-files
     (setq initial-buffer-choice (lambda ()
+    (color-theme-dark-blue)
         (org-todo-list 1)
         (get-buffer "*Org Agenda*"))))
 ```
