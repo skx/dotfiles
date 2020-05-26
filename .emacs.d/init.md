@@ -552,17 +552,19 @@ The following configuration enables the contents of a block named `skx-startbloc
   "If there is a code-block named 'skx-startblock' in the current
   org-document then evaluate the content within it.
 
-  Emacs will prompt for permission as a safety precaution,
-  unless the buffer is associated with a filename matching any
-  of the patterns inside the list safe-skx-org-eval-startblock.
+  Emacs would usually prompt for permission as a safety precaution,
+  but if the buffer is associated with a filename matching any
+  of the patterns inside the list safe-skx-org-eval-startblock we
+  just allow it.
   "
   (save-excursion
     (org-save-outline-visibility t
       (if (member "skx-startblock" (org-babel-src-block-names))
-        (if (regexp-match-list (buffer-file-name) safe-skx-org-eval-startblock)
-            (setq-local org-confirm-babel-evaluate nil)))
-      (org-babel-goto-named-src-block "skx-startblock")
-      (org-babel-execute-src-block))))
+          (if (regexp-match-list (buffer-file-name) safe-skx-org-eval-startblock)
+              (progn
+                (setq-local org-confirm-babel-evaluate nil)
+                (org-babel-goto-named-src-block "skx-startblock")
+                (org-babel-execute-src-block)))))))
 
 (add-hook 'org-mode-hook 'skx-org-eval-startblock)
 ```
@@ -576,7 +578,7 @@ To use this define a block like so in your org-mode files:
 #+END_SRC
 ```
 
-You'll note that by default org-mode will prompt you whether the execution should be permitted, we use the `safe-skx-org-eval-startblock` to enable whitelisting particular file-patterns - if there is a match there will be no need to answer `y` to the prompt.
+By default `org-mode` will prompt you to confirm that you want execution to happen, but here we use `safe-skx-org-eval-startblock` to enable whitelisting particular file-patterns - if there is a match there will be no need to answer `y` to the prompt.
 
 We'll enable line-wrapping and spell-checking when we enter org-mode:
 
