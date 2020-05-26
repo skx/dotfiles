@@ -685,6 +685,29 @@ When exporting `org-mode` files to PDF it is nicer if new sections start on a ne
 
 ```
 
+One other problem is that code blocks don't export neatly.  To resolve that you need this:
+
+```lisp
+(require 'org)
+(require 'ox-latex)
+(add-to-list 'org-latex-packages-alist '("" "minted"))
+(setq org-latex-listings 'minted)
+
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+(setq org-src-fontify-natively t)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((R . t)
+   (latex . t)))
+```
+
+In addition to the block you'll need =apt-get install python-pygments=
+
 
 ### Org-Mode UTF
 
