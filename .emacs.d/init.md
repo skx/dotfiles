@@ -664,6 +664,24 @@ The following setting prevents accidentally editing hidden text when the point i
 ```
 
 
+### Org-Mode Viewing Exported Documents
+
+Typically when I export documents I work with them elsewhere, but the export options (accessible via `C-c C-e`) have options for exporting and viewing:
+
+* Export to HTML and Open
+* Export to PDF and Open
+
+I want those exports to open in `firefox` and `evince` respectively, the following snippet makes that happen:
+
+```lisp
+(setq org-file-apps
+    (quote
+        ((auto-mode . emacs)
+         ("\\.x?html?\\'" . "/usr/bin/firefox %s")
+         ("\\.pdf\\'" . "/usr/bin/evince %s"))))
+```
+
+
 
 ### Org-Mode LaTex & PDF Export
 
