@@ -918,17 +918,20 @@ client-modes in Emacs, this is my own:
 
 ## User Interface Setup
 
-I prefer to avoid menu-bars, tool-bars, and have a minimal look:
+I prefer to keep a reasonably minimal look, so I disable the toolbar and scroll-bars.
+
+The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so I'll leave that enabled unless I'm running in a terminal.
 
 ```lisp
     (require 'scroll-bar)
 
-    ;; Disable the scroll-bars, tool-bar, and menu-bar
+    ;; Disable the scroll-bars, and the tool-bar.
     (dolist (mode
-        '(scroll-bar-mode
-          tool-bar-mode
-          menu-bar-mode))
-     (funcall mode 0))
+        '(scroll-bar-mode tool-bar-mode))
+      (funcall mode 0))
+
+    ;; Show the menubar only when running with graphics
+    (menu-bar-mode (display-graphic-p))
 
     ;; Ctrl +, or Ctrl - will change the text size.
     (global-set-key (kbd "C-+") 'text-scale-increase)
@@ -937,6 +940,12 @@ I prefer to avoid menu-bars, tool-bars, and have a minimal look:
     ;; Make sure our cursor doesn't get in the way.
     (require 'avoid)
     (mouse-avoidance-mode 'cat-and-mouse)
+```
+
+Once the basics have been setup the next step is to configure some colours:
+
+```lisp
+(load-theme 'misterioso)
 ```
 
 Now we've tweaked the GUI we can setup the clipboard integration:
@@ -954,12 +963,6 @@ theme which is used for colours, and then secondly the colour of
 the cursor:
 
 ```lisp
-    ;; If we can load the colour-theme library, choose a dark theme.
-    (with-feature (color-theme)
-        (color-theme-initialize)
-        (setq color-theme-is-global t)
-        (color-theme-dark-blue))
-
     ;; Change cursor color according to mode.
     ;;  read-only -> red
     ;;  insert    -> blue
@@ -1234,7 +1237,6 @@ Here we check that the org-files are not empty, because if they aren't present t
 ```lisp
 (if org-agenda-files
     (setq initial-buffer-choice (lambda ()
-    (color-theme-dark-blue)
         (org-todo-list 1)
         (get-buffer "*Org Agenda*"))))
 ```
