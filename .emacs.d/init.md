@@ -727,6 +727,50 @@ One other problem is that code blocks don't export neatly.  To resolve that you 
 In addition to the block you'll need =apt-get install python-pygments=
 
 
+### Org-Mode Secrets
+
+Sometimes org-mode files contain secrets, things that you don't want to make visible to other people.  One common solution is to encrypt the contents of particular regions with GPG.
+
+You can run `M-x org-decrypt-entries` to make them visible, but re-encrypt any time you save:
+
+```lisp
+  (require 'org-crypt)
+  (add-hook 'org-mode-hook
+    (lambda()
+        (add-hook 'before-save-hook 'org-encrypt-entries nil t)
+        (setq org-tags-exclude-from-inheritance (quote ("crypt")))
+        (setq org-crypt-key "root@localhost")
+        (setq auto-save-default nil)))
+```
+
+The downside to encrypting contents is that you'll have a random GPG-message in your exported document.  There are two solutions here:
+
+* Remove the section on export.
+* Wrap it, so that it looks pretty.
+
+I prefer to make it obvious there is an encrypted section, because you could add `:crypt:noexport:` to allow both encryption and no exporting if you wish.
+
+Here we wrap all GPG_messages with "#+BEGIN_EXAMPLE" to format them neatly on export:
+
+```lisp
+
+   (defun skx/html-quote-pgp (backend)
+     "Wrap GPG messages when exporting to HTML"
+     (when (or (org-export-derived-backend-p backend 'html)
+               (org-export-derived-backend-p backend 'latex))
+         (save-excursion
+           (goto-char 0)
+             (while (re-search-forward "^\\(\s*-+BEGIN PGP MESSAGE-+\\)" nil t)
+               (replace-match "\n#+BEGIN_EXAMPLE\n\\1"))
+             (goto-char 0)
+             (while (re-search-forward "^\\(\s*-+END PGP MESSAGE-+\\)" nil t)
+                 (replace-match "\n\\1\n#+END_EXAMPLE\n"))
+             )))
+
+   (add-hook 'org-export-before-parsing-hook 'skx/html-quote-pgp)
+
+```
+
 ### Org-Mode UTF
 
 ```lisp
