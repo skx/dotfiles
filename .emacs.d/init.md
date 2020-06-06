@@ -676,7 +676,7 @@ The following snippet ensures that every node receives a unique-ID when a file i
     (save-excursion
         (goto-char (point-max))
         (while (outline-previous-heading)
-        (if (not (string= "crypt" (org-get-tags)))
+        (if (not (string= "(crypt)" (format "%s" (org-get-tags))))
            (org-id-get-create))))))
 
 (add-hook 'after-save-hook 'org-mode-create-header-ids)
