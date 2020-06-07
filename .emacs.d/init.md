@@ -663,29 +663,6 @@ The following setting prevents accidentally editing hidden text when the point i
 (setq org-catch-invisible-edits 'error)
 ```
 
-### Org-Mode IDs
-
-The following snippet ensures that every node receives a unique-ID when a file is saved:
-
-```lisp
-(require 'org-id)
-
-(defun org-mode-create-header-ids()
-  "Auto export html"
-  (when (eq major-mode 'org-mode)
-    (save-excursion
-        (goto-char (point-max))
-        (while (outline-previous-heading)
-        (if (not (string= "(crypt)" (format "%s" (org-get-tags))))
-           (org-id-get-create))))))
-
-(add-hook 'after-save-hook 'org-mode-create-header-ids)
-```
-
-(The headers are given a UUID to provide stable link-targets.)
-
-
-
 ### Org-Mode Viewing Exported Documents
 
 Typically when I export documents I work with them elsewhere, but the export options (accessible via `C-c C-e`) have options for exporting and viewing:
