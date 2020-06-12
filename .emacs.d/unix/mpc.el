@@ -46,13 +46,14 @@
       (delete-region (point-min) (point-max))
       (insert "mpc :")
       (insert "n == next | p == prev | spc = pause\n\n")
-      (insert (mpc-get-playlist))
+      (save-excursion
+        (insert (mpc-get-playlist)))
+      (forward-line (mpc-currently-playing))
+      (forward-line -1)
       )
   (setq major-mode 'mpc)
   (setq mode-name "MPC")
   (use-local-map mpc-mode-map)
-  (beginning-of-buffer)
-  (re-search-forward "^>" (point-max) t)
   (require 'hl-line)
   (hl-line-mode t)
   (toggle-read-only t)
@@ -65,8 +66,13 @@
 (defun mpc-get-playlist()
   "Return the currently loaded playlist"
   (shell-command-to-string
-   (format "%s playlist --format='%%position%% %%file%%'" mpc-path)))
+   (format "%s playlist --format='%%position%%\t%%file%%'" mpc-path)))
 
+
+(defun mpc-currently-playing()
+  "Return the number of the currently playing track"
+  (string-to-number (shell-command-to-string
+    (format "%s current --format='%%position%%'" mpc-path))))
 
 ;;
 ;; Refresh the display.
