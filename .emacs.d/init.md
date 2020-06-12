@@ -589,6 +589,15 @@ We'll enable line-wrapping and spell-checking when we enter org-mode:
         (toggle-truncate-lines)))
 ```
 
+`org-mode` is __all__ about lists!  So one thing that is nice is to visually update the display of the list-prefixes, via unicode characters.  We'll use `org-bullets` for that:
+
+```lisp
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda ()
+    (org-bullets-mode 1)))
+```
+
+
 Now we're done with the general setup so we'll handle the more specific things here:
 
 ```lisp
