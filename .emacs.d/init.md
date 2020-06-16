@@ -1233,8 +1233,16 @@ some I've grown accustomed to:
 
 ```lisp
     (global-set-key "\M-g" 'goto-line)
-    (global-set-key "\C-s" 'isearch-forward-regexp)
-    (global-set-key "\C-r" 'isearch-backward-regexp)
+
+    ;; Here we search forward with C-s, and backwards with C-r.
+    ;;
+    ;; NOTE: That I set "search-default-mode" to allow me to match
+    ;; `äiti` when searching for `aiti`, for example.
+    (setq search-default-mode 'char-fold-to-regexp)
+
+    (global-set-key "\C-s" 'isearch-forward)
+    (global-set-key "\C-r" 'isearch-backward)
+
     (global-set-key "\M-e" 'eval-region-or-last-sexp)
     (global-set-key "\M-'" 'imenu-list-smart-toggle)   ;; org/markdown sidebar
 
