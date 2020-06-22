@@ -1,12 +1,12 @@
 ;;; markdown-mode.el --- Major mode for Markdown-formatted text -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2007-2017 Jason R. Blevins and markdown-mode
+;; Copyright (C) 2007-2020 Jason R. Blevins and markdown-mode
 ;; contributors (see the commit log for details).
 
 ;; Author: Jason R. Blevins <jblevins@xbeta.org>
 ;; Maintainer: Jason R. Blevins <jblevins@xbeta.org>
 ;; Created: May 24, 2007
-;; Version: 2.4-dev
+;; Version: 2.5-dev
 ;; Package-Requires: ((emacs "25.1"))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: https://jblevins.org/projects/markdown-mode/
@@ -46,11 +46,12 @@
 (defvar jit-lock-start)
 (defvar jit-lock-end)
 (defvar flyspell-generic-check-word-predicate)
+(defvar electric-pair-pairs)
 
 
 ;;; Constants =================================================================
 
-(defconst markdown-mode-version "2.4-dev"
+(defconst markdown-mode-version "2.5-dev"
   "Markdown mode version number.")
 
 (defconst markdown-output-buffer-name "*markdown-output*"
@@ -586,6 +587,14 @@ requires Emacs to be built with ImageMagick support."
                 (choice (sexp :tag "Maximum height in pixels")
                         (const :tag "No maximum height" nil)))))
 
+(defcustom markdown-mouse-follow-link t
+  "Non-nil means mouse on a link will follow the link.
+This variable must be set before loading markdown-mode."
+  :group 'markdown
+  :type 'bool
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.5"))
+
 
 ;;; Markdown-Specific `rx' Macro ==============================================
 
@@ -780,7 +789,7 @@ Groups 3 and 5 matches the opening and closing delimiters.
 Group 4 matches the text inside the delimiters.")
 
 (defconst markdown-regex-gfm-italic
-  "\\(?:^\\|\\s-\\)\\(?1:\\(?2:[*_]\\)\\(?3:[^ \\]\\2\\|[^ ]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(?4:\\2\\)\\)"
+  "\\(?:^\\|[^\\]\\)\\(?1:\\(?2:[*_]\\)\\(?3:[^ \\]\\2\\|[^ ]\\(?:.\\|\n[^\n]\\)*?[^\\ ]\\)\\(?4:\\2\\)\\)"
   "Regular expression for matching italic text in GitHub Flavored Markdown.
 Underscores in words are not treated as special.
 Group 1 matches the entire expression, including delimiters.
@@ -2133,21 +2142,23 @@ Depending on your font, some reasonable choices are:
 Used for `flyspell-generic-check-word-predicate'."
   (save-excursion
     (goto-char (1- (point)))
-    (not (or (markdown-code-block-at-point-p)
-             (markdown-inline-code-at-point-p)
-             (markdown-in-comment-p)
-             (let ((faces (get-text-property (point) 'face)))
-               (if (listp faces)
-                   (or (memq 'markdown-reference-face faces)
-                       (memq 'markdown-markup-face faces)
-                       (memq 'markdown-plain-url-face faces)
-                       (memq 'markdown-inline-code-face faces)
-                       (memq 'markdown-url-face faces))
-                 (memq faces '(markdown-reference-face
-                               markdown-markup-face
-                               markdown-plain-url-face
-                               markdown-inline-code-face
-                               markdown-url-face))))))))
+    (if (or (markdown-code-block-at-point-p)
+            (markdown-inline-code-at-point-p)
+            (markdown-in-comment-p)
+            (markdown--face-p (point) '(markdown-reference-face
+                                        markdown-markup-face
+                                        markdown-plain-url-face
+                                        markdown-inline-code-face
+                                        markdown-url-face)))
+        (prog1 nil
+          ;; If flyspell overlay is put, then remove it
+          (let ((bounds (bounds-of-thing-at-point 'word)))
+            (when bounds
+              (cl-loop for ov in (overlays-in (car bounds) (cdr bounds))
+                       when (overlay-get ov 'flyspell-overlay)
+                       do
+                       (delete-overlay ov)))))
+      t)))
 
 
 ;;; Markdown Parsing Functions ================================================
@@ -2768,16 +2779,31 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                               (match-beginning 5) (match-end 5)))
         t))))
 
+(defun markdown--gfm-italic-p (begin end)
+  (let ((is-underscore (eql (char-after begin) ?_)))
+    (if (not is-underscore)
+        t
+      (save-excursion
+        (save-match-data
+          (goto-char begin)
+          (and (looking-back "\\(?:^\\|[[:blank:]]\\)" (1- begin))
+               (progn
+                 (goto-char end)
+                 (looking-at-p "\\(?:[[:blank:]]\\|$\\)"))))))))
+
 (defun markdown-match-italic (last)
   "Match inline italics from the point to LAST."
-  (let ((regex (if (memq major-mode '(gfm-mode gfm-view-mode))
-                   markdown-regex-gfm-italic markdown-regex-italic)))
+  (let* ((is-gfm (memq major-mode '(gfm-mode gfm-view-mode)))
+         (regex (if is-gfm
+                    markdown-regex-gfm-italic
+                  markdown-regex-italic)))
     (when (and (markdown-match-inline-generic regex last)
                (not (markdown--face-p
                      (match-beginning 1)
                      '(markdown-html-attr-name-face markdown-html-attr-value-face))))
       (let ((begin (match-beginning 1))
-            (end (match-end 1)))
+            (end (match-end 1))
+            (close-end (match-end 4)))
         (if (or (eql (char-before begin) (char-after begin))
                 (markdown-inline-code-at-pos-p begin)
                 (markdown-inline-code-at-pos-p end)
@@ -2789,7 +2815,8 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                  begin end 'face '(markdown-bold-face
                                    markdown-list-face
                                    markdown-hr-face
-                                   markdown-math-face)))
+                                   markdown-math-face))
+                (and is-gfm (not (markdown--gfm-italic-p begin close-end))))
             (progn (goto-char (min (1+ begin) last))
                    (when (< (point) last)
                      (markdown-match-italic last)))
@@ -3523,7 +3550,7 @@ prefixed with an integer from 1 to the length of
         (save-excursion
           (while (and (markdown--face-p (point) (list face)) (not (bobp)))
             (forward-char -1))
-          (forward-char (- (1- (length start-delim)))) ;; for delmiter
+          (forward-char (- (1- (length start-delim)))) ;; for delimiter
           (unless (bolp)
             (forward-char -1))
           (when (looking-at regex)
@@ -4102,75 +4129,87 @@ if three backquotes inserted at the beginning of line."
   ;; scripts/get-recognized-gfm-languages.el. that produces a single long sexp,
   ;; but with appropriate use of a keyboard macro, indenting and filling it
   ;; properly is pretty fast.
-  '("1C-Enterprise" "ABAP" "ABNF" "AGS-Script" "AMPL" "ANTLR"
-    "API-Blueprint" "APL" "ASN.1" "ASP" "ATS" "ActionScript" "Ada" "Agda"
-    "Alloy" "Alpine-Abuild" "Ant-Build-System" "ApacheConf" "Apex"
-    "Apollo-Guidance-Computer" "AppleScript" "Arc" "Arduino" "AsciiDoc"
-    "AspectJ" "Assembly" "Augeas" "AutoHotkey" "AutoIt" "Awk" "Batchfile"
-    "Befunge" "Bison" "BitBake" "Blade" "BlitzBasic" "BlitzMax" "Bluespec"
-    "Boo" "Brainfuck" "Brightscript" "Bro" "C#" "C++" "C-ObjDump"
-    "C2hs-Haskell" "CLIPS" "CMake" "COBOL" "COLLADA" "CSON" "CSS" "CSV"
-    "CWeb" "Cap'n-Proto" "CartoCSS" "Ceylon" "Chapel" "Charity" "ChucK"
+  '("1C-Enterprise" "4D" "ABAP" "ABNF" "AGS-Script" "AMPL" "ANTLR"
+    "API-Blueprint" "APL" "ASN.1" "ASP" "ATS" "ActionScript" "Ada"
+    "Adobe-Font-Metrics" "Agda" "Alloy" "Alpine-Abuild" "Altium-Designer"
+    "AngelScript" "Ant-Build-System" "ApacheConf" "Apex"
+    "Apollo-Guidance-Computer" "AppleScript" "Arc" "AsciiDoc" "AspectJ" "Assembly"
+    "Asymptote" "Augeas" "AutoHotkey" "AutoIt" "Awk" "Ballerina" "Batchfile"
+    "Befunge" "BibTeX" "Bison" "BitBake" "Blade" "BlitzBasic" "BlitzMax"
+    "Bluespec" "Boo" "Brainfuck" "Brightscript" "C#" "C++" "C-ObjDump"
+    "C2hs-Haskell" "CLIPS" "CMake" "COBOL" "COLLADA" "CSON" "CSS" "CSV" "CWeb"
+    "Cabal-Config" "Cap'n-Proto" "CartoCSS" "Ceylon" "Chapel" "Charity" "ChucK"
     "Cirru" "Clarion" "Clean" "Click" "Clojure" "Closure-Templates"
-    "CoffeeScript" "ColdFusion" "ColdFusion-CFC" "Common-Lisp"
-    "Component-Pascal" "Cool" "Coq" "Cpp-ObjDump" "Creole" "Crystal"
-    "Csound" "Csound-Document" "Csound-Score" "Cuda" "Cycript" "Cython"
-    "D-ObjDump" "DIGITAL-Command-Language" "DM" "DNS-Zone" "DTrace"
-    "Darcs-Patch" "Dart" "Diff" "Dockerfile" "Dogescript" "Dylan" "EBNF"
-    "ECL" "ECLiPSe" "EJS" "EQ" "Eagle" "Ecere-Projects" "Eiffel" "Elixir"
-    "Elm" "Emacs-Lisp" "EmberScript" "Erlang" "F#" "FLUX" "Factor" "Fancy"
-    "Fantom" "Filebench-WML" "Filterscript" "Formatted" "Forth" "Fortran"
-    "FreeMarker" "Frege" "G-code" "GAMS" "GAP" "GCC-Machine-Description"
-    "GDB" "GDScript" "GLSL" "GN" "Game-Maker-Language" "Genie" "Genshi"
-    "Gentoo-Ebuild" "Gentoo-Eclass" "Gettext-Catalog" "Gherkin" "Glyph"
-    "Gnuplot" "Go" "Golo" "Gosu" "Grace" "Gradle" "Grammatical-Framework"
-    "Graph-Modeling-Language" "GraphQL" "Graphviz-(DOT)" "Groovy"
-    "Groovy-Server-Pages" "HCL" "HLSL" "HTML" "HTML+Django" "HTML+ECR"
-    "HTML+EEX" "HTML+ERB" "HTML+PHP" "HTTP" "Hack" "Haml" "Handlebars"
-    "Harbour" "Haskell" "Haxe" "Hy" "HyPhy" "IDL" "IGOR-Pro" "INI"
-    "IRC-log" "Idris" "Inform-7" "Inno-Setup" "Io" "Ioke" "Isabelle"
-    "Isabelle-ROOT" "JFlex" "JSON" "JSON5" "JSONLD" "JSONiq" "JSX"
-    "Jasmin" "Java" "Java-Server-Pages" "JavaScript" "Jison" "Jison-Lex"
-    "Jolie" "Julia" "Jupyter-Notebook" "KRL" "KiCad" "Kit" "Kotlin" "LFE"
-    "LLVM" "LOLCODE" "LSL" "LabVIEW" "Lasso" "Latte" "Lean" "Less" "Lex"
+    "Cloud-Firestore-Security-Rules" "CoNLL-U" "CodeQL" "CoffeeScript"
+    "ColdFusion" "ColdFusion-CFC" "Common-Lisp" "Common-Workflow-Language"
+    "Component-Pascal" "Cool" "Coq" "Cpp-ObjDump" "Creole" "Crystal" "Csound"
+    "Csound-Document" "Csound-Score" "Cuda" "Cycript" "Cython" "D-ObjDump"
+    "DIGITAL-Command-Language" "DM" "DNS-Zone" "DTrace" "Dafny" "Darcs-Patch"
+    "Dart" "DataWeave" "Dhall" "Diff" "DirectX-3D-File" "Dockerfile" "Dogescript"
+    "Dylan" "EBNF" "ECL" "ECLiPSe" "EJS" "EML" "EQ" "Eagle" "Easybuild"
+    "Ecere-Projects" "EditorConfig" "Edje-Data-Collection" "Eiffel" "Elixir" "Elm"
+    "Emacs-Lisp" "EmberScript" "Erlang" "F#" "F*" "FIGlet-Font" "FLUX" "Factor"
+    "Fancy" "Fantom" "Faust" "Filebench-WML" "Filterscript" "Formatted" "Forth"
+    "Fortran" "Fortran-Free-Form" "FreeMarker" "Frege" "G-code" "GAML" "GAMS"
+    "GAP" "GCC-Machine-Description" "GDB" "GDScript" "GEDCOM" "GLSL" "GN"
+    "Game-Maker-Language" "Genie" "Genshi" "Gentoo-Ebuild" "Gentoo-Eclass"
+    "Gerber-Image" "Gettext-Catalog" "Gherkin" "Git-Attributes" "Git-Config"
+    "Glyph" "Glyph-Bitmap-Distribution-Format" "Gnuplot" "Go" "Golo" "Gosu"
+    "Grace" "Gradle" "Grammatical-Framework" "Graph-Modeling-Language" "GraphQL"
+    "Graphviz-(DOT)" "Groovy" "Groovy-Server-Pages" "HAProxy" "HCL" "HLSL" "HTML"
+    "HTML+Django" "HTML+ECR" "HTML+EEX" "HTML+ERB" "HTML+PHP" "HTML+Razor" "HTTP"
+    "HXML" "Hack" "Haml" "Handlebars" "Harbour" "Haskell" "Haxe" "HiveQL" "HolyC"
+    "Hy" "HyPhy" "IDL" "IGOR-Pro" "INI" "IRC-log" "Idris" "Ignore-List" "Inform-7"
+    "Inno-Setup" "Io" "Ioke" "Isabelle" "Isabelle-ROOT" "JFlex" "JSON"
+    "JSON-with-Comments" "JSON5" "JSONLD" "JSONiq" "JSX" "Jasmin" "Java"
+    "Java-Properties" "Java-Server-Pages" "JavaScript" "JavaScript+ERB" "Jison"
+    "Jison-Lex" "Jolie" "Jsonnet" "Julia" "Jupyter-Notebook" "KRL" "KiCad-Layout"
+    "KiCad-Legacy-Layout" "KiCad-Schematic" "Kit" "Kotlin" "LFE" "LLVM" "LOLCODE"
+    "LSL" "LTspice-Symbol" "LabVIEW" "Lasso" "Latte" "Lean" "Less" "Lex"
     "LilyPond" "Limbo" "Linker-Script" "Linux-Kernel-Module" "Liquid"
-    "Literate-Agda" "Literate-CoffeeScript" "Literate-Haskell"
-    "LiveScript" "Logos" "Logtalk" "LookML" "LoomScript" "Lua" "M4"
-    "M4Sugar" "MAXScript" "MQL4" "MQL5" "MTML" "MUF" "Makefile" "Mako"
-    "Markdown" "Marko" "Mask" "Mathematica" "Matlab" "Maven-POM" "Max"
-    "MediaWiki" "Mercury" "Meson" "Metal" "MiniD" "Mirah" "Modelica"
-    "Modula-2" "Module-Management-System" "Monkey" "Moocode" "MoonScript"
-    "Myghty" "NCL" "NL" "NSIS" "Nemerle" "NetLinx" "NetLinx+ERB" "NetLogo"
-    "NewLisp" "Nginx" "Nim" "Ninja" "Nit" "Nix" "Nu" "NumPy" "OCaml"
-    "ObjDump" "Objective-C" "Objective-C++" "Objective-J" "Omgrofl" "Opa"
-    "Opal" "OpenCL" "OpenEdge-ABL" "OpenRC-runscript" "OpenSCAD"
-    "OpenType-Feature-File" "Org" "Ox" "Oxygene" "Oz" "P4" "PAWN" "PHP"
-    "PLSQL" "PLpgSQL" "POV-Ray-SDL" "Pan" "Papyrus" "Parrot"
-    "Parrot-Assembly" "Parrot-Internal-Representation" "Pascal" "Pep8"
-    "Perl" "Perl6" "Pic" "Pickle" "PicoLisp" "PigLatin" "Pike" "Pod"
-    "PogoScript" "Pony" "PostScript" "PowerBuilder" "PowerShell"
-    "Processing" "Prolog" "Propeller-Spin" "Protocol-Buffer" "Public-Key"
-    "Pug" "Puppet" "Pure-Data" "PureBasic" "PureScript" "Python"
-    "Python-console" "Python-traceback" "QML" "QMake" "RAML" "RDoc"
-    "REALbasic" "REXX" "RHTML" "RMarkdown" "RPM-Spec" "RUNOFF" "Racket"
-    "Ragel" "Rascal" "Raw-token-data" "Reason" "Rebol" "Red" "Redcode"
-    "Regular-Expression" "Ren'Py" "RenderScript" "RobotFramework" "Roff"
+    "Literate-Agda" "Literate-CoffeeScript" "Literate-Haskell" "LiveScript"
+    "Logos" "Logtalk" "LookML" "LoomScript" "Lua" "M4" "M4Sugar" "MATLAB"
+    "MAXScript" "MLIR" "MQL4" "MQL5" "MTML" "MUF" "Macaulay2" "Makefile" "Mako"
+    "Markdown" "Marko" "Mask" "Mathematica" "Maven-POM" "Max" "MediaWiki"
+    "Mercury" "Meson" "Metal" "Microsoft-Developer-Studio-Project" "MiniD" "Mirah"
+    "Modelica" "Modula-2" "Modula-3" "Module-Management-System" "Monkey" "Moocode"
+    "MoonScript" "Motorola-68K-Assembly" "Muse" "Myghty" "NASL" "NCL" "NEON" "NL"
+    "NPM-Config" "NSIS" "Nearley" "Nemerle" "NetLinx" "NetLinx+ERB" "NetLogo"
+    "NewLisp" "Nextflow" "Nginx" "Nim" "Ninja" "Nit" "Nix" "Nu" "NumPy" "OCaml"
+    "ObjDump" "Object-Data-Instance-Notation" "ObjectScript" "Objective-C"
+    "Objective-C++" "Objective-J" "Odin" "Omgrofl" "Opa" "Opal"
+    "Open-Policy-Agent" "OpenCL" "OpenEdge-ABL" "OpenQASM" "OpenRC-runscript"
+    "OpenSCAD" "OpenStep-Property-List" "OpenType-Feature-File" "Org" "Ox"
+    "Oxygene" "Oz" "P4" "PHP" "PLSQL" "PLpgSQL" "POV-Ray-SDL" "Pan" "Papyrus"
+    "Parrot" "Parrot-Assembly" "Parrot-Internal-Representation" "Pascal" "Pawn"
+    "Pep8" "Perl" "Pic" "Pickle" "PicoLisp" "PigLatin" "Pike" "PlantUML" "Pod"
+    "Pod-6" "PogoScript" "Pony" "PostCSS" "PostScript" "PowerBuilder" "PowerShell"
+    "Prisma" "Processing" "Proguard" "Prolog" "Propeller-Spin" "Protocol-Buffer"
+    "Public-Key" "Pug" "Puppet" "Pure-Data" "PureBasic" "PureScript" "Python"
+    "Python-console" "Python-traceback" "QML" "QMake" "Quake" "RAML" "RDoc"
+    "REALbasic" "REXX" "RHTML" "RMarkdown" "RPC" "RPM-Spec" "RUNOFF" "Racket"
+    "Ragel" "Raku" "Rascal" "Raw-token-data" "Readline-Config" "Reason" "Rebol"
+    "Red" "Redcode" "Regular-Expression" "Ren'Py" "RenderScript"
+    "Rich-Text-Format" "Ring" "Riot" "RobotFramework" "Roff" "Roff-Manpage"
     "Rouge" "Ruby" "Rust" "SAS" "SCSS" "SMT" "SPARQL" "SQF" "SQL" "SQLPL"
-    "SRecode-Template" "STON" "SVG" "Sage" "SaltStack" "Sass" "Scala"
-    "Scaml" "Scheme" "Scilab" "Self" "ShaderLab" "Shell" "ShellSession"
-    "Shen" "Slash" "Slim" "Smali" "Smalltalk" "Smarty" "SourcePawn"
-    "Spline-Font-Database" "Squirrel" "Stan" "Standard-ML" "Stata"
-    "Stylus" "SubRip-Text" "Sublime-Text-Config" "SuperCollider" "Swift"
-    "SystemVerilog" "TI-Program" "TLA" "TOML" "TXL" "Tcl" "Tcsh" "TeX"
-    "Tea" "Terra" "Text" "Textile" "Thrift" "Turing" "Turtle" "Twig"
-    "Type-Language" "TypeScript" "Unified-Parallel-C" "Unity3D-Asset"
-    "Unix-Assembly" "Uno" "UnrealScript" "UrWeb" "VCL" "VHDL" "Vala"
-    "Verilog" "Vim-script" "Visual-Basic" "Volt" "Vue"
-    "Wavefront-Material" "Wavefront-Object" "Web-Ontology-Language"
-    "WebAssembly" "WebIDL" "World-of-Warcraft-Addon-Data" "X10" "XC"
-    "XCompose" "XML" "XPages" "XProc" "XQuery" "XS" "XSLT" "Xojo" "Xtend"
-    "YAML" "YANG" "Yacc" "Zephir" "Zimpl" "desktop" "eC" "edn" "fish"
-    "mupad" "nesC" "ooc" "reStructuredText" "wisp" "xBase")
+    "SRecode-Template" "SSH-Config" "STON" "SVG" "SWIG" "Sage" "SaltStack" "Sass"
+    "Scala" "Scaml" "Scheme" "Scilab" "Self" "ShaderLab" "Shell" "ShellSession"
+    "Shen" "Slash" "Slice" "Slim" "SmPL" "Smali" "Smalltalk" "Smarty" "Solidity"
+    "SourcePawn" "Spline-Font-Database" "Squirrel" "Stan" "Standard-ML" "Starlark"
+    "Stata" "Stylus" "SubRip-Text" "SugarSS" "SuperCollider" "Svelte" "Swift"
+    "SystemVerilog" "TI-Program" "TLA" "TOML" "TSQL" "TSX" "TXL" "Tcl" "Tcsh"
+    "TeX" "Tea" "Terra" "Texinfo" "Text" "Textile" "Thrift" "Turing" "Turtle"
+    "Twig" "Type-Language" "TypeScript" "Unified-Parallel-C" "Unity3D-Asset"
+    "Unix-Assembly" "Uno" "UnrealScript" "UrWeb" "VBA" "VBScript" "VCL" "VHDL"
+    "Vala" "Verilog" "Vim-Snippet" "Vim-script" "Visual-Basic-.NET" "Volt" "Vue"
+    "Wavefront-Material" "Wavefront-Object" "Web-Ontology-Language" "WebAssembly"
+    "WebIDL" "WebVTT" "Wget-Config" "Windows-Registry-Entries" "Wollok"
+    "World-of-Warcraft-Addon-Data" "X-BitMap" "X-Font-Directory-Index" "X-PixMap"
+    "X10" "XC" "XCompose" "XML" "XML-Property-List" "XPages" "XProc" "XQuery" "XS"
+    "XSLT" "Xojo" "Xtend" "YAML" "YANG" "YARA" "YASnippet" "Yacc" "ZAP" "ZIL"
+    "Zeek" "ZenScript" "Zephir" "Zig" "Zimpl" "cURL-Config" "desktop" "dircolors"
+    "eC" "edn" "fish" "mIRC-Script" "mcfunction" "mupad" "nanorc" "nesC" "ooc"
+    "reStructuredText" "sed" "wdl" "wisp" "xBase")
   "Language specifiers recognized by GitHub's syntax highlighting features.")
 
 (defvar-local markdown-gfm-used-languages nil
@@ -5228,10 +5267,11 @@ Assumes match data is available for `markdown-regex-italic'."
   "Keymap for Markdown major mode.")
 
 (defvar markdown-mode-mouse-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [follow-link] 'mouse-face)
-    (define-key map [mouse-2] #'markdown-follow-thing-at-point)
-    map)
+  (when markdown-mouse-follow-link
+    (let ((map (make-sparse-keymap)))
+      (define-key map [follow-link] 'mouse-face)
+      (define-key map [mouse-2] #'markdown-follow-thing-at-point)
+      map))
   "Keymap for following links with mouse.")
 
 (defvar gfm-mode-map
@@ -6546,12 +6586,13 @@ Stop at the first and last headings of a superior heading."
             (setq arg (1- arg)))
         (user-error "No previous same-level heading")))))
 
-(defun markdown-up-heading (arg)
+(defun markdown-up-heading (arg &optional interactive)
   "Move to the visible heading line of which the present line is a subheading.
-With argument, move up ARG levels."
-  (interactive "p")
-  (and (called-interactively-p 'any)
-       (not (eq last-command 'markdown-up-heading)) (push-mark))
+With argument, move up ARG levels.  When called interactively (or
+INTERACTIVE is non-nil), also push the mark."
+  (interactive "p\np")
+  (and interactive (not (eq last-command 'markdown-up-heading))
+       (push-mark))
   (markdown-move-heading-common #'outline-up-heading arg 'adjust))
 
 (defun markdown-back-to-heading (&optional invisible-ok)
@@ -9470,6 +9511,17 @@ rows and columns and the column alignment."
 
 ;;; GitHub Flavored Markdown Mode  ============================================
 
+(defun gfm--electric-pair-fence-code-block ()
+  (when (and electric-pair-mode
+             (not markdown-gfm-use-electric-backquote)
+             (eql last-command-event ?`)
+             (let ((count 0))
+               (while (eql (char-before (- (point) count)) ?`)
+                 (cl-incf count))
+               (= count 3))
+             (eql (char-after) ?`))
+    (save-excursion (insert (make-string 2 ?`)))))
+
 (defvar gfm-mode-hook nil
   "Hook run when entering GFM mode.")
 
@@ -9479,6 +9531,7 @@ rows and columns and the column alignment."
   (setq markdown-link-space-sub-char "-")
   (setq markdown-wiki-link-search-subdirectories t)
   (setq-local markdown-table-at-point-p-function 'gfm--table-at-point-p)
+  (add-hook 'post-self-insert-hook #'gfm--electric-pair-fence-code-block 'append t)
   (markdown-gfm-parse-buffer-for-languages))
 
 
@@ -9506,11 +9559,29 @@ rows and columns and the column alignment."
     map)
   "Keymap for `markdown-view-mode'.")
 
+(defun markdown--filter-visible (beg end &optional delete)
+  (let ((result "")
+        (invisible-faces '(markdown-header-delimiter-face markdown-header-rule-face)))
+    (while (< beg end)
+      (when (markdown--face-p beg invisible-faces)
+        (cl-incf beg)
+        (while (and (markdown--face-p beg invisible-faces) (< beg end))
+          (cl-incf beg)))
+      (let ((next (next-single-char-property-change beg 'invisible)))
+        (unless (get-char-property beg 'invisible)
+          (setq result (concat result (buffer-substring beg (min end next)))))
+        (setq beg next)))
+    (prog1 result
+      (when delete
+        (let ((inhibit-read-only t))
+          (delete-region beg end))))))
+
 ;;;###autoload
 (define-derived-mode markdown-view-mode markdown-mode "Markdown-View"
   "Major mode for viewing Markdown content."
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
   (add-to-invisibility-spec 'markdown-markup)
+  (setq-local filter-buffer-substring-function #'markdown--filter-visible)
   (read-only-mode 1))
 
 (defvar gfm-view-mode-map
@@ -9522,6 +9593,7 @@ rows and columns and the column alignment."
   "Major mode for viewing GitHub Flavored Markdown content."
   (setq-local markdown-hide-markup markdown-hide-markup-in-view-modes)
   (setq-local markdown-fontify-code-blocks-natively t)
+  (setq-local filter-buffer-substring-function #'markdown--filter-visible)
   (add-to-invisibility-spec 'markdown-markup)
   (read-only-mode 1))
 
