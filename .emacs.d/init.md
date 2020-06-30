@@ -735,6 +735,35 @@ One other problem is that code blocks don't export neatly.  To resolve that you 
 In addition to the block you'll need =apt-get install python-pygments=
 
 
+### Org-Mode Timestamping
+
+The following allows any `#+LAST_MODIFIED` headers to be updated on file-save:
+
+```lisp
+(defun skx/update-org-modified-property ()
+  "If a file contains a '#+LAST_MODIFIED' property update it to contain
+  the current date/time"
+  (interactive)
+  (save-excursion
+    (widen)
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+LAST_MODIFIED:" (point-max) t)
+      (progn
+        (kill-line)
+        (insert (format-time-string " %d/%m/%Y %H:%M:%S") )))))
+
+```
+
+It is made available like so:
+
+```lisp
+(defun skx-org-mode-before-save-hook ()
+  (when (eq major-mode 'org-mode)
+    (skx/update-org-modified-property)))
+
+(add-hook 'before-save-hook #'skx-org-mode-before-save-hook)
+```
+
 ### Org-Mode Secrets
 
 Sometimes org-mode files contain secrets, things that you don't want to make visible to other people.  One common solution is to encrypt the contents of particular regions with GPG.
