@@ -672,6 +672,38 @@ The following setting prevents accidentally editing hidden text when the point i
 (setq org-catch-invisible-edits 'error)
 ```
 
+
+### Org-Mode Utility Functions
+
+The following function allows extracting the value of a global header from the current document:
+
+```lisp
+  (defun skx/org-global-prop( name )
+    "Get the value from the global property with the given name, e.g. 'AUTHOR', 'TITLE', etc."
+    (save-excursion
+      (outline-show-all)
+      (goto-line 0)
+      (if (re-search-forward (concat "^#\\+" name ":") nil t)
+          (progn
+            (setq start (point))
+            (re-search-forward "$")
+            (setq end (point))
+            (string-trim (buffer-substring-no-properties start end))))
+      ))
+```
+
+One way that I like to use it is to rename buffers according to their title:
+
+```lisp
+(defun skx/org-mode-rename-buffer ()
+  (when (eq major-mode 'org-mode)
+     (if (skx/org-global-prop "TITLE")
+       (rename-buffer (skx/org-global-prop "TITLE")))))
+
+(add-hook 'org-mode-hook  'skx/org-mode-rename-buffer)
+```
+
+
 ### Org-Mode Viewing Exported Documents
 
 Typically when I export documents I work with them elsewhere, but the export options (accessible via `C-c C-e`) have options for exporting and viewing:
