@@ -764,7 +764,7 @@ One other problem is that code blocks don't export neatly.  To resolve that you 
    (latex . t)))
 ```
 
-In addition to the block you'll need =apt-get install python-pygments=
+In addition to the block you'll need `apt-get install python-pygments`.
 
 
 ### Org-Mode Timestamping
@@ -819,7 +819,7 @@ The downside to encrypting contents is that you'll have a random GPG-message in 
 
 I prefer to make it obvious there is an encrypted section, because you could add `:crypt:noexport:` to allow both encryption and no exporting if you wish.
 
-Here we wrap all GPG_messages with "#+BEGIN_EXAMPLE" to format them neatly on export:
+Here we wrap all GPG_messages with "`#+BEGIN_EXAMPLE`" to format them neatly on export:
 
 ```lisp
 
