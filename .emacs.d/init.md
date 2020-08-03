@@ -616,6 +616,13 @@ Now we're done with the general setup so we'll handle the more specific things h
 ;; Our agenda-view will span two weeks by default.
 (setq org-agenda-span 14)
 
+;; But the agenda will start on the current day.
+(setq org-agenda-start-on-weekday nil)
+
+;; We don't show tasks that are complete
+(setq org-agenda-skip-deadline-if-done t)
+(setq org-agenda-skip-scheduled-if-done t)
+
 ;; RETURN will follow links in org-mode files
 (setq org-return-follows-link  t)
 
