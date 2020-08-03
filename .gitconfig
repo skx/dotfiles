@@ -20,6 +20,8 @@ quotepath = false
 [push]
 default = matching
 
+[init]
+defaultBranch = master
 
 #
 # We might have a .local configuration-file which will make changes
@@ -27,3 +29,4 @@ default = matching
 #
 [include]
 path = .gitconfig.local
+
