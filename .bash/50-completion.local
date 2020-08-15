@@ -55,7 +55,7 @@ fi
 #
 
 for cmd in rss2email sysbox ; do
-    if ( which ${cmd} ) ; then
+    if ( which ${cmd} >/dev/null 2>/dev/null ) ; then
         source <(${cmd} bash-completion)
     fi
 done
