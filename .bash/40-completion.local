@@ -42,10 +42,20 @@ if [ -e /opt/pass/completion/pass.bash-completion ]; then
 fi
 
 #
-# sysbox is a collection of scripting/sysadmin utilities
+# sysbox is a collection of scripting/sysadmin utilities:
 #
-# https://github.com/skx/sysbox
+#    https://github.com/skx/sysbox
 #
-test -x ~/go/bin/sysbox 2>/dev/null >/dev/null && \
-    source <(~/go/bin/sysbox bash-completion) || \
-       echo "sysbox is not installed"
+# rss2email is a simple utility for polling RSS feeds and
+# generating emails:
+#
+#    https://github.com/skx/rss2email
+#
+# Both have support for bash-completion
+#
+
+for cmd in rss2email sysbox ; do
+    if ( which ${cmd} ) ; then
+        source <(${cmd} bash-completion)
+    fi
+done
