@@ -636,7 +636,7 @@ Now we're done with the general setup so we'll handle the more specific things h
 (setq org-log-done t)
 
 ;; Setup TODO-workflow, and colouring.
-(setq org-todo-keywords '((sequence "TODO" "INPROGRESS" "|" "DONE" "CANCELED")))
+(setq org-todo-keywords '((sequence "TODO(!)" "INPROGRESS(!)" "|" "DONE(!)" "CANCELED(!)")))
 (setq org-todo-keyword-faces '(
     ("INPROGRESS" . (:foreground "blue" :weight bold))
     ("CANCELED"   . (:foreground "pink" :weight bold))))
@@ -1351,3 +1351,4 @@ Usage via:
   * https://stackoverflow.com/questions/683425/globally-override-key-binding-in-emacs
   * See also
     * https://github.com/Atman50/emacs-config/blob/master/README.org#i-use-ctrl-z-for-personal-bindings
+* https://github.com/integral-dw/org-superstar-mode
