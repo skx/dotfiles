@@ -654,6 +654,24 @@ Now we're done with the general setup so we'll handle the more specific things h
 
 ```
 
+### Org-Mode and Table LInks
+
+If you press `RET` on a link inside a table it doesn't work as expected.
+
+```lisp
+(defun org-clicky()
+   "Allow following links, even inside tables"
+  (interactive)
+  (if (eq 'org-link (get-text-property (point) 'face))
+     (org-open-at-point)
+  (org-return)))
+
+(add-hook 'org-mode-hook
+          (lambda ()
+            (local-set-key (kbd "RET") 'org-clicky)))
+```
+
+
 ### Org-Mode and Blank Lines
 
 Blank lines keep getting inserted in between headlines and I don't want to see them in collapsed (contents) views. When I use TAB to fold (cycle) tasks I don't want to see any blank lines between headings.
