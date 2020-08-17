@@ -14,6 +14,7 @@ function add_to_path
 # Add in some optional directories
 #
 add_to_path /opt/node/bin
+add_to_path /opt/packer
 add_to_path /opt/pass
 add_to_path /opt/sysadmin-util
 add_to_path /usr/games
