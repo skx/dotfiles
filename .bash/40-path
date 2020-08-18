@@ -11,7 +11,22 @@ function add_to_path
 
 
 #
-# Add in some optional directories
+# Empty the PATH so we have a known-starting point.
+#
+export PATH=
+
+#
+# Add on the expected/standard directories.
+#
+add_to_path /bin
+add_to_path /usr/bin
+add_to_path /sbin
+add_to_path /usr/sbin
+add_to_path /usr/local/bin
+add_to_path /usr/local/sbin
+
+#
+# Some optional directories might exist, and if so they will be added.
 #
 add_to_path /opt/node/bin
 add_to_path /opt/packer
@@ -23,20 +38,36 @@ add_to_path /var/lib/gems/1.8/bin
 add_to_path /var/lib/gems/1.9/bin
 
 #
-# Go
+# We allow a per-user, and a per-user + per-host setup.
+#
+add_to_path ~/bin/
+add_to_path ~/bin-$(hostname --short)
+
+
+#
+# Now we have some extra setup for things that might be present.
+#
+
+
+#
+# Golang
 #
 if [ -d /opt/go ]; then
+
+    # Add the path
     add_to_path /opt/go/bin
-    export GOROOT=/opt/go
-    export GO111MODULE=on
-    export      GOPATH=$HOME/go
     add_to_path $HOME/go/bin
+
+    # go-specific environmental variable setup.
+    export GO111MODULE=on
+    export GOPATH=$HOME/go
+    export GOROOT=/opt/go
 
 fi
 
 
 #
-# Allow locally installed gems to work.
+# Ruby Gems
 #
 if [ -d ~/gems/bin ]; then
     export GEM_HOME=~/gems/
@@ -44,18 +75,7 @@ if [ -d ~/gems/bin ]; then
 fi
 
 
-#
-#  Set the PATH to include ~/bin and ~/bin-$hostname if they exist.
-#
-for i in ~/bin ~/bin-$(hostname --short) ; do
-    add_to_path $i
-done
 
-
-#
-#  Add in the common things.
-#
-export PATH=$PATH:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 
 
 #
