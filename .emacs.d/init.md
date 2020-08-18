@@ -27,6 +27,13 @@ be nice but to get started we'll just require that library:
     (require 'cl)
 ```
 
+We also want to operate as a server, so we'll make sure that we start that
+before we go any further:
+
+```lisp
+(server-start)
+```
+
 The first thing we need to do is make sure that the various subdirectories
 beneath the `~/.emacs/` directory are added to the load-path.  This will
 ensure that future use of `require` will find the files we're attempting
@@ -1294,9 +1301,7 @@ some I've grown accustomed to:
     (global-set-key "\C-xk"
         '(lambda ()
             (interactive)
-                (if (and (fboundp 'gnuserv-buffer-p) (gnuserv-buffer-p (current-buffer)))
-                    (gnuserv-buffer-done (current-buffer))
-                (kill-buffer (current-buffer)))))
+                (kill-buffer (current-buffer))))
 
 
     ;; Prevent accidentally killing emacs.
