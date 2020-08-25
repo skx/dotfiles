@@ -54,7 +54,7 @@ fi
 # Both have support for bash-completion
 #
 
-for cmd in rss2email sysbox ; do
+for cmd in evalfilter rss2email sysbox ; do
     if ( which ${cmd} >/dev/null 2>/dev/null ) ; then
         source <(${cmd} bash-completion)
     fi
