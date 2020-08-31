@@ -543,49 +543,6 @@ As noted above it is possible to evaluated blocks of script from within `org-mod
               (org-babel-do-load-languages 'org-babel-load-languages '((shell . t))))
 ```
 
-Another useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block when a file is loaded.
-
-The following configuration enables the contents of a block named `skx-startblock` to be executed automatically when the file is loaded:
-
-```lisp
-(defvar safe-skx-org-eval-startblock (list (concat (getenv "HOME") "/Repos/git.steve.fi/") (concat (getenv "HOME") "/Repos/git.steve.org.uk/") (concat (getenv "HOME") "/Org") (concat (getenv "HOME") "/WorkLogs") )
- "A list of filename patterns which will have their contents evaluated with no prompting.")
-
-(defun regexp-match-list(regexp list)
-  "Return nil unless the regexp matches at least one of the list items"
-  (delq nil (mapcar (lambda(x) (string-match x regexp )) list)))
-
-(defun skx-org-eval-startblock ()
-  "If there is a code-block named 'skx-startblock' in the current
-  org-document then evaluate the content within it.
-
-  Emacs would usually prompt for permission as a safety precaution,
-  but if the buffer is associated with a filename matching any
-  of the patterns inside the list safe-skx-org-eval-startblock we
-  just allow it.
-  "
-  (save-excursion
-    (org-save-outline-visibility t
-      (if (member "skx-startblock" (org-babel-src-block-names))
-          (if (regexp-match-list (buffer-file-name) safe-skx-org-eval-startblock)
-              (progn
-                (setq-local org-confirm-babel-evaluate nil)
-                (org-babel-goto-named-src-block "skx-startblock")
-                (org-babel-execute-src-block)))))))
-
-(add-hook 'org-mode-hook 'skx-org-eval-startblock)
-```
-
-To use this define a block like so in your org-mode files:
-
-```
-#+NAME: skx-startblock
-#+BEGIN_SRC emacs-lisp :results output silent
-  (message "I like cakes - do you?")
-#+END_SRC
-```
-
-By default `org-mode` will prompt you to confirm that you want execution to happen, but here we use `safe-skx-org-eval-startblock` to enable whitelisting particular file-patterns - if there is a match there will be no need to answer `y` to the prompt.
 
 We'll enable line-wrapping and spell-checking when we enter org-mode:
 
@@ -661,7 +618,81 @@ Now we're done with the general setup so we'll handle the more specific things h
 
 ```
 
-### Org-Mode and Table LInks
+
+## Org-Mode Code Execution
+
+Another useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block when a file is loaded.
+
+The following configuration enables the contents of a block named `skx-startblock` to be executed automatically when the file is loaded:
+
+```lisp
+(defvar safe-skx-org-eval-startblock (list (concat (getenv "HOME") "/Repos/git.steve.fi/") (concat (getenv "HOME") "/Repos/git.steve.org.uk/") (concat (getenv "HOME") "/Org") (concat (getenv "HOME") "/WorkLogs") )
+ "A list of filename patterns which will have their contents evaluated with no prompting.")
+
+(defun regexp-match-list(regexp list)
+  "Return nil unless the regexp matches at least one of the list items"
+  (delq nil (mapcar (lambda(x) (string-match x regexp )) list)))
+
+(defun skx-org-eval-startblock ()
+  "If there is a code-block named 'skx-startblock' in the current
+  org-document then evaluate the content within it.
+
+  Emacs would usually prompt for permission as a safety precaution,
+  but if the buffer is associated with a filename matching any
+  of the patterns inside the list safe-skx-org-eval-startblock we
+  just allow it.
+  "
+  (skx-org-eval "skx-startblock"))
+
+(defun skx-org-eval-saveblock ()
+  "If there is a code-block named 'skx-saveblock' in the current
+  org-document then evaluate the content within it prior to saving
+  the current document.
+
+  Emacs would usually prompt for permission as a safety precaution,
+  but if the buffer is associated with a filename matching any
+  of the patterns inside the list safe-skx-org-eval-startblock we
+  just allow it.
+  "
+  (skx-org-eval "skx-saveblock"))
+
+
+(defun skx-org-eval(name)
+  "Execute the named blcok, if it exists"
+  (save-excursion
+    (org-save-outline-visibility t
+      (if (member name (org-babel-src-block-names))
+          (if (regexp-match-list (buffer-file-name) safe-skx-org-eval-startblock)
+              (progn
+                (setq-local org-confirm-babel-evaluate nil)
+                (org-babel-goto-named-src-block name)
+                (org-babel-execute-src-block)))))))
+
+
+;; Load the start-block on startup
+(add-hook 'org-mode-hook 'skx-org-eval-startblock)
+
+;; evaluation the save-block on save
+(defun skx-org-mode-before-save-hook-eval ()
+  (when (eq major-mode 'org-mode)
+    (skx-org-eval-saveblock)))
+
+(add-hook 'before-save-hook #'skx-org-mode-before-save-hook-eval)
+```
+
+To use this define a block like so in your org-mode files:
+
+```
+#+NAME: skx-startblock
+#+BEGIN_SRC emacs-lisp :results output silent
+  (message "I like cakes - do you?")
+#+END_SRC
+```
+
+By default `org-mode` will prompt you to confirm that you want execution to happen, but here we use `safe-skx-org-eval-startblock` to enable whitelisting particular file-patterns - if there is a match there will be no need to answer `y` to the prompt.
+
+
+### Org-Mode and Table Links
 
 If you press `RET` on a link inside a table it doesn't work as expected.
 
