@@ -642,7 +642,7 @@ The following configuration enables the contents of a block named `skx-startbloc
   of the patterns inside the list safe-skx-org-eval-startblock we
   just allow it.
   "
-  (skx-org-eval "skx-startblock"))
+  (skx-org-eval-named-block "skx-startblock"))
 
 (defun skx-org-eval-saveblock ()
   "If there is a code-block named 'skx-saveblock' in the current
@@ -654,11 +654,11 @@ The following configuration enables the contents of a block named `skx-startbloc
   of the patterns inside the list safe-skx-org-eval-startblock we
   just allow it.
   "
-  (skx-org-eval "skx-saveblock"))
+  (skx-org-eval-named-block "skx-saveblock"))
 
 
-(defun skx-org-eval(name)
-  "Execute the named blcok, if it exists"
+(defun skx-org-eval-named-block(name)
+  "Execute the named block, if it exists, from within the current file."
   (save-excursion
     (org-save-outline-visibility t
       (if (member name (org-babel-src-block-names))
@@ -680,16 +680,23 @@ The following configuration enables the contents of a block named `skx-startbloc
 (add-hook 'before-save-hook #'skx-org-mode-before-save-hook-eval)
 ```
 
-To use this define a block like so in your org-mode files:
+To use these facilities define blocks like so in your org-mode files:
 
 ```
 #+NAME: skx-startblock
 #+BEGIN_SRC emacs-lisp :results output silent
-  (message "I like cakes - do you?")
+  (message "I like cakes - on document loads - do you?")
 #+END_SRC
 ```
 
-By default `org-mode` will prompt you to confirm that you want execution to happen, but here we use `safe-skx-org-eval-startblock` to enable whitelisting particular file-patterns - if there is a match there will be no need to answer `y` to the prompt.
+```
+#+NAME: skx-saveblock
+#+BEGIN_SRC emacs-lisp :results output silent
+  (message "I like cakes - just before a save - do you?")
+#+END_SRC
+```
+
+By default `org-mode` will prompt you to confirm that you want execution to happen, but we use `safe-skx-org-eval-startblock` to enable whitelisting particular file-patterns - if there is a match there will be no need to answer `y` to the prompt.
 
 
 ### Org-Mode and Table Links
