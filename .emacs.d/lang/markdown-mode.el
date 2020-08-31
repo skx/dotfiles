@@ -2771,7 +2771,7 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
 (defun markdown-match-bold (last)
   "Match inline bold from the point to LAST."
   (when (markdown-match-inline-generic markdown-regex-bold last)
-    (let ((is-gfm (memq major-mode '(gfm-mode gfm-view-mode)))
+    (let ((is-gfm (derived-mode-p 'gfm-mode))
           (begin (match-beginning 2))
           (end (match-end 2)))
       (if (or (markdown-inline-code-at-pos-p begin)
@@ -2795,7 +2795,7 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
 
 (defun markdown-match-italic (last)
   "Match inline italics from the point to LAST."
-  (let* ((is-gfm (memq major-mode '(gfm-mode gfm-view-mode)))
+  (let* ((is-gfm (derived-mode-p 'gfm-mode))
          (regex (if is-gfm
                     markdown-regex-gfm-italic
                   markdown-regex-italic)))
@@ -2818,7 +2818,9 @@ When FACELESS is non-nil, do not return matches where faces have been applied."
                                    markdown-list-face
                                    markdown-hr-face
                                    markdown-math-face))
-                (and is-gfm (not (markdown--gfm-markup-underscore-p begin close-end))))
+                (and is-gfm
+                     (or (char-equal (char-after begin) (char-after (1+ begin))) ;; check bold case
+                         (not (markdown--gfm-markup-underscore-p begin close-end)))))
             (progn (goto-char (min (1+ begin) last))
                    (when (< (point) last)
                      (markdown-match-italic last)))
@@ -5849,7 +5851,7 @@ CHECKER-FUNCTION."
        "\n\nIf SILENT is non-nil, do not message anything when no
 such references found.")
      (interactive "P")
-     (when (not (memq major-mode '(markdown-mode gfm-mode)))
+     (unless (derived-mode-p 'markdown-mode)
        (user-error "Not available in current mode"))
      (let ((oldbuf (current-buffer))
            (refs (,checker-function))
@@ -6683,15 +6685,15 @@ setext header, but should not be folded."
 ;; This function was originally derived from `org-cycle' from org.el.
 (defun markdown-cycle (&optional arg)
   "Visibility cycling for Markdown mode.
-If ARG is t, perform global visibility cycling.  If the point is
-at an atx-style header, cycle visibility of the corresponding
-subtree.  Otherwise, indent the current line or insert a tab,
-as appropriate, by calling `indent-for-tab-command'."
+This function is called with a `\\[universal-argument]' or if ARG is t, perform
+global visibility cycling.  If the point is at an atx-style header, cycle
+visibility of the corresponding subtree.  Otherwise, indent the current line
+ or insert a tab, as appropriate, by calling `indent-for-tab-command'."
   (interactive "P")
   (cond
 
    ;; Global cycling
-   ((eq arg t)
+   (arg
     (cond
      ;; Move from overview to contents
      ((and (eq last-command this-command)
@@ -7765,7 +7767,7 @@ in parent directories if
 `markdown-wiki-link-search-parent-directories' is non-nil."
   (let* ((basename (replace-regexp-in-string
                     "[[:space:]\n]" markdown-link-space-sub-char name))
-         (basename (if (memq major-mode '(gfm-mode gfm-view-mode))
+         (basename (if (derived-mode-p 'gfm-mode)
                        (concat (upcase (substring basename 0 1))
                                (downcase (substring basename 1 nil)))
                      basename))
@@ -7806,7 +7808,7 @@ window when OTHER is non-nil."
       (when other (other-window 1))
       (let ((default-directory wp))
         (find-file filename)))
-    (unless (memq major-mode '(markdown-mode gfm-mode))
+    (unless (derived-mode-p 'markdown-mode)
       (markdown-mode))))
 
 (defun markdown-follow-wiki-link-at-point (&optional arg)
@@ -8131,8 +8133,7 @@ or span."
 (defun markdown-reload-extensions ()
   "Check settings, update font-lock keywords and hooks, and re-fontify buffer."
   (interactive)
-  (when (member major-mode
-                '(markdown-mode markdown-view-mode gfm-mode gfm-view-mode))
+  (when (derived-mode-p 'markdown-mode)
     ;; Refontify buffer
     (font-lock-flush)
     ;; Add or remove hooks related to extensions

@@ -3,7 +3,7 @@
 
 ;; Copyright 2011-2020 François-Xavier Bois
 
-;; Version: 17.0.0
+;; Version: 17.0.2
 ;; Author: François-Xavier Bois <fxbois AT Google Mail Service>
 ;; Maintainer: François-Xavier Bois
 ;; Package-Requires: ((emacs "23.1"))
@@ -24,7 +24,7 @@
 
 ;;---- CONSTS ------------------------------------------------------------------
 
-(defconst web-mode-version "17.0.0"
+(defconst web-mode-version "17.0.1"
   "Web Mode version.")
 
 ;;---- GROUPS ------------------------------------------------------------------
@@ -228,6 +228,11 @@ See web-mode-block-face."
 
 (defcustom web-mode-enable-element-tag-fontification nil
   "Enable tag name fontification."
+  :type 'boolean
+  :group 'web-mode)
+
+(defcustom web-mode-enable-front-matter-block nil
+  "Enable front matter block (data at the beginning the template between --- and ---)."
   :type 'boolean
   :group 'web-mode)
 
@@ -779,8 +784,8 @@ Must be used in conjunction with web-mode-enable-block-face."
 
 ;;---- VARS --------------------------------------------------------------------
 
-;;(defvar font-lock-beg)
-;;(defvar font-lock-end)
+(defvar font-lock-beg)
+(defvar font-lock-end)
 
 (defvar web-mode-auto-pairs nil)
 (defvar web-mode-block-regexp nil)
@@ -798,7 +803,7 @@ Must be used in conjunction with web-mode-enable-block-face."
 (defvar web-mode-expand-initial-scroll nil)
 (defvar web-mode-expand-previous-state "")
 ;;(defvar web-mode-font-lock-keywords '(web-mode-font-lock-highlight))
-(defvar web-mode-fontification-off nil)
+(defvar web-mode-skip-fontification nil)
 (defvar web-mode-inlay-regexp nil)
 (defvar web-mode-is-scratch nil)
 (defvar web-mode-jshint-errors 0)
@@ -2425,6 +2430,9 @@ another auto-completion with different ac-sources (e.g. ac-php)")
 (defvar web-mode-ac-sources-alist nil
   "alist mapping language names to ac-sources for that language.")
 
+(defvar web-mode-trace nil
+  "Activate debug tracing.")
+
 (defvar web-mode-syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?- "_" table)
@@ -2686,7 +2694,7 @@ another auto-completion with different ac-sources (e.g. ac-php)")
   (make-local-variable 'web-mode-indentless-attributes)
   (make-local-variable 'web-mode-indentless-elements)
   (make-local-variable 'web-mode-is-scratch)
-  (make-local-variable 'web-mode-fontification-off)
+  (make-local-variable 'web-mode-skip-fontification)
   (make-local-variable 'web-mode-jshint-errors)
   (make-local-variable 'web-mode-last-enabled-feature)
   (make-local-variable 'web-mode-markup-indent-offset)
@@ -2698,9 +2706,10 @@ another auto-completion with different ac-sources (e.g. ac-php)")
   (make-local-variable 'web-mode-scan-end)
   (make-local-variable 'web-mode-sql-indent-offset)
   (make-local-variable 'web-mode-time)
+  (make-local-variable 'web-mode-trace)
 
-  ;;(make-local-variable 'font-lock-beg)
-  ;;(make-local-variable 'font-lock-end)
+  (make-local-variable 'font-lock-beg)
+  (make-local-variable 'font-lock-end)
 
   (make-local-variable 'comment-end)
   (make-local-variable 'comment-region-function)
@@ -2782,19 +2791,62 @@ another auto-completion with different ac-sources (e.g. ac-php)")
    ((not (buffer-file-name))
     )
    ((string-match-p "web-mode-benchmark.html" (buffer-file-name))
-    (web-mode-trace "end"))
+    (web-mode-measure "end"))
    ) ;cond
 
   )
 
 ;;---- INVALIDATION ------------------------------------------------------------
 
+;; 1/ after-change
+;; 2/ extend-region
+;; 3/ scan
+;; 4/ fontify
+;; 5/ post-command
+
+(defun web-mode-on-after-change (beg end len)
+  (when web-mode-trace
+    (message "after-change: pos(%d) beg(%d) end(%d) len(%d) this-command(%S)"
+             (point) beg end len this-command))
+  ;;(backtrace)
+  ;;(when (eq this-original-command 'yank)
+  ;;  (setq web-mode-skip-fontification t))
+  (when (or (null web-mode-change-beg) (< beg web-mode-change-beg))
+    (setq web-mode-change-beg beg))
+  (when (or (null web-mode-change-end) (> end web-mode-change-end))
+    (setq web-mode-change-end end)))
+
+(defun web-mode-extend-region ()
+  (when web-mode-trace
+    (message "extend-region: font-lock-beg(%S) font-lock-end(%S) web-mode-change-beg(%S) web-mode-change-end(%S) web-mode-skip-fontification(%S)"
+             font-lock-beg font-lock-end web-mode-change-beg web-mode-change-end web-mode-skip-fontification))
+  (cond
+   ;;(web-mode-skip-fontification
+   ;; nil)
+   (t
+    (when (or (null web-mode-change-beg) (< font-lock-beg web-mode-change-beg))
+      (when web-mode-trace (message "extend-region: font-lock-beg(%S) < web-mode-change-beg(%S)" font-lock-beg web-mode-change-beg))
+      (setq web-mode-change-beg font-lock-beg))
+    (when (or (null web-mode-change-end) (> font-lock-end web-mode-change-end))
+      (when web-mode-trace (message "extend-region: font-lock-end(%S) > web-mode-change-end(%S)" font-lock-end web-mode-change-end))
+      (setq web-mode-change-end font-lock-end))
+    (let ((region (web-mode-scan web-mode-change-beg web-mode-change-end)))
+      (when region
+        ;;(message "region: %S" region)
+        (setq font-lock-beg (car region)
+              font-lock-end (cdr region))
+        ) ;when
+      ) ;let
+    nil) ;t
+   ))
+
 (defun web-mode-scan (&optional beg end)
+  (when web-mode-trace
+    (message "scan: beg(%S) end(%S) web-mode-change-beg(%S) web-mode-change-end(%S)"
+             beg end web-mode-change-beg web-mode-change-end))
   (unless beg (setq beg web-mode-change-beg))
   (unless end (setq end web-mode-change-end))
-  ;;(message "%S %S" web-mode-content-type (get-text-property beg 'part-side))
-  ;;(message "propertize: beg(%S) end(%S)" web-mode-change-beg web-mode-change-end)
-  ;;(message "%S %S" (get-text-property beg 'part-side) (get-text-property end 'part-side))
+  ;;(message "%S %S %S" web-mode-content-type (get-text-property beg 'part-side) (get-text-property end 'part-side))
   (when (and end (> end (point-max)))
     (setq end (point-max)))
   (setq web-mode-change-beg nil
@@ -2811,8 +2863,7 @@ another auto-completion with different ac-sources (e.g. ac-php)")
     ;;(message "invalidate block (%S > %S)" beg end)
     (web-mode-invalidate-block-region beg end))
    ((and (or (member web-mode-content-type
-                     '("css" "javascript" "json" "jsx" "sass" "stylus"
-                       "typescript"))
+                     '("css" "javascript" "json" "jsx" "sass" "stylus" "typescript"))
              (and (get-text-property beg 'part-side)
                   (get-text-property end 'part-side)
                   (> beg (point-min))
@@ -2827,11 +2878,147 @@ another auto-completion with different ac-sources (e.g. ac-php)")
   )
 
 (defun web-mode-invalidate-region (reg-beg reg-end)
-  ;;(message "%S | reg-beg(%S) reg-end(%S)" (point) reg-beg reg-end)
+  (when web-mode-trace
+    (message "invalidate-region: point(%S) reg-beg(%S) reg-end(%S)" (point) reg-beg reg-end))
   (setq reg-beg (web-mode-invalidate-region-beginning-position reg-beg)
         reg-end (web-mode-invalidate-region-end-position reg-end))
   ;;(message "invalidate-region: reg-beg(%S) reg-end(%S)" reg-beg reg-end)
   (web-mode-scan-region reg-beg reg-end))
+
+(defun web-mode--command-is-self-insert-p ()
+  "Return non-nil if `this-command' is `self-insert-command'.
+Also return non-nil if it is the command `self-insert-command' is remapped to."
+  (memq this-command (list 'self-insert-command
+                           (key-binding [remap self-insert-command]))))
+
+(defun web-mode-on-post-command ()
+  (when (and web-mode-trace (not (member this-command
+                                         '(left-char right-char previous-line next-line save-buffer mwheel-scroll end-of-line beginning-of-line))))
+    (message "post-command: this-command(%S) web-mode-change-beg(%S) web-mode-change-end(%S) previous-state(%S)"
+             this-command web-mode-change-beg web-mode-change-end web-mode-expand-previous-state))
+  (let (ctx n char)
+    (when (and web-mode-expand-previous-state
+               (not (member this-command web-mode-commands-like-expand-region)))
+      (when (eq this-command 'keyboard-quit)
+        (goto-char web-mode-expand-initial-pos))
+      (deactivate-mark)
+      (when web-mode-expand-initial-scroll
+        (set-window-start (selected-window) web-mode-expand-initial-scroll)
+        )
+      (setq web-mode-expand-previous-state nil
+            web-mode-expand-initial-pos nil
+            web-mode-expand-initial-scroll nil))
+
+    (when (member this-command '(yank))
+      ;;(setq web-mode-skip-fontification nil)
+      (when (and web-mode-scan-beg web-mode-scan-end global-font-lock-mode)
+        (save-excursion
+          (font-lock-fontify-region web-mode-scan-beg web-mode-scan-end))
+        (when web-mode-enable-auto-indentation
+          (indent-region web-mode-scan-beg web-mode-scan-end))
+        ) ;and
+      )
+
+    (when (and (< (point) 16) web-mode-change-beg web-mode-change-end)
+      (web-mode-detect-content-type))
+
+    (when (and web-mode-change-beg web-mode-change-end
+               web-mode-enable-engine-detection
+               (or (null web-mode-engine) (string= web-mode-engine "none"))
+               (< (point) web-mode-chunk-length)
+               (web-mode-detect-engine))
+      (web-mode-on-engine-setted)
+      (web-mode-buffer-fontify))
+
+    (when (> (point) 1)
+      (setq char (char-before)))
+
+    (cond
+
+     ((null char)
+      )
+
+     ((and (>= (point) 3)
+           (web-mode--command-is-self-insert-p)
+           (not (member (get-text-property (point) 'part-token) '(comment string)))
+           (not (eq (get-text-property (point) 'tag-type) 'comment))
+           )
+      (setq ctx (web-mode-auto-complete)))
+
+     ((and web-mode-enable-auto-opening
+           (member this-command '(newline electric-newline-and-maybe-indent newline-and-indent))
+           (or (and (not (eobp))
+                    (eq (char-after) ?\<)
+                    (eq (get-text-property (point) 'tag-type) 'end)
+                    (looking-back ">\n[ \t]*" (point-min))
+                    (setq n (length (match-string-no-properties 0)))
+                    (eq (get-text-property (- (point) n) 'tag-type) 'start)
+                    (string= (get-text-property (- (point) n) 'tag-name)
+                             (get-text-property (point) 'tag-name))
+                    )
+               (and (get-text-property (1- (point)) 'block-side)
+                    (string= web-mode-engine "php")
+                    (looking-back "<\\?php[ ]*\n" (point-min))
+                    (looking-at-p "[ ]*\\?>"))))
+      (newline-and-indent)
+      (forward-line -1)
+      (indent-according-to-mode)
+      )
+     ) ;cond
+
+    (cond
+
+     ((not web-mode-enable-auto-opening)
+      )
+     ((and (member this-command '(newline electric-newline-and-maybe-indent newline-and-indent))
+           (get-text-property (point) 'part-side)
+           (eq (get-text-property (point) 'part-token) 'string))
+      (indent-according-to-mode)
+      (when (and web-mode-change-end (> web-mode-change-end (point-max)))
+        (message "post-command: enlarge web-mode-change-end")
+        (setq web-mode-change-end (point-max))
+        )
+      )
+     ((and (web-mode--command-is-self-insert-p)
+           (or (and ctx
+                    (or (plist-get ctx :auto-closed)
+                        (plist-get ctx :auto-expanded)))
+               (and (> (point) (point-min))
+                    (get-text-property (1- (point)) 'tag-end)
+                    (get-text-property (line-beginning-position) 'tag-beg))))
+      (indent-according-to-mode)
+      (when (and web-mode-change-end (> web-mode-change-end (point-max)))
+        (message "post-command: enlarge web-mode-change-end")
+        (setq web-mode-change-end (point-max))
+        )
+      )
+     ((and (web-mode--command-is-self-insert-p)
+           (member (get-text-property (point) 'part-side) '(javascript jsx css))
+           (looking-back "^[ \t]+[]})]" (point-min)))
+      (indent-according-to-mode)
+      (when (and web-mode-change-end (> web-mode-change-end (point-max)))
+        (message "post-command: enlarge web-mode-change-end")
+        (setq web-mode-change-end (point-max))
+        )
+      )
+     ) ; cond web-mode-enable-auto-opening
+
+    (when web-mode-enable-current-element-highlight
+      (web-mode-highlight-current-element))
+
+    (when (and web-mode-enable-current-column-highlight
+               (not (web-mode-buffer-narrowed-p)))
+      (web-mode-column-show))
+
+    (when (and web-mode-trace (not (member this-command
+                                           '(left-char right-char previous-line next-line save-buffer mwheel-scroll end-of-line beginning-of-line))))
+      (when (or web-mode-change-beg web-mode-change-end)
+        (message "post-command: web-mode-change-beg(%S) web-mode-change-end(%S)"
+                 web-mode-change-end web-mode-change-end))
+      (message "-------------------------------------------------------------------")
+      )
+
+    ))
 
 ;; NOTE: il est important d'identifier des caractères en fin de ligne
 ;; web-mode-block-tokenize travaille en effet sur les fins de lignes pour
@@ -6112,39 +6299,12 @@ another auto-completion with different ac-sources (e.g. ac-php)")
 
 ;;---- FONTIFICATION -----------------------------------------------------------
 
-;; 1/ after-change
-;; 2/ extend-region
-;; 3/ scan
-;; 4/ fontify
-;; 5/ post-command
-
-(defun web-mode-extend-region ()
-  ;;(message "extend-region: flb(%S) fle(%S) wmcb(%S) wmce(%S)" font-lock-beg font-lock-end web-mode-change-beg web-mode-change-end)
-  (cond
-   (web-mode-fontification-off
-    nil)
-   (t
-    (when (or (null web-mode-change-beg) (< font-lock-beg web-mode-change-beg))
-      ;;(message "font-lock-beg(%S) < web-mode-change-beg(%S)" font-lock-beg web-mode-change-beg)
-      (setq web-mode-change-beg font-lock-beg))
-    (when (or (null web-mode-change-end) (> font-lock-end web-mode-change-end))
-      ;;(message "font-lock-end(%S) > web-mode-change-end(%S)" font-lock-end web-mode-change-end)
-      (setq web-mode-change-end font-lock-end))
-    (let ((region (web-mode-scan web-mode-change-beg web-mode-change-end)))
-      (when region
-        ;;(message "region: %S" region)
-        (setq font-lock-beg (car region)
-              font-lock-end (cdr region))
-        ) ;when
-      ) ;let
-    nil) ;t
-   ))
-
 (defun web-mode-fontify (limit)
-  ;;(message "fontify: point(%S) limit(%S) change-beg(%S) change-end(%S)" (point) limit web-mode-change-beg web-mode-change-end)
+  (when web-mode-trace
+    (message "fontify: point(%S) limit(%S)" (point) limit))
   (cond
-   (web-mode-fontification-off
-    nil)
+   ;;(web-mode-skip-fontification
+   ;; nil)
    (t
     (web-mode-with-silent-modifications
       (save-excursion
@@ -6358,8 +6518,11 @@ another auto-completion with different ac-sources (e.g. ac-php)")
     ))
 
 (defun web-mode-fontify-block (reg-beg reg-end)
+  (when web-mode-trace
+    (message "fontify-block: reg-beg(%S) reg-end(%S) engine(%S) keywords(%S)"
+             reg-beg reg-end web-mode-engine (not (null web-mode-engine-font-lock-keywords))))
+
   (let (sub1 sub2 sub3 continue char keywords token-type face beg end (buffer (current-buffer)))
-    ;;(message "reg-beg=%S reg-end=%S" reg-beg reg-end)
 
     ;; NOTE: required for blocks inside tag attrs
     (remove-list-of-text-properties reg-beg reg-end '(font-lock-face))
@@ -6383,8 +6546,7 @@ another auto-completion with different ac-sources (e.g. ac-php)")
       ) ;comment block
 
      (web-mode-engine-font-lock-keywords
-      (setq keywords web-mode-engine-font-lock-keywords)
-      )
+      (setq keywords web-mode-engine-font-lock-keywords))
 
      ((string= web-mode-engine "django")
       (cond
@@ -6506,7 +6668,6 @@ another auto-completion with different ac-sources (e.g. ac-php)")
             (when (and web-mode-enable-heredoc-fontification
                        (eq char ?\<)
                        (> (- end beg) 8)
-                       ;;(progn (message "%S" (buffer-substring-no-properties beg end)) t)
                        (string-match-p "JS\\|JAVASCRIPT\\|HTM\\|CSS" (buffer-substring-no-properties beg end)))
               (setq keywords
                     (cond
@@ -6516,8 +6677,8 @@ another auto-completion with different ac-sources (e.g. ac-php)")
                       web-mode-javascript-font-lock-keywords)
                      ))
               (web-mode-fontify-region beg end keywords)
-            ))
-;;          (message "%S %c %S beg=%S end=%S" web-mode-enable-string-interpolation char web-mode-engine beg end)
+              )
+            ) ;save-match-data
           (when (and web-mode-enable-string-interpolation
                      (member char '(?\" ?\<))
                      (member web-mode-engine '("php" "erb"))
@@ -6537,8 +6698,6 @@ another auto-completion with different ac-sources (e.g. ac-php)")
           (when (and web-mode-enable-sql-detection
                      (eq token-type 'string)
                      (> (- end beg) 6)
-                     ;;(eq char ?\<)
-                     ;;(web-mode-looking-at-p (concat "[ \n]*" web-mode-sql-queries) (1+ beg))
                      (web-mode-looking-at-p (concat "\\(.\\|<<<[[:alnum:]]+\\)[ \n]*" web-mode-sql-queries) beg)
                      )
             (web-mode-interpolate-sql-string beg end)
@@ -6547,14 +6706,12 @@ another auto-completion with different ac-sources (e.g. ac-php)")
         ) ;while continue
       ) ;when keywords
 
-    ;;(when (and (member web-mode-engine '("jsp" "mako"))
     (when (and (member web-mode-engine '("mako"))
                (> (- reg-end reg-beg) 12)
                (eq ?\< (char-after reg-beg)))
       (web-mode-interpolate-block-tag reg-beg reg-end))
 
     (when web-mode-enable-block-face
-;;      (message "block-face %S %S" reg-beg reg-end)
       (font-lock-append-text-property reg-beg reg-end 'face 'web-mode-block-face))
 
     ))
@@ -7903,7 +8060,7 @@ another auto-completion with different ac-sources (e.g. ac-php)")
         (setq reg-beg (or (web-mode-part-beginning-position pos) (point-min)))
         (goto-char reg-beg)
         (if (and (string= web-mode-engine "mojolicious")
-                 (looking-back "javascript begin"))
+                 (looking-back "javascript begin" (point-min)))
             (search-backward "%" nil t)
           (search-backward "<" nil t))
         (setq reg-col (current-column))
@@ -8075,6 +8232,14 @@ another auto-completion with different ac-sources (e.g. ac-php)")
          ((or (bobp) (= (line-number-at-pos pos) 1))
           (when debug (message "I100(%S) first line" pos))
           (setq offset 0))
+
+         ;; #123 #1145
+         ((and web-mode-enable-front-matter-block
+               (eq (char-after (point-min)) ?\-)
+               (or (looking-at-p "---")
+                   (search-forward "---" (point-max) t)))
+          (when debug (message "I108(%S) front-matter-block" pos))
+          (setq offset nil))
 
          ;; #1073
          ((get-text-property pos 'invisible)
@@ -10129,50 +10294,55 @@ Pos should be in a tag."
   (when mark-active
     (let (beg end line-beg line-end pos tag tag-start tag-end)
       (save-excursion
-        (setq tag (read-from-minibuffer "Tag name? ")
-              tag-start (concat "<" tag ">")
-              tag-end (concat "</" tag ">")
-              pos (point)
-              beg (region-beginning)
-              end (region-end)
-              line-beg (web-mode-line-number beg)
-              line-end (web-mode-line-number end))
-        (goto-char end)
-        (unless (bolp)
-          (insert tag-end)
-          (back-to-indentation)
-          (when (> beg (point))
-            (goto-char beg))
-          (insert tag-start))
-        (while (> line-end line-beg)
-          (forward-line -1)
-          (setq line-end (1- line-end))
-          (unless (looking-at-p "[[:space:]]*$")
-            (end-of-line)
+        (combine-after-change-calls
+          (setq tag (read-from-minibuffer "Tag name? ")
+                tag-start (concat "<" tag ">")
+                tag-end (concat "</" tag ">")
+                pos (point)
+                beg (region-beginning)
+                end (region-end)
+                line-beg (web-mode-line-number beg)
+                line-end (web-mode-line-number end))
+          (goto-char end)
+          (unless (bolp)
             (insert tag-end)
             (back-to-indentation)
             (when (> beg (point))
               (goto-char beg))
             (insert tag-start))
-          ) ;while
-        (deactivate-mark)
-        ))))
+          (while (> line-end line-beg)
+            (forward-line -1)
+            (setq line-end (1- line-end))
+            (unless (looking-at-p "[[:space:]]*$")
+              (end-of-line)
+              (insert tag-end)
+              (back-to-indentation)
+              (when (> beg (point))
+                (goto-char beg))
+              (insert tag-start))
+            ) ;while
+          (deactivate-mark)
+          ) ;combine-after-change-calls
+        ) ;save-excursion
+      )))
 
 (defun web-mode-lify-region ()
   "Transform current REGION in an html list (<li>line1</li>...)"
   (interactive)
   (let (beg end lines)
     (save-excursion
-      (when  mark-active
-        (setq beg (region-beginning)
-              end (region-end))
-        (setq lines (buffer-substring beg end))
-        (kill-region beg end)
-        (setq lines (replace-regexp-in-string "^[ \t]*" "<li>" lines))
-        (setq lines (replace-regexp-in-string "$" "</li>" lines))
-        (web-mode-insert-and-indent lines)
-        ) ;when
-      ) ; save-excursion
+      (combine-after-change-calls
+        (when  mark-active
+          (setq beg (region-beginning)
+                end (region-end))
+          (setq lines (buffer-substring beg end))
+          (kill-region beg end)
+          (setq lines (replace-regexp-in-string "^[ \t]*" "<li>" lines))
+          (setq lines (replace-regexp-in-string "$" "</li>" lines))
+          (web-mode-insert-and-indent lines)
+          ) ;when
+        ) ;combine-after-change-calls
+      ) ;save-excursion
     ) ;let
   )
 
@@ -10521,6 +10691,10 @@ Prompt user if TAG-NAME isn't provided."
         (web-mode-block-skip-blank-forward (point) '(delimiter-beg))
       (skip-chars-forward "[:space:]" (line-end-position)))
     (cond
+     ;; #1147
+     ((and (get-text-property (point) 'jsx-beg)
+           (eq (get-text-property (1+ (point)) 'part-token) 'comment))
+      (web-mode-uncomment (1+ (point))))
      ((or (eq (get-text-property (point) 'tag-type) 'comment)
           (eq (get-text-property (point) 'block-token) 'comment)
           (eq (get-text-property (point) 'part-token) 'comment))
@@ -10870,8 +11044,10 @@ Prompt user if TAG-NAME isn't provided."
              (setq beg (car boundaries))
              (setq end (1+ (cdr boundaries)))
              (> (- end beg) 4))
-        (message "%S" boundaries)
-        ;;(message "beg(%S) end(%S)" beg end)
+        (when (and (eq (get-text-property beg 'part-token) 'comment)
+                   (get-text-property (1- beg) 'jsx-beg))
+          (setq beg (1- beg)
+                end (1+ end)))
         (setq comment (buffer-substring-no-properties beg end))
         (setq sub2 (substring comment 0 2))
         (cond
@@ -11512,146 +11688,6 @@ Prompt user if TAG-NAME isn't provided."
      (t
       nil)
      )
-
-    ))
-
-(defun web-mode--command-is-self-insert-p ()
-  "Return non-nil if `this-command' is `self-insert-command'.
-Also return non-nil if it is the command `self-insert-command' is remapped to."
-  (memq this-command (list 'self-insert-command
-                           (key-binding [remap self-insert-command]))))
-
-;; NOTE: after-change triggered before post-command
-
-(defun web-mode-on-after-change (beg end len)
-  ;;(message "after-change: pos=%d, beg=%d, end=%d, len=%d, ocmd=%S, cmd=%S" (point) beg end len this-original-command this-command)
-  ;;(backtrace)
-  (when (eq this-original-command 'yank)
-    (setq web-mode-fontification-off t))
-  (when (or (null web-mode-change-beg) (< beg web-mode-change-beg))
-    (setq web-mode-change-beg beg))
-  (when (or (null web-mode-change-end) (> end web-mode-change-end))
-    (setq web-mode-change-end end))
-  ;;(message "on-after-change: fontification-off(%S) change-beg(%S) change-end(%S)" web-mode-fontification-off web-mode-change-beg web-mode-change-end)
-  )
-
-(defun web-mode-on-post-command ()
-  ;;(message "post-command: cmd=%S, state=%S, beg=%S, end=%S" this-command web-mode-expand-previous-state web-mode-change-beg web-mode-change-end)
-  (let (ctx n char)
-    (when (and web-mode-expand-previous-state
-               (not (member this-command web-mode-commands-like-expand-region)))
-      (when (eq this-command 'keyboard-quit)
-        (goto-char web-mode-expand-initial-pos))
-      (deactivate-mark)
-      (when web-mode-expand-initial-scroll
-        (set-window-start (selected-window) web-mode-expand-initial-scroll)
-        )
-      (setq web-mode-expand-previous-state nil
-            web-mode-expand-initial-pos nil
-            web-mode-expand-initial-scroll nil))
-
-    (when (member this-command '(yank))
-      (setq web-mode-fontification-off nil)
-      (when (and web-mode-scan-beg web-mode-scan-end global-font-lock-mode)
-        (save-excursion
-          (font-lock-fontify-region web-mode-scan-beg web-mode-scan-end))
-        (when web-mode-enable-auto-indentation
-          (indent-region web-mode-scan-beg web-mode-scan-end))
-        ) ;and
-      )
-
-    (when (and (< (point) 16) web-mode-change-beg web-mode-change-end)
-      (web-mode-detect-content-type))
-
-    (when (and web-mode-change-beg web-mode-change-end
-               web-mode-enable-engine-detection
-               (or (null web-mode-engine) (string= web-mode-engine "none"))
-               (< (point) web-mode-chunk-length)
-               (web-mode-detect-engine))
-      (web-mode-on-engine-setted)
-      (web-mode-buffer-fontify))
-
-    (when (> (point) 1)
-      (setq char (char-before)))
-
-    (cond
-
-     ((null char)
-      )
-
-     ((and (>= (point) 3)
-           (web-mode--command-is-self-insert-p)
-           (not (member (get-text-property (point) 'part-token) '(comment string)))
-           (not (eq (get-text-property (point) 'tag-type) 'comment))
-           )
-      (setq ctx (web-mode-auto-complete)))
-
-     ((and web-mode-enable-auto-opening
-           (member this-command '(newline electric-newline-and-maybe-indent newline-and-indent))
-           (or (and (not (eobp))
-                    (eq (char-after) ?\<)
-                    (eq (get-text-property (point) 'tag-type) 'end)
-                    (looking-back ">\n[ \t]*" (point-min))
-                    (setq n (length (match-string-no-properties 0)))
-                    (eq (get-text-property (- (point) n) 'tag-type) 'start)
-                    (string= (get-text-property (- (point) n) 'tag-name)
-                             (get-text-property (point) 'tag-name))
-                    )
-               (and (get-text-property (1- (point)) 'block-side)
-                    (string= web-mode-engine "php")
-                    (looking-back "<\\?php[ ]*\n" (point-min))
-                    (looking-at-p "[ ]*\\?>"))))
-      (newline-and-indent)
-      (forward-line -1)
-      (indent-according-to-mode)
-      )
-     ) ;cond
-
-    (cond
-
-     ((not web-mode-enable-auto-opening)
-      )
-     ((and (member this-command '(newline electric-newline-and-maybe-indent newline-and-indent))
-           (get-text-property (point) 'part-side)
-           (eq (get-text-property (point) 'part-token) 'string))
-      (indent-according-to-mode)
-      (when (and web-mode-change-end (> web-mode-change-end (point-max)))
-        (message "post-command: enlarge web-mode-change-end")
-        (setq web-mode-change-end (point-max))
-        )
-      )
-     ((and (web-mode--command-is-self-insert-p)
-           (or (and ctx
-                    (or (plist-get ctx :auto-closed)
-                        (plist-get ctx :auto-expanded)))
-               (and (> (point) (point-min))
-                    (get-text-property (1- (point)) 'tag-end)
-                    (get-text-property (line-beginning-position) 'tag-beg))))
-      (indent-according-to-mode)
-      (when (and web-mode-change-end (> web-mode-change-end (point-max)))
-        (message "post-command: enlarge web-mode-change-end")
-        (setq web-mode-change-end (point-max))
-        )
-      )
-     ((and (web-mode--command-is-self-insert-p)
-           (member (get-text-property (point) 'part-side) '(javascript jsx css))
-           (looking-back "^[ \t]+[]})]" (point-min)))
-      (indent-according-to-mode)
-      (when (and web-mode-change-end (> web-mode-change-end (point-max)))
-        (message "post-command: enlarge web-mode-change-end")
-        (setq web-mode-change-end (point-max))
-        )
-      )
-     ) ; cond web-mode-enable-auto-opening
-
-    (when web-mode-enable-current-element-highlight
-      (web-mode-highlight-current-element))
-
-    (when (and web-mode-enable-current-column-highlight
-               (not (web-mode-buffer-narrowed-p)))
-      (web-mode-column-show))
-
-    ;;(message "post-command (%S) (%S)" web-mode-change-end web-mode-change-end)
 
     ))
 
@@ -14228,7 +14264,7 @@ extended to support more filetypes by customizing
     (web-mode)
     ))
 
-(defun web-mode-trace (msg)
+(defun web-mode-measure (msg)
   (let (sub)
     (when (null web-mode-time) (setq web-mode-time (current-time)))
     (setq sub (time-subtract (current-time) web-mode-time))
@@ -14263,6 +14299,15 @@ extended to support more filetypes by customizing
     (message "%s\n" out)
     ;;(message "syntax-class=%S" (syntax-class (syntax-after (point))))
     (message nil)))
+
+(defun web-mode-toggle-tracing ()
+  "Toggle tracing."
+  (interactive)
+  (if web-mode-trace
+      (setq web-mode-trace nil)
+    (message "** tracing on ** point(%S) web-mode-change-beg(%S) web-mode-change-end(%S) web-mode-skip-fontification(%S)"
+             (point) web-mode-change-beg web-mode-change-end web-mode-skip-fontification)
+    (setq web-mode-trace t)))
 
 (defun web-mode-debug ()
   "Display informations useful for debugging."
