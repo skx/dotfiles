@@ -1,0 +1,13 @@
+* config.local.org
+
+#+NAME: skx-startblock
+#+BEGIN_SRC emacs-lisp :results output silent
+  (defun load-diary()
+    "Load my diary/work-log, and scroll to today's entry."
+    (interactive)
+    (find-file (expand-file-name "~/WorkLogs/enfuce/Diary.org"))
+    (today)
+    )
+  (global-set-key (kbd "C-x w") 'load-diary)
+  (global-set-key (kbd "C-c w") 'load-diary)
+#+END_SRC
