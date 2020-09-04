@@ -569,7 +569,7 @@ Now we're done with the general setup so we'll handle the more specific things h
 ;; Store our org-files beneath ~/Org.
 (custom-set-variables  '(org-directory "~/Org"))
 
-;; load all files for the agenda
+;; Populate the agenda from ~/Org + ~/WorkLogs/
 (setq org-agenda-files (apply 'append
 	(mapcar
 		(lambda (directory)
@@ -609,6 +609,9 @@ Now we're done with the general setup so we'll handle the more specific things h
 ;; Indentation in org-buffers matches the header-level
 (setq org-startup-indented t)
 
+;; This sets the indention-depth for child-entries
+(setq org-indent-indentation-per-level 2)
+
 ;; Ctrl-a & Ctrl-e (for start/end of line) behave "magically" inside headlines
 ;; this is what I think most people would expect
 (setq org-special-ctrl-a/e 't)
@@ -616,6 +619,11 @@ Now we're done with the general setup so we'll handle the more specific things h
 ;; Bring up the agenda.
 (global-set-key "\C-ca" 'org-agenda)
 
+;; This hides the "*bold*", "/italic/" and "=preformatted=" markers:
+(setq org-hide-emphasis-markers t)
+
+;; Instead of showing ".." after folded-areas show the symbol.
+(setq org-ellipsis " ▼")
 ```
 
 
