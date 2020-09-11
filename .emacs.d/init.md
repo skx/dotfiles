@@ -114,6 +114,18 @@ I'm annoyed by backups and similar.  So I disable them all:
 ```
 
 
+## Bell: Disabled
+
+Emacs has an annoying habit of making a beep if you attempt to scroll beyond the bottom of a buffer, cancel an operation, or carry out other everyday tasks.
+
+We disable that behaviour here, in preference to a visual-flash:
+
+```lisp
+(setq visible-bell 1)
+```
+
+
+
 ## Buffers
 
 If multiple buffers use the same filename we'll prefix with the parent directory:
