@@ -434,7 +434,7 @@ and `Esc-+` to hide/show all:
 ```lisp
     (defun enable-hs-mode-hook()
       (hs-minor-mode 1)
-      (local-set-key (kbd "M-TAB") 'hs-toggle-hiding)
+      (local-set-key (kbd "M-C-I") 'hs-toggle-hiding)
       (local-set-key (kbd "M--") 'hs-hide-all)
       (local-set-key (kbd "M-+") 'hs-show-all))
 
@@ -442,9 +442,10 @@ and `Esc-+` to hide/show all:
     (add-hook 'c++-mode-hook 'enable-hs-mode-hook t)
     (add-hook 'c-mode-hook 'enable-hs-mode-hook t)
     (add-hook 'go-mode-hook 'enable-hs-mode-hook t)
+    (add-hook 'emacs-lisp-mode-hook 'enable-hs-mode-hook t)
     (add-hook 'perl-mode-hook 'enable-hs-mode-hook t)
-    (add-hook 'web-mode-hook 'enable-hs-mode-hook t)
     (add-hook 'python-hook 'enable-hs-mode-hook t)
+    (add-hook 'web-mode-hook 'enable-hs-mode-hook t)
 ```
 
 
