@@ -33,19 +33,20 @@
 (defvar break-time-interval (* 30 60)
   "The period in which to show a break, in seconds.")
 
-
 (setq break-timer nil)
 
 (defun break-time-announce ()
   "Announce a random message from the ‘break-time-messages‘ list to the user.
 
-  We block for confirmation, via q', after the animated display."
+  We block for confirmation, via 'q', after the animated display."
+  ;; kill the old buffer, because if not it will be in view-mode
+  ;; which means it will be read-only and we cannot add the message there
+  (if (get-buffer "*breaktime*") (kill-buffer "*breaktime*"))
   (switch-to-buffer (get-buffer-create "*breaktime*"))
   (erase-buffer)
   (animate-string (nth (random (length break-time-messages)) break-time-messages)
                   (/ (window-height) 2) (- (/ (window-width) 2) 12))
   (view-mode))
-
 
 (defun break-time-start()
   "Setup a timer to announce break-times on a regular schedule.
@@ -59,7 +60,6 @@ be adjusted, via ‘break-time-interval‘."
   (setq break-timer (run-at-time t break-time-interval 'break-time-announce))
   (message "Break-notifications will repeat every %d minutes" (/ break-time-interval 60)))
 
-
 (defun break-time-end()
   "Cancel any open break-timer, disabling the scheduled break-time messages."
   (interactive)
@@ -68,6 +68,5 @@ be adjusted, via ‘break-time-interval‘."
       (cancel-timer break-timer)
     (message "Break timer is not active!"))
   (setq break-timer nil))
-
 
 (provide 'break-time)
