@@ -44,9 +44,13 @@
   (if (get-buffer "*breaktime*") (kill-buffer "*breaktime*"))
   (switch-to-buffer (get-buffer-create "*breaktime*"))
   (erase-buffer)
-  (animate-string (nth (random (length break-time-messages)) break-time-messages)
-                  (/ (window-height) 2) (- (/ (window-width) 2) 12))
-  (view-mode))
+
+  ;; pick a random message, and then prepend the time to it.
+  (let ((msg (nth (random (length break-time-messages)) break-time-messages)))
+    (setq msg (format "%s - %s" (format-time-string "%H:%M" (current-time)) msg))
+    ;; animate, but make sure the result is centered.
+    (animate-string msg  (/ (window-height) 2) (- (/ (window-width) 2) (/ (length msg) 2) ))
+  (view-mode)))
 
 (defun break-time-start()
   "Setup a timer to announce break-times on a regular schedule.
