@@ -1342,6 +1342,10 @@ collapse muliple newlines into one, across a region.
     (require 'whitespace)
     (add-hook 'write-file-hooks 'delete-trailing-whitespace)
 
+    ;; But many Unix system-files require a trailing newline to work
+    ;; correctly, for example `crontab` files.  So make sure that's OK
+    (setq require-final-newline t)
+
     (defun collapse-blank-lines(start end)
      (interactive "r")
      (replace-regexp "^\n\\{2,\\}" "\n" nil start end))
