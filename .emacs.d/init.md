@@ -643,6 +643,9 @@ Now we're done with the general setup so we'll handle the more specific things h
     ("CANCELED"   . (:foreground "pink" :weight bold))))
 
 
+;; When showing TODO we show the headline from which the item came.
+(setq org-agenda-prefix-format "%-12:c %b")
+
 ;; Indentation in org-buffers matches the header-level
 (setq org-startup-indented t)
 
