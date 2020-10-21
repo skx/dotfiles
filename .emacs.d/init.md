@@ -617,12 +617,14 @@ Now we're done with the general setup so we'll handle the more specific things h
 ;; Add a custom org-agenda command
 ;;
 ;; Show TODOs, except thos that are 100% complete
-(add-to-list 'org-agenda-custom-commands
-            '("T" todo ""
+(with-feature (org-agenda)
+	(add-to-list 'org-agenda-custom-commands
+	'("T" todo ""
               ((org-agenda-skip-function
                 (lambda nil
                   (org-agenda-skip-entry-if (quote regexp) "100%")))
-)))
+))))
+
 
 ;; Our agenda-view will span two weeks by default.
 (setq org-agenda-span 14)
