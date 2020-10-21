@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Exec=/usr/bin/redshift -l 55:3
-Hidden=false
-X-GNOME-Autostart-enabled=true
-Name[en_GB]=redshift
-Name=redshift
-Comment[en_GB]=Tweaks to colours.
-Comment=Tweaks to colours.
