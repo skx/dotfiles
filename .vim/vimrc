@@ -1,6 +1,5 @@
 function! SourceConfig()
   let file_list = split(globpath('$HOME/.vim/config/', '*.vim'), '\n')
-
   for file in file_list
     execute('source '.file)
   endfor
