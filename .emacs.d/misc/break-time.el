@@ -50,7 +50,7 @@
     (setq msg (format "%s - %s" (format-time-string "%H:%M" (current-time)) msg))
     ;; animate, but make sure the result is centered.
     (animate-string msg  (/ (window-height) 2) (- (/ (window-width) 2) (/ (length msg) 2) ))
-  (view-mode)))
+  (view-mode t)))
 
 (defun break-time-start()
   "Setup a timer to announce break-times on a regular schedule.
