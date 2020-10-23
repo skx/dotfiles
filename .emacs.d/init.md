@@ -611,6 +611,10 @@ Now we're done with the general setup so we'll handle the more specific things h
 ;; Store our org-files beneath ~/Org.
 (custom-set-variables  '(org-directory "~/Org"))
 
+;; Don't track org-id-locations globally, as this creates
+;; a ~/.emacs.d/.org-id-locations file which is annoying.
+(setq org-id-track-globally nil)
+
 ;; Populate the agenda from ~/Org + ~/WorkLogs/
 (setq org-agenda-files (apply 'append
 	(mapcar
