@@ -621,14 +621,17 @@ Now we're done with the general setup so we'll handle the more specific things h
 
 ;; Add a custom org-agenda command
 ;;
-;; Show TODOs, except thos that are 100% complete
+;; Show TODOs, except those that are 100% complete, or which have
+;; `:noexport:` in their text.  Note that this isn't a tag-match,
+;; just a literal match as used in my worklog(s).
+;;
 (with-feature (org-agenda)
 	(add-to-list 'org-agenda-custom-commands
 	'("T" todo ""
               ((org-agenda-skip-function
                 (lambda nil
-                  (org-agenda-skip-entry-if (quote regexp) "100%")))
-))))
+                  (org-agenda-skip-entry-if (quote regexp) ":noexport:\\|100%")))))))
+
 
 
 ;; Our agenda-view will span two weeks by default.
