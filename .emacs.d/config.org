@@ -20,6 +20,7 @@ This is a bit terrible, but also a bit awesome.
 |-----------------------------------+----------------------------------------------------------------------------------------+--------|
 | ~/.emacs.d/lang/cfengine.el       | https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el             | OK     |
 | ~/.emacs.d/lang/go-mode.el        | https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode.el                | OK     |
+| ~/.emacs.d/lang/groovy-mode.el | https://raw.githubusercontent.com/Groovy-Emacs-Modes/groovy-emacs-modes/master/groovy-mode.el | OK |
 | ~/.emacs.d/lang/lua-mode.el       | https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el                  | OK     |
 | ~/.emacs.d/lang/markdown-mode.el  | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el       | OK     |
 | ~/.emacs.d/lang/monkey.el         | https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el                    | OK     |
