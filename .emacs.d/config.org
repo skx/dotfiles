@@ -16,17 +16,17 @@ To resync all the files place the cursor on the bottom-row of the table and exec
 This is a bit terrible, but also a bit awesome.
 
 #+NAME: github-urls
-| Destination                       | Link                                                                                   | Result |
-|-----------------------------------+----------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/cfengine.el       | https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el             | OK     |
-| ~/.emacs.d/lang/go-mode.el        | https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode.el                | OK     |
-| ~/.emacs.d/lang/groovy-mode.el | https://raw.githubusercontent.com/Groovy-Emacs-Modes/groovy-emacs-modes/master/groovy-mode.el | OK |
-| ~/.emacs.d/lang/lua-mode.el       | https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el                  | OK     |
-| ~/.emacs.d/lang/markdown-mode.el  | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el       | OK     |
-| ~/.emacs.d/lang/monkey.el         | https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el                    | OK     |
-| ~/.emacs.d/lang/puppet-mode.el    | https://raw.githubusercontent.com/voxpupuli/puppet-mode/master/puppet-mode.el          | OK     |
-| ~/.emacs.d/lang/terraform-mode.el | https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el | OK     |
-| ~/.emacs.d/lang/web-mode.el       | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                   | OK     |
+| Destination                       | Link                                                                                          | Result |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/cfengine.el       | https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el                    | OK     |
+| ~/.emacs.d/lang/go-mode.el        | https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode.el                       | OK     |
+| ~/.emacs.d/lang/groovy-mode.el    | https://raw.githubusercontent.com/Groovy-Emacs-Modes/groovy-emacs-modes/master/groovy-mode.el | OK     |
+| ~/.emacs.d/lang/lua-mode.el       | https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el                         | OK     |
+| ~/.emacs.d/lang/markdown-mode.el  | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el              | OK     |
+| ~/.emacs.d/lang/monkey.el         | https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el                           | OK     |
+| ~/.emacs.d/lang/puppet-mode.el    | https://raw.githubusercontent.com/voxpupuli/puppet-mode/master/puppet-mode.el                 | OK     |
+| ~/.emacs.d/lang/terraform-mode.el | https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el        | OK     |
+| ~/.emacs.d/lang/web-mode.el       | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                          | OK     |
 #+TBLFM: $3='(download $2 $1)
 
 
