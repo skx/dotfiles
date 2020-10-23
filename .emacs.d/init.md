@@ -209,6 +209,15 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
 
 
 ```lisp
+
+    ;; CFEngine
+    (with-feature (cfengine)
+      (add-to-list 'auto-mode-alist '("\\.cf\\'" . cfengine-auto-mode)))
+
+    ;; Groovy
+    (autoload 'groovy-mode "groovy-mode" "Major mode for editing Groovy code." t)
+    (add-to-list 'auto-mode-alist '("\\.groovy\\'" . groovy-mode))
+
     ;; Lua
     (with-feature (lua-mode)
         (add-to-list 'auto-mode-alist '("\\.lua\\'" . lua-mode))
@@ -218,10 +227,6 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
     (with-feature (markdown-mode)
         (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
         (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
-
-    ;; CFEngine
-    (with-feature (cfengine)
-      (add-to-list 'auto-mode-alist '("\\.cf\\'" . cfengine-auto-mode)))
 
     ;; Puppet
     (with-feature (puppet-mode)
