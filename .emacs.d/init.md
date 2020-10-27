@@ -150,6 +150,15 @@ If multiple buffers use the same filename we'll prefix with the parent directory
 ```
 
 
+### Calc Mode
+
+`literate-calc-mode` is a cute mode which allows constantly-updating calculations.  You can edit sums inside markdown, org-mode, and similar files, and see the results as overlays.
+
+```lisp
+(require 'literate-calc-mode)
+```
+
+
 ## Custom Variables
 
 By default, Emacs stores any configuration you make through its UI by writing custom-set-variables invocations to your init file, or to the file specified by custom-file. Though this is convenient, it’s also an excellent way to cause aggravation when the variable you keep trying to modify is being set in some custom-set-variables invocation. We can’t disable this behavior, and the custom-file variable can’t be nil, but we can make it look in a different place every time.
