@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# Show the previous commit message, and nothing else.
+#
+
+git log -1 --pretty=%B
+

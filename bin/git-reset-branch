@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# Reset the changes on this branch to master
+#
+
+
+#
+# Find the current branch.
+#
+cur=$(git rev-parse --abbrev-ref HEAD)
+
+#
+# Perform the reset
+#
+git reset $(git merge-base master ${cur})
+
