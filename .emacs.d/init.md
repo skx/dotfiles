@@ -704,11 +704,16 @@ Now we're done with the general setup so we'll handle the more specific things h
 
 Another useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block when a file is loaded.
 
-The following configuration enables the contents of a block named `skx-startblock` to be executed automatically when the file is loaded:
+The following configuration enables the contents of a block named `skx-startblock` to be executed automatically when the file is loaded, and the block `skx-saveblock` to be evaluated once _before_ a file is saved:
 
 ```lisp
-(defvar safe-skx-org-eval-startblock (list (concat (getenv "HOME") "/Repos/git.steve.fi/") (concat (getenv "HOME") "/Repos/git.steve.org.uk/") (concat (getenv "HOME") "/Org") (concat (getenv "HOME") "/WorkLogs") )
- "A list of filename patterns which will have their contents evaluated with no prompting.")
+(defvar safe-skx-org-eval-startblock
+    (list
+        (concat (getenv "HOME") "/Repos/git.steve.fi/")
+        (concat (getenv "HOME") "/Repos/git.steve.org.uk/")
+        (concat (getenv "HOME") "/Org")
+        (concat (getenv "HOME") "/WorkLogs"))
+"A list of filename patterns which will have their contents evaluated with no prompting.")
 
 (defun regexp-match-list(regexp list)
   "Return nil unless the regexp matches at least one of the list items"
