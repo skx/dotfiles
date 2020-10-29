@@ -707,37 +707,36 @@ Another useful change to org-mode is allowing the ability to execute the Emacs l
 The following configuration enables the contents of a block named `skx-startblock` to be executed automatically when the file is loaded, and the block `skx-saveblock` to be evaluated once _before_ a file is saved:
 
 ```lisp
-(defvar safe-skx-org-eval-startblock
+(defvar skx-org-eval-safe-list
     (list
         (concat (getenv "HOME") "/Repos/git.steve.fi/")
         (concat (getenv "HOME") "/Repos/git.steve.org.uk/")
         (concat (getenv "HOME") "/Org")
         (concat (getenv "HOME") "/WorkLogs"))
-"A list of filename patterns which will have their contents evaluated with no prompting.")
+"A list of patterns which will have their contents evaluated with no prompting.")
 
 (defun regexp-match-list(regexp list)
-  "Return nil unless the regexp matches at least one of the list items"
+  "Return nil unless the regexp matches at least one of the list items."
   (delq nil (mapcar (lambda(x) (string-match x regexp )) list)))
 
 (defun skx-org-eval-startblock ()
-  "If there is a code-block named 'skx-startblock' in the current
-  org-document then evaluate the content within it.
+  "Evaluate the content of a code-block named 'skx-startblock' in the current
+  org-document, if present.
 
   Emacs would usually prompt for permission as a safety precaution,
   but if the buffer is associated with a filename matching any
-  of the patterns inside the list safe-skx-org-eval-startblock we
+  of the patterns inside the list skx-org-eval-safe-list we
   just allow it.
   "
   (skx-org-eval-named-block "skx-startblock"))
 
 (defun skx-org-eval-saveblock ()
-  "If there is a code-block named 'skx-saveblock' in the current
-  org-document then evaluate the content within it prior to saving
-  the current document.
+  "Evaluate the content of a code-block named 'skx-saveblock' in the current
+  org-document, if present.
 
   Emacs would usually prompt for permission as a safety precaution,
   but if the buffer is associated with a filename matching any
-  of the patterns inside the list safe-skx-org-eval-startblock we
+  of the patterns inside the list skx-org-eval-safe-list we
   just allow it.
   "
   (skx-org-eval-named-block "skx-saveblock"))
@@ -748,7 +747,7 @@ The following configuration enables the contents of a block named `skx-startbloc
   (save-excursion
     (org-save-outline-visibility t
       (if (member name (org-babel-src-block-names))
-          (if (regexp-match-list (buffer-file-name) safe-skx-org-eval-startblock)
+          (if (regexp-match-list (buffer-file-name) skx-org-eval-safe-list)
               (progn
                 (setq-local org-confirm-babel-evaluate nil)
                 (org-babel-goto-named-src-block name)
