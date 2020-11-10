@@ -604,6 +604,13 @@ We'll enable line-wrapping and spell-checking when we enter org-mode:
         (toggle-truncate-lines)))
 ```
 
+When following links `C-RETURN` moves back:
+
+```lisp
+(add-hook 'org-mode-hook (lambda ()
+  (local-set-key (kbd "<C-return>") 'org-mark-ring-goto))
+```
+
 `org-mode` is __all__ about lists!  So one thing that is nice is to visually update the display of the list-prefixes, via unicode characters.  We'll use `org-bullets` for that:
 
 ```lisp
@@ -638,15 +645,18 @@ Now we're done with the general setup so we'll handle the more specific things h
 ;; `:noexport:` in their text.  Note that this isn't a tag-match,
 ;; just a literal match as used in my worklog(s).
 ;;
+(defun skx/org-agenda-skip-complete ()
+  (org-agenda-skip-entry-if 'regexp ":noexport:\\|100%"))
+
 (with-feature (org-agenda)
-	(add-to-list 'org-agenda-custom-commands
-	'("T" todo ""
-              ((org-agenda-skip-function
-                (lambda nil
-                  (org-agenda-skip-entry-if (quote regexp) ":noexport:\\|100%")))))))
+  (setq org-agenda-custom-commands
+     '(("wi" "List of items closed in the past week."
+        tags "+CLOSED>\"<-7d>\"/DONE")
+       ("wo" "Outstanding items."
+        todo ""
+        ((org-agenda-skip-function 'skx/org-agenda-skip-complete))))))
 
-
-
+;;
 ;; Our agenda-view will span two weeks by default.
 (setq org-agenda-span 14)
 
