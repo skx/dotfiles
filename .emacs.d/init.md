@@ -608,7 +608,7 @@ When following links `C-RETURN` moves back:
 
 ```lisp
 (add-hook 'org-mode-hook (lambda ()
-  (local-set-key (kbd "<C-return>") 'org-mark-ring-goto))
+  (local-set-key (kbd "<C-return>") 'org-mark-ring-goto)))
 ```
 
 `org-mode` is __all__ about lists!  So one thing that is nice is to visually update the display of the list-prefixes, via unicode characters.  We'll use `org-bullets` for that:
