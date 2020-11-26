@@ -451,6 +451,16 @@ explicitly set them to pink, and configure the indentation too:
 
 ```
 
+### Language Modes - YAML Mode
+
+YAML is used in Gitlab CI, and similar places.
+
+```lisp
+(require 'yaml-mode)
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+(add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode))
+```
+
 ### Language Mode Helpers - Code Folding
 
 I define a hook which will setup the toggling of code-blocks via HideShow,
