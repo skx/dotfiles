@@ -116,7 +116,8 @@ arguments."
   :type '(choice file function (const :tag "None" nil)))
 
 (defcustom markdown-open-image-command nil
-  "Command used for opening image files directly at `markdown-follow-link-at-point'."
+  "Command used for opening image files directly.
+This is used at `markdown-follow-link-at-point'."
   :group 'markdown
   :type '(choice file function (const :tag "None" nil)))
 
@@ -1154,7 +1155,8 @@ this property is a list with elements of the form (begin . end)
 giving the bounds of the current and parent list items."
   (save-excursion
     (goto-char start)
-    (let (bounds level pre-regexp)
+    (let ((prev-list-line -100)
+          bounds level pre-regexp)
       ;; Find a baseline point with zero list indentation
       (markdown-search-backward-baseline)
       ;; Search for all list items between baseline and END
@@ -1171,7 +1173,9 @@ giving the bounds of the current and parent list items."
          ((markdown-new-baseline)
           (setq bounds nil))
          ;; Make sure this is not a line from a pre block
-         ((looking-at-p pre-regexp))
+         ((and (looking-at-p pre-regexp)
+               ;; too indented line is also treated as list if previous line is list
+               (>= (- (line-number-at-pos) prev-list-line) 2)))
          ;; If not, then update levels and propertize list item when in range.
          (t
           (let* ((indent (current-indentation))
@@ -1182,6 +1186,7 @@ giving the bounds of the current and parent list items."
             (setq bounds (markdown--append-list-item-bounds
                           marker indent cur-bounds bounds))
           (when (and (<= start (point)) (<= (point) end))
+            (setq prev-list-line (line-number-at-pos first))
             (put-text-property first last 'markdown-list-item bounds)))))
         (end-of-line)))))
 
@@ -1663,7 +1668,7 @@ region of a YAML metadata block as propertized by
                                     markdown--syntax-properties)
             (put-text-property comment-begin comment-end
                                'markdown-comment (list comment-begin comment-end))
-            (goto-char (min (1+ comment-end) end (point-max)))))
+            (goto-char (min comment-end end (point-max)))))
          ;; Nothing found
          (t (setq finish t)))))
     nil))
@@ -2136,7 +2141,7 @@ Depending on your font, some reasonable choices are:
 
 (defconst markdown-footnote-chars
   "[[:alnum:]-]"
-  "Regular expression matching any character that is allowed in a footnote identifier.")
+  "Regular expression matching any character for a footnote identifier.")
 
 (defconst markdown-regex-footnote-definition
   (concat "^ \\{0,3\\}\\[\\(\\^" markdown-footnote-chars "*?\\)\\]:\\(?:[ \t]+\\|$\\)")
@@ -2150,7 +2155,10 @@ Depending on your font, some reasonable choices are:
 Used for `flyspell-generic-check-word-predicate'."
   (save-excursion
     (goto-char (1- (point)))
-    (if (or (markdown-code-block-at-point-p)
+    ;; https://github.com/jrblevin/markdown-mode/issues/560
+    ;; enable spell check YAML meta data
+    (if (or (and (markdown-code-block-at-point-p)
+                 (not (markdown-text-property-at-point 'markdown-yaml-metadata-section)))
             (markdown-inline-code-at-point-p)
             (markdown-in-comment-p)
             (markdown--face-p (point) '(markdown-reference-face
@@ -4294,6 +4302,11 @@ opening code fence and an info string."
   :safe #'natnump
   :package-version '(markdown-mode . "2.3"))
 
+(defcustom markdown-code-block-braces nil
+  "When non-nil, automatically insert braces for GFM code blocks."
+  :group 'markdown
+  :type 'boolean)
+
 (defun markdown-insert-gfm-code-block (&optional lang edit)
   "Insert GFM code block for language LANG.
 If LANG is nil, the language will be queried from user.  If a
@@ -4314,45 +4327,49 @@ code block in an indirect buffer after insertion."
              (quit "")))
          current-prefix-arg))
   (unless (string= lang "") (markdown-gfm-add-used-language lang))
-  (when (> (length lang) 0)
+  (when (and (> (length lang) 0)
+             (not markdown-code-block-braces))
     (setq lang (concat (make-string markdown-spaces-after-code-fence ?\s)
                        lang)))
-  (if (use-region-p)
-      (let* ((b (region-beginning)) (e (region-end)) end
-             (indent (progn (goto-char b) (current-indentation))))
-        (goto-char e)
-        ;; if we're on a blank line, don't newline, otherwise the ```
-        ;; should go on its own line
-        (unless (looking-back "\n" nil)
-          (newline))
+  (let ((gfm-open-brace (if markdown-code-block-braces "{" ""))
+        (gfm-close-brace (if markdown-code-block-braces "}" "")))
+    (if (use-region-p)
+        (let* ((b (region-beginning)) (e (region-end)) end
+               (indent (progn (goto-char b) (current-indentation))))
+          (goto-char e)
+          ;; if we're on a blank line, don't newline, otherwise the ```
+          ;; should go on its own line
+          (unless (looking-back "\n" nil)
+            (newline))
+          (indent-to indent)
+          (insert "```")
+          (markdown-ensure-blank-line-after)
+          (setq end (point))
+          (goto-char b)
+          ;; if we're on a blank line, insert the quotes here, otherwise
+          ;; add a new line first
+          (unless (looking-at-p "\n")
+            (newline)
+            (forward-line -1))
+          (markdown-ensure-blank-line-before)
+          (indent-to indent)
+          (insert "```" gfm-open-brace lang gfm-close-brace)
+          (markdown-syntax-propertize-fenced-block-constructs (point-at-bol) end))
+      (let ((indent (current-indentation))
+            start-bol)
+        (delete-horizontal-space :backward-only)
+        (markdown-ensure-blank-line-before)
+        (indent-to indent)
+        (setq start-bol (point-at-bol))
+        (insert "```" gfm-open-brace lang gfm-close-brace "\n")
+        (indent-to indent)
+        (unless edit (insert ?\n))
         (indent-to indent)
         (insert "```")
         (markdown-ensure-blank-line-after)
-        (setq end (point))
-        (goto-char b)
-        ;; if we're on a blank line, insert the quotes here, otherwise
-        ;; add a new line first
-        (unless (looking-at-p "\n")
-          (newline)
-          (forward-line -1))
-        (markdown-ensure-blank-line-before)
-        (indent-to indent)
-        (insert "```" lang)
-        (markdown-syntax-propertize-fenced-block-constructs (point-at-bol) end))
-    (let ((indent (current-indentation)) start-bol)
-      (delete-horizontal-space :backward-only)
-      (markdown-ensure-blank-line-before)
-      (indent-to indent)
-      (setq start-bol (point-at-bol))
-      (insert "```" lang "\n")
-      (indent-to indent)
-      (unless edit (insert ?\n))
-      (indent-to indent)
-      (insert "```")
-      (markdown-ensure-blank-line-after)
-      (markdown-syntax-propertize-fenced-block-constructs start-bol (point)))
-    (end-of-line 0)
-    (when edit (markdown-edit-code-block))))
+        (markdown-syntax-propertize-fenced-block-constructs start-bol (point)))
+      (end-of-line 0)
+      (when edit (markdown-edit-code-block)))))
 
 (defun markdown-code-block-lang (&optional pos-prop)
   "Return the language name for a GFM or tilde fenced code block.
@@ -5526,52 +5543,61 @@ See also `markdown-mode-map'.")
   "Create and return a nested imenu index alist for the current buffer.
 See `imenu-create-index-function' and `imenu--index-alist' for details."
   (let* ((root '(nil . nil))
-         cur-alist
-         (cur-level 0)
-         (empty-heading "-")
-         (self-heading ".")
-         hashes pos level heading)
+         (min-level 9999)
+         hashes headers)
     (save-excursion
       ;; Headings
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-header (point-max) t)
-        (unless (markdown-code-block-at-point-p)
+        (unless (or (markdown-code-block-at-point-p)
+                    (and (match-beginning 3)
+                         (get-text-property (match-beginning 3) 'markdown-yaml-metadata-end)))
           (cond
            ((match-string-no-properties 2) ;; level 1 setext
-            (setq heading (match-string-no-properties 1))
-            (setq pos (match-beginning 1)
-                  level 1))
+            (setq min-level 1)
+            (push (list :heading (match-string-no-properties 1)
+                        :point (match-beginning 1)
+                        :level 1) headers))
            ((match-string-no-properties 3) ;; level 2 setext
-            (setq heading (match-string-no-properties 1))
-            (setq pos (match-beginning 1)
-                  level 2))
+            (setq min-level (min min-level 2))
+            (push (list :heading (match-string-no-properties 1)
+                        :point (match-beginning 1)
+                        :level (- 2 (1- min-level))) headers))
            ((setq hashes (markdown-trim-whitespace
                           (match-string-no-properties 4)))
-            (setq heading (match-string-no-properties 5)
-                  pos (match-beginning 4)
-                  level (length hashes))))
-          (let ((alist (list (cons heading pos))))
-            (cond
-             ((= cur-level level)       ; new sibling
-              (setcdr cur-alist alist)
-              (setq cur-alist alist))
-             ((< cur-level level)       ; first child
-              (dotimes (_ (- level cur-level 1))
-                (setq alist (list (cons empty-heading alist))))
-              (if cur-alist
-                  (let* ((parent (car cur-alist))
-                         (self-pos (cdr parent)))
-                    (setcdr parent (cons (cons self-heading self-pos) alist)))
-                (setcdr root alist))    ; primogenitor
-              (setq cur-alist alist)
-              (setq cur-level level))
-             (t                         ; new sibling of an ancestor
-              (let ((sibling-alist (last (cdr root))))
-                (dotimes (_ (1- level))
-                  (setq sibling-alist (last (cdar sibling-alist))))
-                (setcdr sibling-alist alist)
-                (setq cur-alist alist))
-              (setq cur-level level))))))
+            (setq min-level (min min-level (length hashes)))
+            (push (list :heading (match-string-no-properties 5)
+                        :point (match-beginning 4)
+                        :level (- (length hashes) (1- min-level))) headers)))))
+      (cl-loop with cur-level = 0
+               with cur-alist = nil
+               with empty-heading = "-"
+               with self-heading = "."
+               for header in (reverse headers)
+               for level = (plist-get header :level)
+               do
+               (let ((alist (list (cons (plist-get header :heading) (plist-get header :point)))))
+                 (cond
+                  ((= cur-level level)  ; new sibling
+                   (setcdr cur-alist alist)
+                   (setq cur-alist alist))
+                  ((< cur-level level)  ; first child
+                   (dotimes (_ (- level cur-level 1))
+                     (setq alist (list (cons empty-heading alist))))
+                   (if cur-alist
+                       (let* ((parent (car cur-alist))
+                              (self-pos (cdr parent)))
+                         (setcdr parent (cons (cons self-heading self-pos) alist)))
+                     (setcdr root alist)) ; primogenitor
+                   (setq cur-alist alist)
+                   (setq cur-level level))
+                  (t                    ; new sibling of an ancestor
+                   (let ((sibling-alist (last (cdr root))))
+                     (dotimes (_ (1- level))
+                       (setq sibling-alist (last (cdar sibling-alist))))
+                     (setcdr sibling-alist alist)
+                     (setq cur-alist alist))
+                   (setq cur-level level)))))
       ;; Footnotes
       (let ((fn (markdown-get-defined-footnotes)))
         (if (or (zerop (length fn))
@@ -8391,13 +8417,14 @@ or \\[markdown-toggle-inline-images]."
       (widen)
       (goto-char (point-min))
       (while (re-search-forward markdown-regex-link-inline nil t)
-        (let ((start (match-beginning 0))
+        (let* ((start (match-beginning 0))
               (imagep (match-beginning 1))
               (end (match-end 0))
-              (file (match-string-no-properties 6)))
+              (file (match-string-no-properties 6))
+              (unhex_file (url-unhex-string file)))
           (when (and imagep
                      (not (zerop (length file))))
-            (unless (file-exists-p file)
+            (unless (file-exists-p unhex_file)
               (let* ((download-file (funcall markdown-translate-filename-function file))
                      (valid-url (ignore-errors
                                   (member (downcase (url-type (url-generic-parse-url download-file)))
@@ -8407,18 +8434,22 @@ or \\[markdown-toggle-inline-images]."
                   (when (not valid-url)
                     ;; strip query parameter
                     (setq file (replace-regexp-in-string "?.+\\'" "" file))))))
-            (when (file-exists-p file)
-              (let* ((abspath (if (file-name-absolute-p file)
-                                  file
-                                (concat default-directory file)))
+            (when (file-exists-p unhex_file)
+              (let* ((abspath (if (file-name-absolute-p unhex_file)
+                                  unhex_file
+                                (concat default-directory unhex_file)))
                      (image
-                      (if (and markdown-max-image-size
+                      (cond ((and markdown-max-image-size
                                (image-type-available-p 'imagemagick))
-                          (create-image
-                           abspath 'imagemagick nil
-                           :max-width (car markdown-max-image-size)
-                           :max-height (cdr markdown-max-image-size))
-                        (create-image abspath))))
+                             (create-image
+                              abspath 'imagemagick nil
+                              :max-width (car markdown-max-image-size)
+                              :max-height (cdr markdown-max-image-size)))
+                            (markdown-max-image-size
+                             (create-image abspath nil nil
+                                           :max-width (car markdown-max-image-size)
+                                           :max-height (cdr markdown-max-image-size)))
+                            (t (create-image abspath)))))
                 (when image
                   (let ((ov (make-overlay start end)))
                     (overlay-put ov 'display image)
@@ -8575,11 +8606,19 @@ position."
 (defvar edit-indirect-guess-mode-function)
 (defvar edit-indirect-after-commit-functions)
 
-(defun markdown--edit-indirect-after-commit-function (_beg end)
-  "Ensure trailing newlines at the END of code blocks."
+(defun markdown--edit-indirect-after-commit-function (beg end)
+  "Corrective logic run on code block content from lines BEG to END.
+Restores code block indentation from BEG to END, and ensures trailing newlines
+at the END of code blocks."
+  ;; ensure trailing newlines
   (goto-char end)
   (unless (eq (char-before) ?\n)
-    (insert "\n")))
+    (insert "\n"))
+  ;; restore code block indentation
+  (goto-char (- beg 1))
+  (let ((block-indentation (current-indentation)))
+    (when (> block-indentation 0)
+      (indent-rigidly beg end block-indentation))))
 
 (defun markdown-edit-code-block ()
   "Edit Markdown code block in an indirect buffer."
@@ -8590,13 +8629,17 @@ position."
                (begin (and bounds (goto-char (nth 0 bounds)) (point-at-bol 2)))
                (end (and bounds (goto-char (nth 1 bounds)) (point-at-bol 1))))
           (if (and begin end)
-              (let* ((lang (markdown-code-block-lang))
+              (let* ((indentation (and (goto-char (nth 0 bounds)) (current-indentation)))
+                     (lang (markdown-code-block-lang))
                      (mode (or (and lang (markdown-get-lang-mode lang))
                                markdown-edit-code-block-default-mode))
                      (edit-indirect-guess-mode-function
                       (lambda (_parent-buffer _beg _end)
-                        (funcall mode))))
-                (edit-indirect-region begin end 'display-buffer))
+                        (funcall mode)))
+                     (indirect-buf (edit-indirect-region begin end 'display-buffer)))
+                (when (> indentation 0) ;; un-indent in edit-indirect buffer
+                  (with-current-buffer indirect-buf
+                    (indent-rigidly (point-min) (point-max) (- indentation)))))
             (user-error "Not inside a GFM or tilde fenced code block")))
       (when (y-or-n-p "Package edit-indirect needed to edit code blocks. Install it now? ")
         (progn (package-refresh-contents)
