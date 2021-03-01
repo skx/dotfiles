@@ -750,11 +750,11 @@ The following configuration enables the contents of a block named `skx-startbloc
 ```lisp
 (defvar skx-org-eval-safe-list
     (list
-        (concat (getenv "HOME") "/Repos/git.steve.fi/")
-        (concat (getenv "HOME") "/Repos/git.steve.org.uk/")
-        (concat (getenv "HOME") "/Org")
-        (concat (getenv "HOME") "/WorkLogs"))
-"A list of patterns which will have their contents evaluated with no prompting.")
+        (expand-file-name "~/Repos/git.steve.fi/")
+        (expand-file-name "~/Repos/git.steve.org.uk/")
+        (expand-file-name "~/Org")
+        (expand-file-name "~/WorkLogs"))
+"A list of directories beneath which org-files can be evaluated with no prompting.")
 
 (defun regexp-match-list(regexp list)
   "Return nil unless the regexp matches at least one of the list items."
