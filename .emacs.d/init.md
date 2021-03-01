@@ -88,21 +88,42 @@ either the current expression, or the current selection:
 We'll bind this to a key, later.
 
 
+## Basic History
+
+I like to keep history of various tools beneath a transient directory, which I can remove whenever I like, rather than scattered around the filesystem.
+
+First of all we define a helper to make a directory, if it is missing:
+
+```lisp
+(defun mkdir-if-missing (path)
+  (if (not (file-exists-p (expand-file-name path)))
+    (make-directory (expand-file-name path t))))
+```
+
+Now we can configure the history:
+
+```lisp
+;; Ensure we have ~/.trash.d which is the directory I use for transient things
+;; As well as a subdirectory for emacs.
+(mapcar (lambda (directory)
+          (mkdir-if-missing directory))
+          '("~/.trash.d/" "~/.trash.d/emacs.history/"))
+
+;; Save our history into this new directory
+(setq savehist-file
+  (format "%s/emacs.history.%s"
+    (expand-file-name "~/.trash.d/emacs.history")
+    (getenv "USER")))
+
+;; Enable history saving.
+(savehist-mode 1)
+```
+
 ## Backup Files
 
 I'm annoyed by backups and similar.  So I disable them all:
 
 ```lisp
-    ;; create a directory to hold history
-    (if (not (file-exists-p (expand-file-name "~/.trash.d/")))
-        (make-directory (expand-file-name "~/.trash.d/" t)))
-
-    (if (not (file-exists-p (expand-file-name "~/.trash.d/emacs.history/")))
-        (make-directory (expand-file-name "~/.trash.d/emacs.history/" t)))
-
-    ;; Save our history there
-    (setq savehist-file (concat (expand-file-name "~/.trash.d/emacs.history/") "emacs." (getenv "USER")))
-    (savehist-mode 1)
 
     ;; Disable backups
     (setq backup-inhibited t)
