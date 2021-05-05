@@ -11,23 +11,10 @@ fi
 
 
 #
-# If we have .DOTFILES configured
-#
-# AND
-#
-# If we have a git completion handler
-# then use it.
-#
-if ( type .DOTFILES >/dev/null 2>/dev/null ); then
-    if ( type _git 2>/dev/null >/dev/null ); then
-       complete -o default -o nospace -F _git  .DOTFILES
-   fi
-fi
-
-#
 # Move up
 #
 alias ..='cd ..'
+
 
 #
 #  Make passwords a little nicer:
@@ -50,15 +37,6 @@ fi
 #
 alias xine-shuffle='play "xine -g --no-logo --no-splash --loop=shuffle+"'
 alias totem-shuffle='play totem'
-
-#
-#  Calendar
-#
-if [ -x /usr/bin/when ]; then
-    alias upcoming='when cw'
-    alias birthdays='when  --past=0 --future=365 | grep Birthday'
-fi
-
 
 #
 # Prefer our emacs-wrapper to native emacs
