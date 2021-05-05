@@ -441,6 +441,19 @@ I'm having fun doing "retro" things with a [Z80 processor](https://en.wikipedia.
 ```lisp
     (require `z80-mode)
     (add-to-list 'auto-mode-alist (cons "\\.z80\\'" 'z80-mode))
+
+(add-hook 'z80-mode-hook (lambda ()
+       (set (make-local-variable 'comment-start) "//")
+       (set (make-local-variable 'comment-end) "")
+       (set (make-local-variable 'hs-block-start-regexp) "^; ?{")
+       (set (make-local-variable 'hs-block-end-regexp) "^; ?}")
+       (hs-minor-mode t)
+       (set 'hs-block-start-regexp "^; ?{{")
+       (set 'hs-block-end-regexp "^; ?}}")
+       (local-set-key (kbd "M-C-i") 'hs-toggle-hiding)
+       (local-set-key (kbd "M--") 'hs-hide-all)
+       (local-set-key (kbd "M-+") 'hs-show-all)))
+
 ```
 
 ### Language Modes - Web Mode
