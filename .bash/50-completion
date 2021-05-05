@@ -1,31 +1,9 @@
-
-
+# No completion?  Then ignore this file
 [ -e /etc/bash_completion ] || return
 
 
-_fab()
-{
-    local cur
-    COMPREPLY=()
-    # Variable to hold the current word
-    cur="${COMP_WORDS[COMP_CWORD]}"
-
-    # Build a list of the available tasks using the command 'fab -l'
-    local tags=$(fab -l 2>/dev/null | grep "^ " | awk '{print $1;}')
-
-    # Generate possible matches and store them in the
-    # array variable COMPREPLY
-    COMPREPLY=($(compgen -W "${tags}" $cur))
-}
-
-# Assign the auto-completion function _fab for our command fab.
-complete -F _fab fab
-
-
-#
 # If we can load git-completion things then apply that to the
 # `.DOTFILES` alias too.
-#
 if [ -e  /usr/share/bash-completion/completions/gitk ]; then
     .  /usr/share/bash-completion/completions/gitk
     if ( declare -f -F __git_complete >/dev/null ) ; then
@@ -46,15 +24,20 @@ fi
 #
 #    https://github.com/skx/sysbox
 #
-# rss2email is a simple utility for polling RSS feeds and
-# generating emails:
+# rss2email is a simple utility for polling RSS feeds and generating emails:
 #
 #    https://github.com/skx/rss2email
 #
-# Both have support for bash-completion
+# evalfilter is a bytecode-based embeddable scripting language, a toy
+# project I enjoy working with:
 #
-
+#    https://github.com/skx/evalfilter
+#
+# Each of these tools have support for completion, via a common cli-handler.
+#
 for cmd in evalfilter rss2email sysbox ; do
+
+    # If installed, add the completion
     if ( which ${cmd} >/dev/null 2>/dev/null ) ; then
         source <(${cmd} bash-completion)
     fi
