@@ -832,6 +832,50 @@ To use these facilities define blocks like so in your org-mode files:
 By default `org-mode` will prompt you to confirm that you want execution to happen, but we use `safe-skx-org-eval-startblock` to enable whitelisting particular file-patterns - if there is a match there will be no need to answer `y` to the prompt.
 
 
+### Org-Mode table navigation
+
+There are no built-in functions for jumping around tables, so these two functions add the ability to go to the next/previous ones:
+
+```lisp
+(defun org-next-table (&optional arg)
+  "Jump to the next table.
+
+With a prefix argument ARG, jump forward ARG many tables."
+  (interactive "p")
+  (dotimes (n arg)
+    (let ((pt (point)))
+      (when (org-at-table-p)
+        (goto-char (org-table-end)))
+      (if (re-search-forward org-table-line-regexp nil t)
+          (when (org-invisible-p)
+            (org-reveal t)
+            (org-show-entry)
+            (unless (org-at-table-p)
+              (org-next-table 1)))
+        (goto-char pt)))))
+
+(defun org-previous-table (&optional arg)
+  "Jump to the previous table.
+
+With a prefix argument ARG, jump backward ARG many tables."
+  (interactive "p")
+  (dotimes (n arg)
+    (let ((pt (point)))
+      (when (org-at-table-p)
+        (goto-char (org-table-begin)))
+      (if (re-search-backward org-table-line-regexp nil t)
+          (progn
+            (when (org-invisible-p)
+              (org-reveal t)
+              (org-show-entry)
+              (unless (org-at-table-p)
+                (org-previous-table 1)))
+            (goto-char (1+ (org-table-begin))))
+        (goto-char pt)))))
+
+```
+
+
 ### Org-Mode and Table Links
 
 If you press `RET` on a link inside a table it doesn't work as expected.
