@@ -130,26 +130,6 @@ function play
 
 }
 
-function pwsafe
-{
-    if [ -x /usr/bin/pwsafe ]; then
-        found=0
-
-        for i in Repos/personal/pwsafe; do
-            if [ -e ~/${i}/pwsafe.dat ]; then
-                /usr/bin/pwsafe --file=$HOME/${i}/pwsafe.dat $*
-                found=1
-            fi
-        done
-
-        if [ "$found" == "0" ]; then
-            echo "GIT copy of password database not present."
-        fi
-    else
-        echo "pwsafe doesn't appear to be installed."
-    fi
-}
-
 
 # cd back up to the top-level git/hg repo dir
 # thanks Dan!

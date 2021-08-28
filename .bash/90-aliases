@@ -17,15 +17,6 @@ alias ..='cd ..'
 
 
 #
-#  Make passwords a little nicer:
-#     13 characters long
-#     10 generated each time
-#     -B Avoid ambigious characters
-#     -y Include symbols
-#
-[ -x /usr/bin/pwgen ] && alias pwgen='pwgen -B -y 13 10'
-
-#
 #  For Xine
 #
 if [ -x /usr/bin/xine ]; then
