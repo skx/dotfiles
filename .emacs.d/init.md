@@ -649,6 +649,15 @@ When following links `C-RETURN` moves back:
   (local-set-key (kbd "<C-return>") 'org-mark-ring-goto)))
 ```
 
+On the topic of links, sometimes org-mode things that things are links
+which are not, and kills exporting.  We want to ignore that behaviour:
+
+```lisp
+;; I just want an export.
+;; If I wanted a link check, I'd ask for one.
+(setq org-export-with-broken-links t)
+```
+
 `org-mode` is __all__ about lists!  So one thing that is nice is to visually update the display of the list-prefixes, via unicode characters.  We'll use `org-bullets` for that:
 
 ```lisp
@@ -943,9 +952,8 @@ One way that I like to use it is to rename buffers according to their title:
 
 ```lisp
 (defun skx/org-mode-rename-buffer ()
-  (when (eq major-mode 'org-mode)
-     (if (skx/org-global-prop "TITLE")
-       (rename-buffer (skx/org-global-prop "TITLE")))))
+  (if (skx/org-global-prop "TITLE")
+    (rename-buffer (skx/org-global-prop "TITLE"))))
 
 (add-hook 'org-mode-hook  'skx/org-mode-rename-buffer)
 ```
@@ -1597,3 +1605,5 @@ Usage via:
   * See also
     * https://github.com/Atman50/emacs-config/blob/master/README.org#i-use-ctrl-z-for-personal-bindings
 * https://github.com/integral-dw/org-superstar-mode
+* A massive `.emacs` file with good commentary:
+  * https://svn.red-bean.com/repos/kfogel/trunk/.emacs
