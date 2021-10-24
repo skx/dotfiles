@@ -1357,8 +1357,21 @@ the cursor:
     (add-hook 'post-command-hook 'hcz-set-cursor-color-according-to-mode)
 ```
 
-The following section takes care of setting up other user-interface things
-the way that I prefer them.
+Lisp famously uses a lot of parenthesis, but so does Python, Perl,
+and many other languages.  The following section highlights expressions
+inside parenthesis in a cute way:
+
+```lisp
+    (setq show-paren-style 'expression)
+    (setq show-paren-when-point-in-periphery t)
+    (setq show-paren-when-point-inside-paren t)
+    (after-init-hook . show-paren-mode)
+    (setq  show-paren-ring-bell-on-mismatch t)
+    (show-paren-mode t)
+```
+
+The following section takes care of setting up other basic and
+global things the way that I prefer them.
 
 ```lisp
     ;; Show the time on the status bar.
@@ -1375,9 +1388,6 @@ the way that I prefer them.
 
     ;; Show column-numbers too
     (column-number-mode)
-
-    ;; Show matching brackets easily.
-    (show-paren-mode t)
 
     ;; Avoid the annoying startup message.
     (setq inhibit-startup-message t)
