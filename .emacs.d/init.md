@@ -632,7 +632,6 @@ As noted above it is possible to evaluated blocks of script from within `org-mod
               (org-babel-do-load-languages 'org-babel-load-languages '((shell . t))))
 ```
 
-
 We'll enable line-wrapping and spell-checking when we enter org-mode:
 
 ```lisp
@@ -640,6 +639,13 @@ We'll enable line-wrapping and spell-checking when we enter org-mode:
     (lambda()
         (flyspell-mode)
         (toggle-truncate-lines)))
+```
+
+We'll also improve the default list-management functionality:
+
+```lisp
+(with-feature (org-autolist)
+   (add-hook 'org-mode-hook (lambda () (org-autolist-mode))))
 ```
 
 When following links `C-RETURN` moves back:
