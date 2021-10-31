@@ -970,7 +970,7 @@ Must be used in conjunction with web-mode-enable-block-face."
     ("ctemplate"        . "\\.\\(chtml\\|mustache\\)\\'")
     ("django"           . "\\.\\(djhtml\\|tmpl\\|dtl\\|liquid\\|j2\\|njk\\)\\'")
     ("dust"             . "\\.dust\\'")
-    ("elixir"           . "\\.l?eex\\'")
+    ("elixir"           . "\\.[hl]?eex\\'")
     ("ejs"              . "\\.ejs\\'")
     ("erb"              . "\\.\\(erb\\|rhtml\\|erb\\.html\\)\\'")
     ("expressionengine" . "\\.ee\\'")
@@ -1421,7 +1421,7 @@ shouldn't be moved back.)")
   (regexp-opt
    (append
     (cdr (assoc "elixir" web-mode-extra-keywords))
-    '("do" "end" "case" "bc" "lc" "for" "if" "cond" "with" "unless" "try" "receive" "fn" "defmodule" "defprotocol" "defimpl" "defrecord" "defrecordp" "defstruct" "defdelegate" "defcallback" "defexception" "defoverridable" "defguard" "defgaurdp" "exit" "after" "rescue" "catch" "else" "raise" "throw" "quote" "unquote" "super" "when" "and" "or" "not" "in"))))
+    '("after" "and" "bc" "case" "catch" "cond" "defcallback" "defdelegate" "defexception" "defgaurdp" "defguard" "defimpl" "defmodule" "defoverridable" "defprotocol" "defrecord" "defrecordp" "defstruct" "do" "else" "end" "exit" "fn" "for" "form_for" "if" "in" "lc" "not" "or" "quote" "raise" "receive" "rescue" "super" "throw" "try" "unless" "unquote" "when" "with"))))
 
 
 (defvar web-mode-elixir-constants
@@ -2350,7 +2350,7 @@ shouldn't be moved back.)")
 (defvar web-mode-php-font-lock-keywords
   (list
    (cons (concat "\\_<\\(" web-mode-php-keywords "\\)\\_>") '(0 'web-mode-keyword-face))
-   (cons (concat "(\\_<\\(" web-mode-php-types "\\)\\_>") '(1 'web-mode-type-face))
+   (cons (concat "\\_<\\(" web-mode-php-types "\\)\\_>") '(1 'web-mode-type-face))
    (cons (concat "\\_<\\(" web-mode-php-constants "\\)\\_>") '(0 'web-mode-constant-face))
    '("function[ ]+\\([[:alnum:]_]+\\)" 1 'web-mode-function-name-face)
    '("\\_<\\([[:alnum:]_]+\\)[ ]?(" 1 'web-mode-function-call-face)
@@ -5516,7 +5516,7 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
               val-beg nil)
         )
 
-       ((and (= state 6) (member char '(?\s ?\n ?\/)))
+       ((and (= state 6) (member char '(?\s ?\n))) ;#1150
         (setq attrs (+ attrs (web-mode-attr-scan state char name-beg name-end val-beg attr-flags equal-offset)))
         (setq state 1
               attr-flags 0
@@ -5633,9 +5633,17 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
       (if (null val-beg)
           (setq val-end name-end)
         (setq val-end (point))
-        (when (or (null char) (member char '(?\s ?\n ?\> ?\/)))
-          (setq val-end (1- val-end))
+        (cond
+         ((null char)
+          (setq val-end (1- val-end)))
+         ((member char '(?\s ?\n ?\/))
+          (setq val-end (1- val-end)))
+         ((eq char ?\>)
+          (if (logior flags 8)
+              (setq val-end (- val-end 2))
+            (setq val-end (- val-end 1)))
           )
+         )
         ) ;if
       (put-text-property name-beg (1+ name-beg) 'tag-attr-beg flags)
       (put-text-property name-beg (1+ val-end) 'tag-attr t)
@@ -8750,6 +8758,8 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
                    (string-match-p "^[&|?:+-]" curr-line))
                (not (and (string= language "php")
                          (string-match-p "^->" curr-line)))
+               (not (and (string= language "php")
+                         (string-match-p "^?[a-zA-z]*" curr-line)))
                (not (and (string= language "php")
                          (string-match-p "\\(else[ ]?:\\|if[ ]?([^)]*)[ ]?:\\)" prev-line)))
                (not (string-match-p "^\\(++\\|--\\)" curr-line))

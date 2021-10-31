@@ -32,6 +32,7 @@
 
 (require 'calc)
 (require 'cl-lib)
+(require 'ob)
 (require 'org-element)
 (require 'rx)
 (require 's)
@@ -39,7 +40,6 @@
 (require 'thingatpt)
 
 ;; TODO semantic highlighting
-;; TODO org-babel-execute
 ;; TODO org export
 
 (defgroup literate-calc-mode nil
@@ -54,6 +54,15 @@ If any of these functions returns non-nil, overlays will not be displayed."
   :group 'literate-calc-mode
   :type 'hook)
 
+(defcustom literate-calc-mode-idle-time 1
+  "How long to wait after typing to recalculate results.
+
+A larger value can prevent lagginess in larger buffers by only
+recalculating once the buffer contents have settled."
+  :group 'literate-calc-mode
+  :type '(choice integer
+                 float))
+
 (defun literate-calc-mode-inhibit-in-src-blocks ()
   "Return non-nil if point is in a source block."
   (and (derived-mode-p #'org-mode)
@@ -62,6 +71,7 @@ If any of these functions returns non-nil, overlays will not be displayed."
 
 (defvar-local literate-calc-minor-mode nil)
 (defvar-local literate-calc--scope (list))
+(defvar-local literate-calc--idle-timer nil)
 
 (defconst literate-calc--expression
   (rx string-start
@@ -76,7 +86,7 @@ If any of these functions returns non-nil, overlays will not be displayed."
   (rx " => "
       (opt (+ (any alphanumeric blank "-_")) ": ")
       (opt "-")
-      (+ (any digit blank "._[,]"))
+      (+? anything)
       line-end))
 
 (defmacro literate-calc--without-hooks (&rest body)
@@ -89,6 +99,11 @@ If any of these functions returns non-nil, overlays will not be displayed."
      ,@body
      (when hooks-active
        (literate-calc--setup-hooks))))
+
+(defun literate-calc--eval (value)
+  "Wrapper around `(calc-eval VALUE)' with extra args."
+  (calc-eval `(,value
+               calc-group-digits t)))
 
 (defun literate-calc--format-result (name result)
   "Return the output format for RESULT with the optional NAME.
@@ -139,14 +154,19 @@ Returns a list of (NAME RESULT) if the result is bound to a name."
                                             (s-replace k (format "(%s)" v) s)))
                                         variable-scope
                                         :initial-value var-value))
-             (var-result (if (string-empty-p resolved-value)
-                             "0"
-                           (format "%s" (calc-eval resolved-value)))))
+             (pretty-result (if (string-empty-p resolved-value)
+                                "0"
+                              (format "%s" (literate-calc--eval resolved-value)))))
         (if insert
-            (literate-calc--insert-result var-name var-result)
-            (literate-calc--create-overlay var-name var-result))
+            (literate-calc--insert-result var-name pretty-result)
+          (literate-calc--create-overlay var-name pretty-result))
         (unless (string-empty-p var-name)
-          (list var-name var-result))))))
+          ;; Re-calculate without visual fluff such as digit grouping,
+          ;; so that we can continue using the value without
+          ;; formatting-related errors.
+          (list var-name (if (string-empty-p resolved-value)
+                             "0"
+                           (format "%s" (calc-eval resolved-value)))))))))
 
 ;;;###autoload
 (defun literate-calc-clear-overlays ()
@@ -186,22 +206,25 @@ shadowing."
       (literate-calc--add-binding binding))))
 
 ;;;###autoload
-(defun literate-calc-eval-buffer ()
-  "Evaluate all calc expressions in the current buffer in order."
+(cl-defun literate-calc-eval-buffer (&optional (buffer (current-buffer)))
+  "Evaluate all calc expressions in the current buffer in order.
+
+If BUFFER is set, run in it, otherwise in `current-buffer'."
   (interactive)
-  (literate-calc-clear-overlays)
-  (unless (string-empty-p (buffer-string))
-    (save-excursion
-      (goto-char (point-min))
-      (let ((buffer-line-count (count-lines (point-min) (point-max)))
-            (line-number 1))
-        (while (<= line-number buffer-line-count)
-          (unless (run-hook-with-args-until-success 'literate-calc-mode-inhibit-line-functions)
-            (let ((binding (literate-calc--process-line (thing-at-point 'line)
-                                                        literate-calc--scope)))
-              (literate-calc--add-binding binding)))
-          (setq line-number (1+ line-number))
-          (forward-line 1))))))
+  (with-current-buffer buffer
+    (literate-calc-clear-overlays)
+    (unless (string-empty-p (buffer-string))
+      (save-excursion
+        (goto-char (point-min))
+        (let ((buffer-line-count (count-lines (point-min) (point-max)))
+              (line-number 1))
+          (while (<= line-number buffer-line-count)
+            (unless (run-hook-with-args-until-success 'literate-calc-mode-inhibit-line-functions)
+              (let ((binding (literate-calc--process-line (thing-at-point 'line)
+                                                          literate-calc--scope)))
+                (literate-calc--add-binding binding)))
+            (setq line-number (1+ line-number))
+            (forward-line 1)))))))
 
 ;;;###autoload
 (defun literate-calc-insert-results ()
@@ -255,28 +278,28 @@ shadowing."
            (replace-match "" nil nil))))
      (setq-local literate-calc--scope (list)))))
 
-(defun literate-calc--eval-buffer (beg _end pre-change-length)
-  "Re-eval the buffer on deletions or if we are near a calc line.
+(defun literate-calc--async-eval-buffer (_beg _end _pre-change-length)
+  "Schedule `literate-calc-eval-buffer' after some idle time.
 
-BEG, END, and PRE-CHANGE-LENGTH are what we get by this being a
-handler for `after-change-functions'."
-  (save-match-data
-    (when (or (not (equal 0 pre-change-length))
-              (overlays-in (line-beginning-position) (line-end-position))
-              (save-excursion
-                (goto-char beg)
-                (string-match-p literate-calc--expression
-                                (thing-at-point 'line))))
-      (literate-calc-eval-buffer))))
+The exact timeout is determined by `literate-calc-mode-idle-time'."
+  (when literate-calc--idle-timer
+    (cancel-timer literate-calc--idle-timer))
+  (setq literate-calc--idle-timer
+        (run-with-idle-timer literate-calc-mode-idle-time
+                             nil
+                             #'literate-calc-eval-buffer
+                             (current-buffer))))
 
 (defun literate-calc--setup-hooks ()
   "Set up after-edit hooks & run first evaluation."
-  (add-hook 'after-change-functions #'literate-calc--eval-buffer nil t)
+  (add-hook 'after-change-functions #'literate-calc--async-eval-buffer nil t)
   (literate-calc-eval-buffer))
 
 (defun literate-calc--exit ()
   "Clean up hooks & overlays."
-  (remove-hook 'after-change-functions #'literate-calc--eval-buffer t)
+  (when literate-calc--idle-timer
+    (cancel-timer literate-calc--idle-timer))
+  (remove-hook 'after-change-functions #'literate-calc--async-eval-buffer t)
   (literate-calc-clear-overlays))
 
 (defvar literate-calc-font-lock-defaults)
@@ -298,10 +321,48 @@ handler for `after-change-functions'."
 (define-minor-mode literate-calc-minor-mode
   "Evaluates calc expressions"
   :lighter "lit-calc"
-  (message "%s" literate-calc-minor-mode)
   (if literate-calc-minor-mode
       (literate-calc--setup-hooks)
     (literate-calc--exit)))
+
+(defun org-babel-expand-body:literate-calc (body
+                                            params
+                                            &optional
+                                            processed-params)
+  "Expand BODY according to PARAMS, return the expanded body."
+  (let ((vars (mapcar #'cdr
+	              (cl-remove-if-not (lambda (x) (eq (car x) :var))
+                                        processed-params))))
+    (concat
+     (mapconcat
+      (lambda (pair)
+        (format "%s = %s" (car pair) (cdr pair)))
+      vars "\n")
+     (when vars "\n")
+     body)))
+
+(defun org-babel-execute:literate-calc (body params)
+  "Execute a block of literate-calc code with org-babel.
+This function is called by `org-babel-execute-src-block'"
+  (let* ((processed-params (org-babel-process-params params))
+         (vars (alist-get :var processed-params))
+         (result-type (alist-get :result-type processed-params))
+         (full-body (org-babel-expand-body:literate-calc
+                     body params processed-params)))
+    (with-temp-buffer
+      (insert full-body)
+      (literate-calc-insert-results)
+      (if (equal 'output result-type)
+          ;; Return output.
+          (buffer-string)
+        ;; Return value.
+        (progn
+          (goto-char (point-max))
+          (when-let ((found (re-search-backward literate-calc--result
+                                                (point-min)
+                                                t)))
+            (buffer-substring-no-properties (+ found (length " => "))
+                                            (line-end-position))))))))
 
 (provide 'literate-calc-mode)
 
