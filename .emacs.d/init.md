@@ -1371,7 +1371,7 @@ inside parenthesis in a cute way:
     (setq show-paren-style 'expression)
     (setq show-paren-when-point-in-periphery t)
     (setq show-paren-when-point-inside-paren t)
-    (after-init-hook . show-paren-mode)
+;    (after-init-hook . show-paren-mode)
     (setq  show-paren-ring-bell-on-mismatch t)
     (show-paren-mode t)
 ```
