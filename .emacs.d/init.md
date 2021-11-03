@@ -733,9 +733,11 @@ Now we're done with the general setup so we'll handle the more specific things h
 (setq org-log-done t)
 
 ;; Setup TODO-workflow, and colouring.
-(setq org-todo-keywords '((sequence "TODO(!)" "INPROGRESS(!)" "|" "DONE(!)" "CANCELED(!)")))
+(setq org-todo-keywords '((sequence "TODO(!)" "INPROGRESS" "|" "DONE(!)" "CANCELED" "SPILLOVER")))
 (setq org-todo-keyword-faces '(
-    ("INPROGRESS" . (:foreground "blue" :weight bold))
+    ("TODO" . (:foreground "blue" :weight bold))
+    ("INPROGRESS" . (:foreground "purple" :weight bold))
+    ("SPILLOVER" . (:foreground "red" :weight bold))
     ("CANCELED"   . (:foreground "pink" :weight bold))))
 
 
