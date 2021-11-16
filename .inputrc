@@ -1,0 +1,11 @@
+#
+# Ignore case when completing things.
+#
+set completion-ignore-case on
+
+#
+# If the completion is ambiguous show all the options
+# after a single-press of the TAB-key, instead of forcing
+# a second press
+#
+set show-all-if-ambiguous on
