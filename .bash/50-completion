@@ -35,7 +35,7 @@ fi
 #
 # Each of these tools have support for completion, via a common cli-handler.
 #
-for cmd in evalfilter rss2email sysbox ; do
+for cmd in aws-utils evalfilter rss2email sysbox ; do
 
     # If installed, add the completion
     if ( which ${cmd} >/dev/null 2>/dev/null ) ; then
