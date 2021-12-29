@@ -182,11 +182,12 @@ If multiple buffers use the same filename we'll prefix with the parent directory
 
 ## Completion
 
-There are several packages out there providing "completion".  The most common are `ivy`, `helm`, and `ido`.  I'm using [selectrum](https://github.com/raxod502/selectrum), which is enabled here:
+There are several packages out there providing "completion".  The most common are `ivy`, `helm`, and `ido`.  I'm using the latter:
 
 ```lisp
-(require 'selectrum)
-(selectrum-mode +1)
+(ido-mode 1)
+(setq ido-enable-flex-matching t)
+(ido-everywhere)
 ```
 
 ## Custom Variables
@@ -1123,6 +1124,38 @@ Here we wrap all GPG_messages with "`#+BEGIN_EXAMPLE`" to format them neatly on 
 
 
 
+## Packages
+
+The following code disables TLS 1.3 to work around a known bug in GNU Emacs versions 26.1 and 26.2:
+
+```lisp
+(when (and (version< emacs-version "26.3") (>= libgnutls-version 30603))
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+```
+
+Now we can configure packages
+
+```lisp
+(require 'package)
+(setq package-enable-at-startup nil)
+
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+
+(package-initialize)
+```
+
+When we launch we need to configure the packages, if we've not done so:
+
+```lisp
+(setq custom-file "~/.emacs.d/custom.el")
+
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+```
+
 ## Spell-Checking
 
 I use `flyspell` as a spell-checker when editing text and org-mode files.  Sometimes it decides that words are errors, even when I know best.
@@ -1332,7 +1365,13 @@ The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so
 Once the basics have been setup the next step is to configure some colours:
 
 ```lisp
-(load-theme 'misterioso)
+(load-theme 'wombat)
+(set-face-background 'default "#111")
+(set-face-background 'cursor "#c96")
+(set-face-background 'isearch "#c60")
+(set-face-foreground 'isearch "#eee")
+(set-face-background 'lazy-highlight "#960")
+(set-face-foreground 'lazy-highlight "#ccc")
 ```
 
 Now we've tweaked the GUI we can setup the clipboard integration:
@@ -1382,8 +1421,8 @@ inside parenthesis in a cute way:
     (setq show-paren-style 'expression)
     (setq show-paren-when-point-in-periphery t)
     (setq show-paren-when-point-inside-paren t)
-;    (after-init-hook . show-paren-mode)
-    (setq  show-paren-ring-bell-on-mismatch t)
+    (setq show-paren-ring-bell-on-mismatch t)
+    (setq show-paren-delay 0)
     (show-paren-mode t)
 ```
 
@@ -1506,6 +1545,9 @@ collapse muliple newlines into one, across a region.
 ```lisp
     ;; We want to see trailing whitespace
     (setq-default show-trailing-whitespace t)
+
+    ;; Show non-existent lines with a special glyph in the left fringe:
+    (setq-default indicate-empty-lines t)
 
     ;; We want to remove trailing whitespace when a file is saved.
     (require 'whitespace)
