@@ -32,6 +32,7 @@ add_to_path /opt/node/bin
 add_to_path /opt/packer
 add_to_path /opt/pass
 add_to_path /opt/sysadmin-util
+add_to_path /opt/vpn
 add_to_path /usr/games
 add_to_path /usr/lib/ccache
 add_to_path /var/lib/gems/1.8/bin
