@@ -694,13 +694,13 @@ Now we're done with the general setup so we'll handle the more specific things h
 ;; a ~/.emacs.d/.org-id-locations file which is annoying.
 (setq org-id-track-globally nil)
 
-;; Populate the agenda from ~/Org + ~/WorkLogs/
+;; Populate the agenda from ~/Org + ~/Private/Worklog/
 (setq org-agenda-files (apply 'append
 	(mapcar
 		(lambda (directory)
 			(if (file-directory-p directory )
 			   (directory-files-recursively directory org-agenda-file-regexp)))
-			       '("~/Org" "~/WorkLogs"))))
+			       '("~/Org" "~/Private/Worklog"))))
 
 ;; Add a custom org-agenda command
 ;;
@@ -784,10 +784,8 @@ The following configuration enables the contents of a block named `skx-startbloc
 ```lisp
 (defvar skx-org-eval-safe-list
     (list
-        (expand-file-name "~/Repos/git.steve.fi/")
-        (expand-file-name "~/Repos/git.steve.org.uk/")
         (expand-file-name "~/Org")
-        (expand-file-name "~/WorkLogs"))
+        (expand-file-name "~/Private/"))
 "A list of directories beneath which org-files can be evaluated with no prompting.")
 
 (defun regexp-match-list(regexp list)
