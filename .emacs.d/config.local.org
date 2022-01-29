@@ -5,7 +5,7 @@
   (defun load-diary()
     "Load my diary/work-log, and scroll to today's entry."
     (interactive)
-    (find-file (expand-file-name "~/WorkLogs/enfuce/Diary.org"))
+    (find-file (expand-file-name "~/Private/Worklog/Diary.org"))
     (today)
     )
   (global-set-key (kbd "C-x w") 'load-diary)
