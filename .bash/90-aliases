@@ -44,8 +44,13 @@ alias git-source='git config --get remote.origin.url'
 alias git-top='cd $(git rev-parse --show-toplevel)'
 
 #
-#  Configure password manager
+# The password application lives beneath /opt/pass, which comes from
+# github:
 #
-if [ -d $HOME/Repos/git.steve.org.uk/skx/pass ]; then
-    export PASSWORD_STORE_DIR=$HOME/Repos/git.steve.org.uk/skx/pass
+#   https://github.com/skx/pass/
+#
+# The actual private/encrypted data comes from ~/Private/pass
+#
+if [ -d $HOME/Private/pass ]; then
+    export PASSWORD_STORE_DIR=$HOME/Private/pass
 fi
