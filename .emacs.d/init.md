@@ -863,6 +863,33 @@ To use these facilities define blocks like so in your org-mode files:
 By default `org-mode` will prompt you to confirm that you want execution to happen, but we use `safe-skx-org-eval-startblock` to enable whitelisting particular file-patterns - if there is a match there will be no need to answer `y` to the prompt.
 
 
+### Org-Mode tag cloud
+
+I put together a simple tag-cloud helper package, which we'll now load:
+
+```lisp
+(require 'org-tag-cloud)
+```
+
+To make it useful we'll ensure that we disable warnings about eval, and whenever we save an org-file we'll update the cloud (which is harmless if not present):
+
+```lisp
+; Allow eval-links
+(defun skx-org-mode-hook-eval-ok ()
+    (make-variable-buffer-local 'org-confirm-elisp-link-function)
+    (setq org-confirm-elisp-link-function nil))
+
+(add-hook 'org-mode-hook 'skx-org-mode-hook-eval-ok)
+
+; Update tag-cloud on-save
+(defun skx-org-tag-cloud-update-hook ()
+  (when (eq major-mode 'org-mode)
+    (org-tag-cloud-update)))
+
+(add-hook 'before-save-hook #'skx-org-tag-cloud-update-hook)
+```
+
+
 ### Org-Mode table navigation
 
 There are no built-in functions for jumping around tables, so these two functions add the ability to go to the next/previous ones:
