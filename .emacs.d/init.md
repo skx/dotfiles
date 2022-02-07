@@ -630,6 +630,12 @@ The next thing that is globally useful is to allow searches for internal links t
   (setq org-link-search-must-match-exact-headline nil)
 ```
 
+I put together the [org-nested](https://github.com/skx/org-nested) package to allow refining links easily.  Allowing links to be augmented by refinements.  This is now loaded:
+
+```lisp
+(require 'org-nested)
+```
+
 As noted above it is possible to evaluated blocks of script from within `org-mode`, but shell-scripting is disabled by default so we need to enable this explicitly:
 
 ```lisp
