@@ -1,0 +1,149 @@
+;; org-diary.el
+;;
+;; This is a derived mode of org-mode, which contains a couple of helpers
+;; for maintaining a simple diary.
+;;
+;; A diary is nothing more than an org-mode file which contains a list
+;; of date-based headers, for example:
+;;
+;;   * 01/01/2022
+;;   ** Meetings
+;;   ** TODO
+;;   * 02/01/2022
+;;   ** Meetings
+;;   ** TODO
+;;   * 03/01/2022
+;;   ** Meetings
+;;   ** TODO
+;;  * END
+;;
+;; The idea is that you might maintain a standard entry template, and you
+;; can add a new entry for each new-day.
+;;
+
+
+
+;; List of things we expand inside a new entry template.
+;;
+;; The pairs are "regexp" + "replacement" which is invoked via "apply".
+(setq org-diary-template-variables '(
+                                   ( "YYYY"       . (format-time-string "%Y"))
+                                   ( "MM"         . (format-time-string "%m"))
+                                   ( "DD"         . (format-time-string "%d"))
+                                   ( "HOUR"       . (format-time-string "%H"))
+                                   ( "MINUTE"     . (format-time-string "%M"))
+                                   ( ":noexport:" . (format ""))))
+
+
+;; Define our derived mode
+(define-derived-mode org-diary-mode
+  org-mode "org-diary"
+  "Major mode for maintaining an org-based diary.")
+
+
+;; Ensure it is used for Diary.org files
+(add-to-list 'auto-mode-alist '("Diary.org" . org-diary-mode))
+
+
+;; Now add functions
+
+
+
+(defun org-diary-today ()
+  "Jump to today's entry within the current org-diary file, if it exists."
+  (interactive)
+  (if (not (eq major-mode 'org-diary-mode))
+      (error "Error: You're not visiting an org-diary file/buffer"))
+  (let ((pos nil))
+    (save-excursion
+      (org-save-outline-visibility t
+        (outline-show-all)
+        (goto-line 0)
+        (if (re-search-forward (format-time-string "^\\* %d/%m/%Y") nil t)
+            (setq pos (point))
+          (message "No entry for today found."))))
+    (if pos
+        (progn
+          (outline-show-all)
+          (goto-char pos)
+          t)
+      nil)))
+
+
+(defun org-diary-new-entry ()
+  "Create a new entry for today, if it is not yet present."
+    (interactive)
+    (if (org-diary-today)
+        (message "An entry for today is already present!")
+      (org-diary-insert-new)))
+
+
+(defun org-diary-insert-new ()
+  "Actually insert a new diary-template.
+
+TODO: This needs documentation"
+  (let ((start nil)
+        (text nil)
+        (case-fold-search nil) ; This ensures our replacements match "HOURS" not "Worked Hours"
+        (end nil))
+    (save-excursion
+      (outline-show-all)
+      (goto-line 0)
+      (re-search-forward "^\* DD/MM/YYYY" )
+      (beginning-of-line)
+      (backward-char 1)
+      (setq start (point))
+      ;; point is at the line before "* DD/MM"
+      ;; So we want to skip forward
+      (next-line 2)
+      (re-search-forward "END$")
+      (beginning-of-line)
+      (backward-char 1)
+      (setq end (point))
+      (setq text (buffer-substring start end))
+      (goto-char start)
+
+      (dolist (item org-diary-template-variables)
+          (setq text (replace-regexp-in-string (car item) (apply (cdr item)) text)))
+
+        (insert text))
+    (goto-char start)
+    (outline-hide-sublevels 1)
+    )
+  )
+
+
+(defun org-diary-clear-subtree ()
+  "Delete the subtree we're inside.
+
+  We move to the start of the heading, record our position, then the
+  end of the tree and work backwards until we've gone too far."
+    (let (start)
+      (save-excursion
+        (org-back-to-heading t)
+        (setq start (point))
+        (org-end-of-subtree t)
+        (while (>= (point) start)
+          (delete-char -1)))))
+
+(defun org-diary-remove-empty-sections (backend)
+  "If there are any headings which contain only 'empty' content
+then don't show them on export.
+
+Empty here means either literally empty, or having the content 'None' or 'None.'."
+    (save-excursion
+      (outline-show-all)
+      (goto-line 0)
+
+      (org-map-entries
+       '(lambda ()
+          (if (or (equalp "None." (format "%s" (org-get-entry)))
+                  (equalp "None" (format "%s" (org-get-entry)))
+                  (equalp "" (format "%s" (org-get-entry))))
+              (org-diary-clear-subtree))))))
+
+
+;; Add a pre-export hook to remove empty sections.
+(add-hook 'org-export-before-parsing-hook 'org-diary-remove-empty-sections)
+
+(provide 'org-diary)

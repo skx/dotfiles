@@ -646,6 +646,11 @@ As noted above it is possible to evaluated blocks of script from within `org-mod
 ;; This is the preferred approach, which works on modern release of emacs and org-mode.
 (with-feature (ob-shell)
               (org-babel-do-load-languages 'org-babel-load-languages '((shell . t))))
+
+;; Ensure that we can export org-blocks
+;; This is done for the CSS & Javascript export blocks
+(require 'ob-org)
+
 ```
 
 We'll enable line-wrapping and spell-checking when we enter org-mode:

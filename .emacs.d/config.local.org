@@ -6,7 +6,7 @@
     "Load my diary/work-log, and scroll to today's entry."
     (interactive)
     (find-file (expand-file-name "~/Private/Worklog/Diary.org"))
-    (today)
+    (org-diary-today)
     )
   (global-set-key (kbd "C-x w") 'load-diary)
   (global-set-key (kbd "C-c w") 'load-diary)
