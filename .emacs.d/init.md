@@ -907,7 +907,8 @@ To make it useful we'll ensure that we disable warnings about eval, and whenever
 
 ; Update tag-cloud on-save
 (defun skx-org-tag-cloud-update-hook ()
-  (when (eq major-mode 'org-mode)
+  (when (or (eq major-mode 'org-mode)
+            (eq major-mode 'org-diary-mode))
     (org-tag-cloud-update)))
 
 (add-hook 'before-save-hook #'skx-org-tag-cloud-update-hook)
@@ -1121,13 +1122,13 @@ Sometimes org-mode files contain secrets, things that you don't want to make vis
 You can run `M-x org-decrypt-entries` to make them visible, but re-encrypt any time you save:
 
 ```lisp
-  (require 'org-crypt)
-  (add-hook 'org-mode-hook
-    (lambda()
-        (add-hook 'before-save-hook 'org-encrypt-entries nil t)
-        (setq org-tags-exclude-from-inheritance (quote ("crypt")))
-        (setq org-crypt-key "root@localhost")
-        (setq auto-save-default nil)))
+(require 'org-crypt)
+(add-hook 'org-mode-hook
+          (lambda()
+            (add-hook 'before-save-hook 'org-encrypt-entries nil t)
+            (setq org-tags-exclude-from-inheritance (quote ("crypt")))
+            (setq org-crypt-key "root@localhost")
+            (setq auto-save-default nil)))
 ```
 
 The downside to encrypting contents is that you'll have a random GPG-message in your exported document.  There are two solutions here:
@@ -1140,22 +1141,20 @@ I prefer to make it obvious there is an encrypted section, because you could add
 Here we wrap all GPG_messages with "`#+BEGIN_EXAMPLE`" to format them neatly on export:
 
 ```lisp
+(defun skx/html-quote-pgp (backend)
+  "Wrap GPG messages when exporting to HTML"
+  (when (or (org-export-derived-backend-p backend 'html)
+            (org-export-derived-backend-p backend 'latex))
+    (save-excursion
+      (goto-char 0)
+      (while (re-search-forward "^\\(\s*-+BEGIN PGP MESSAGE-+\\)" nil t)
+        (replace-match "\n#+BEGIN_EXAMPLE\n\\1"))
+      (goto-char 0)
+      (while (re-search-forward "^\\(\s*-+END PGP MESSAGE-+\\)" nil t)
+        (replace-match "\n\\1\n#+END_EXAMPLE\n"))
+      )))
 
-   (defun skx/html-quote-pgp (backend)
-     "Wrap GPG messages when exporting to HTML"
-     (when (or (org-export-derived-backend-p backend 'html)
-               (org-export-derived-backend-p backend 'latex))
-         (save-excursion
-           (goto-char 0)
-             (while (re-search-forward "^\\(\s*-+BEGIN PGP MESSAGE-+\\)" nil t)
-               (replace-match "\n#+BEGIN_EXAMPLE\n\\1"))
-             (goto-char 0)
-             (while (re-search-forward "^\\(\s*-+END PGP MESSAGE-+\\)" nil t)
-                 (replace-match "\n\\1\n#+END_EXAMPLE\n"))
-             )))
-
-   (add-hook 'org-export-before-parsing-hook 'skx/html-quote-pgp)
-
+(add-hook 'org-export-before-parsing-hook 'skx/html-quote-pgp)
 ```
 
 ### Org-Mode UTF
@@ -1194,7 +1193,6 @@ When we launch we need to configure the packages, if we've not done so:
 
 ```lisp
 (setq custom-file "~/.emacs.d/custom.el")
-
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
