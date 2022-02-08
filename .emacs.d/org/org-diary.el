@@ -15,7 +15,10 @@
 ;;   * 03/01/2022
 ;;   ** Meetings
 ;;   ** TODO
-;;  * END
+;;   * DD/MM/YYYY
+;;   ** Meetings
+;;   ** TODO
+;;   * END
 ;;
 ;; The idea is that you might maintain a standard entry template, and you
 ;; can add a new entry for each new-day.
@@ -23,7 +26,7 @@
 
 
 
-;; List of things we expand inside a new entry template.
+;; List of things we expand within a new entry, as we create it.
 ;;
 ;; The pairs are "regexp" + "replacement" which is invoked via "apply".
 (setq org-diary-template-variables '(
@@ -42,7 +45,8 @@
 
 
 ;; Ensure it is used for Diary.org files
-(add-to-list 'auto-mode-alist '("Diary.org" . org-diary-mode))
+(add-to-list 'auto-mode-alist
+             '("[dD][iI][aA][rR][yY]\\.[oO][rR][gG]" . org-diary-mode))
 
 
 ;; Now add functions
@@ -81,7 +85,9 @@
 (defun org-diary-insert-new ()
   "Actually insert a new diary-template.
 
-TODO: This needs documentation"
+It is assumed a Diary.org file will contain a template, contained between
+the literal text '* DD/MM/YYYY' and '* END'.  This will be copied into a new
+entry, and have its variables expanded."
   (let ((start nil)
         (text nil)
         (case-fold-search nil) ; This ensures our replacements match "HOURS" not "Worked Hours"
@@ -89,7 +95,8 @@ TODO: This needs documentation"
     (save-excursion
       (outline-show-all)
       (goto-line 0)
-      (re-search-forward "^\* DD/MM/YYYY" )
+      (if (not (re-search-forward "^\* DD/MM/YYYY" (point-max) t))
+          (error "This buffer does not contain a template-block to insert as a new entry."))
       (beginning-of-line)
       (backward-char 1)
       (setq start (point))
