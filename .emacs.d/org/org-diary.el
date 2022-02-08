@@ -153,4 +153,10 @@ Empty here means either literally empty, or having the content 'None' or 'None.'
 ;; Add a pre-export hook to remove empty sections.
 (add-hook 'org-export-before-parsing-hook 'org-diary-remove-empty-sections)
 
+;; Add a hook to jump to today's entry, if present, on-load
+(add-hook 'org-diary-mode-hook
+    (lambda()
+        (message "Loading today's entry")
+        (org-diary-today)))
+
 (provide 'org-diary)

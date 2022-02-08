@@ -786,6 +786,26 @@ Now we're done with the general setup so we'll handle the more specific things h
 ```
 
 
+## Org-Mode Diary
+
+I keep a work-log where I write down tasks and notes about my working-life
+every day.
+
+This is handled by my [org-diary](https://github.com/skx/org-diary) package, and here we load it and allow quick access to my journal:
+
+```lisp
+(require 'org-diary)
+
+(defun skx-load-diary()
+  "Load my diary/work-log, and scroll to today's entry."
+  (interactive)
+    (find-file (expand-file-name "~/Private/Worklog/Diary.org")))
+
+(global-set-key (kbd "C-x w") 'skx-load-diary)
+(global-set-key (kbd "C-c w") 'skx-load-diary)
+
+```
+
 ## Org-Mode Code Execution
 
 Another useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block when a file is loaded.
@@ -999,16 +1019,6 @@ The following function allows extracting the value of a global header from the c
             (setq end (point))
             (string-trim (buffer-substring-no-properties start end))))
       ))
-```
-
-One way that I like to use it is to rename buffers according to their title:
-
-```lisp
-(defun skx/org-mode-rename-buffer ()
-  (if (skx/org-global-prop "TITLE")
-    (rename-buffer (skx/org-global-prop "TITLE"))))
-
-(add-hook 'org-mode-hook  'skx/org-mode-rename-buffer)
 ```
 
 
