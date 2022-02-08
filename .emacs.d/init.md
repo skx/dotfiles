@@ -895,23 +895,13 @@ I put together a simple tag-cloud helper package, which we'll now load:
 (require 'org-tag-cloud)
 ```
 
-To make it useful we'll ensure that we disable warnings about eval, and whenever we save an org-file we'll update the cloud (which is harmless if not present):
+To make it useful we'll ensure that we disable warnings about eval which would otherwise be shown when following such a link.
 
 ```lisp
 ; Allow eval-links
 (defun skx-org-mode-hook-eval-ok ()
     (make-variable-buffer-local 'org-confirm-elisp-link-function)
     (setq org-confirm-elisp-link-function nil))
-
-(add-hook 'org-mode-hook 'skx-org-mode-hook-eval-ok)
-
-; Update tag-cloud on-save
-(defun skx-org-tag-cloud-update-hook ()
-  (when (or (eq major-mode 'org-mode)
-            (eq major-mode 'org-diary-mode))
-    (org-tag-cloud-update)))
-
-(add-hook 'before-save-hook #'skx-org-tag-cloud-update-hook)
 ```
 
 
