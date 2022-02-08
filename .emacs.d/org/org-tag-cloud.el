@@ -23,8 +23,7 @@ The block can be executed via org-tag-cloud-update."
           (progn
             (setq-local org-confirm-babel-evaluate nil)
             (org-babel-goto-named-src-block "org-tag-cloud")
-            (org-babel-execute-src-block))
-        (message "There is no block named 'org-tag-cloud' present")))))
+            (org-babel-execute-src-block))))))
 
 (defun org-tag-cloud-populate ()
   "Return a suitable structure which can be used to generate a tag-cloud."

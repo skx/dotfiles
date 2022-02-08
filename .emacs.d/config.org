@@ -29,7 +29,9 @@ This is a bit terrible, but also a bit awesome.
 | ~/.emacs.d/lang/web-mode.el           | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                          | OK     |
 | ~/.emacs.d/misc/literate-calc-mode.el | https://raw.githubusercontent.com/sulami/literate-calc-mode.el/master/literate-calc-mode.el   | OK     |
 | ~/.emacs.d/org/org-autolist.el        | https://raw.githubusercontent.com/calvinwyoung/org-autolist/master/org-autolist.el            | OK     |
-| ~/.emacs.d/misc/selectrum.el          | https://raw.githubusercontent.com/raxod502/selectrum/master/selectrum.el                      | OK     |
+| ~/.emacs.d/org/org-diary.el           | https://raw.githubusercontent.com/skx/org-diary/master/org-diary.el                           | OK     |
+| ~/.emacs.d/org/org-nested.el          | https://raw.githubusercontent.com/skx/org-nested/master/org-nested.el                         | OK     |
+| ~/.emacs.d/org/org-tag-cloud.el       | https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el                   | OK     |
 #+TBLFM: $3='(download $2 $1)
 
 
