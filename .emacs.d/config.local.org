@@ -2,12 +2,13 @@
 
 #+NAME: skx-startblock
 #+BEGIN_SRC emacs-lisp :results output silent
+  (require 'org-diary)
   (defun load-diary()
-    "Load my diary/work-log, and scroll to today's entry."
-    (interactive)
-    (find-file (expand-file-name "~/Private/Worklog/Diary.org"))
-    (org-diary-today)
-    )
-  (global-set-key (kbd "C-x w") 'load-diary)
-  (global-set-key (kbd "C-c w") 'load-diary)
+      "Load my diary/work-log, and scroll to today's entry."
+      (interactive)
+      (find-file (expand-file-name "~/Private/Worklog/Diary.org"))
+      (org-diary-today)
+      )
+    (global-set-key (kbd "C-x w") 'load-diary)
+    (global-set-key (kbd "C-c w") 'load-diary)
 #+END_SRC
