@@ -23,14 +23,6 @@
 ;; The idea is that you might maintain a standard entry template, and you
 ;; can add a new entry for each new-day.
 ;;
-;; TODO
-;;
-;;  Document the hooks we've created:
-;;   org-diary-mode-hook
-;;   org-diary-after-today-hook
-;;   org-diary-after-new-entry-hook
-;;
-;;
 
 
 ;; List of things we expand within a new entry, as we create it.
