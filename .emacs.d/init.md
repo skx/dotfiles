@@ -805,7 +805,8 @@ This is handled by my [org-diary](https://github.com/skx/org-diary) package, and
 (defun skx-load-diary()
   "Load my diary/work-log, and scroll to today's entry."
   (interactive)
-    (find-file (expand-file-name "~/Private/Worklog/Diary.org")))
+    (find-file (expand-file-name "~/Private/Worklog/Diary.org"))
+    (org-diary-today))
 
 ;; Bind it.
 (global-set-key (kbd "C-x w") 'skx-load-diary)
