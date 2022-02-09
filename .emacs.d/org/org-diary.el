@@ -23,7 +23,14 @@
 ;; The idea is that you might maintain a standard entry template, and you
 ;; can add a new entry for each new-day.
 ;;
-
+;; TODO
+;;
+;;  Document the hooks we've created:
+;;   org-diary-mode-hook
+;;   org-diary-after-today-hook
+;;   org-diary-after-new-entry-hook
+;;
+;;
 
 
 ;; List of things we expand within a new entry, as we create it.
@@ -36,6 +43,28 @@
                                    ( "HOUR"       . (format-time-string "%H"))
                                    ( "MINUTE"     . (format-time-string "%M"))
                                    ( ":noexport:" . (format ""))))
+
+
+
+(defvar org-diary-date-format "^\\* %d/%m/%Y"
+  "Format string for matching date-based headers.
+
+Currently supported placeholders include:
+%Y is the year as decimal number, including the century.
+%m is the month as a decimal number (range 01 to 12).
+%d is the day as a decimal number (range 01 to 31).
+%V is the ISO 8601 week number as a decimal number (range 01 to 53).
+%a is the locale’s abbreviated name of the day of week, %A the full name.
+%b is the locale's abbreviated name of the month, %B the full name.
+")
+
+
+;; Define a keymap for this mode.
+(defvar org-diary-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-p") 'org-previous-visible-heading)
+    (define-key map (kbd "C-n") 'org-next-visible-heading)
+    map))
 
 
 ;; Define our derived mode
@@ -63,13 +92,14 @@
       (org-save-outline-visibility t
         (outline-show-all)
         (goto-line 0)
-        (if (re-search-forward (format-time-string "^\\* %d/%m/%Y") nil t)
+        (if (re-search-forward (format-time-string org-diary-date-format) nil t)
             (setq pos (point))
           (message "No entry for today found."))))
     (if pos
         (progn
           (outline-show-all)
           (goto-char pos)
+          (run-hooks 'org-diary-after-today-hook)
           t)
       nil)))
 
@@ -79,7 +109,10 @@
     (interactive)
     (if (org-diary-today)
         (message "An entry for today is already present!")
-      (org-diary-insert-new)))
+      (progn
+        (org-diary-insert-new)
+        (org-diary-today) ; jump to the new entry
+        (run-hooks 'org-diary-after-new-entry-hook))))
 
 
 (defun org-diary-insert-new ()
@@ -113,11 +146,7 @@ entry, and have its variables expanded."
       (dolist (item org-diary-template-variables)
           (setq text (replace-regexp-in-string (car item) (apply (cdr item)) text)))
 
-        (insert text))
-    (goto-char start)
-    (outline-hide-sublevels 1)
-    )
-  )
+        (insert text))))
 
 
 (defun org-diary-clear-subtree ()

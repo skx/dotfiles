@@ -796,11 +796,18 @@ This is handled by my [org-diary](https://github.com/skx/org-diary) package, and
 ```lisp
 (require 'org-diary)
 
+;; Add a new tag to all entries, after creating them.
+(add-hook 'org-diary-after-new-entry-hook
+          (lambda()
+            (org-set-tags (format-time-string "%Y_week_%V"))))
+
+;; Create a helper to load the diary.
 (defun skx-load-diary()
   "Load my diary/work-log, and scroll to today's entry."
   (interactive)
     (find-file (expand-file-name "~/Private/Worklog/Diary.org")))
 
+;; Bind it.
 (global-set-key (kbd "C-x w") 'skx-load-diary)
 (global-set-key (kbd "C-c w") 'skx-load-diary)
 
