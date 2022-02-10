@@ -16,6 +16,17 @@ files if they are present, which are written in a similar literate fashion.
 Hopefully this is neat, and allows my configuration to be self-documenting,
 and easily understood.
 
+This is a handy function I use if I need to edit this file:
+
+```lisp
+(defun skx-load-init()
+  "Load my init.md file."
+  (interactive)
+    (find-file (expand-file-name "~/.emacs.d/init.md")))
+
+;; Bind it.
+(global-set-key (kbd "C-c i") 'skx-load-init)
+```
 
 
 ## Initial Functions
@@ -794,6 +805,7 @@ every day.
 This is handled by my [org-diary](https://github.com/skx/org-diary) package, and here we load it and allow quick access to my journal:
 
 ```lisp
+;; Load the library-file.
 (require 'org-diary)
 
 ;; Add a new tag to all entries, after creating them.
@@ -809,7 +821,6 @@ This is handled by my [org-diary](https://github.com/skx/org-diary) package, and
     (org-diary-today))
 
 ;; Bind it.
-(global-set-key (kbd "C-x w") 'skx-load-diary)
 (global-set-key (kbd "C-c w") 'skx-load-diary)
 
 ```
