@@ -796,6 +796,19 @@ Now we're done with the general setup so we'll handle the more specific things h
 (setq org-ellipsis " ▼")
 ```
 
+Since we're hiding the emphasis markers it can be hard to edit text which is formatted.  To handle that we use [org-appear](https://github.com/awth13/org-appear):
+
+```lisp
+; load the library
+(require 'org-appear)
+
+; Ensure that we toggle link-markup as well as bold/italic/etc.
+(setq org-appear-autolinks t)
+
+; enable it in the modes we care about.
+(add-hook 'org-diary-mode-hook 'org-appear-mode)
+(add-hook 'org-mode-hook 'org-appear-mode)
+```
 
 ## Org-Mode Diary
 
