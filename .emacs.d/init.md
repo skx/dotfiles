@@ -551,6 +551,20 @@ The `skx-template` package allows that to be done in a simple fashion; when visi
 (require 'skx-template)
 ```
 
+### Language Mode Helpers - TODO Highlighting
+
+The following snippet of code ensures that `TODO` comments/lines are shown
+easily:
+
+```lisp
+(with-feature (hl-todo)
+  (setq hl-todo-keyword-faces
+      '(("FIXME"   . "#ffff00")
+        ("TODO"   . "#ffff00")
+        ("XXX"   . "#ffff00")))
+    (global-hl-todo-mode t))
+```
+
 ### Language Mode Helpers - Utilities
 
 A lot of programming environments allow you to setup variables via something
