@@ -28,6 +28,20 @@ This is a handy function I use if I need to edit this file:
 (global-set-key (kbd "C-c i") 'skx-load-init)
 ```
 
+Having easy access to a new lisp buffer is also useful, for experimentation:
+
+```lisp
+(defun skx-scratch-buffer()
+  "Create a unique scratch-buffer, and swithc to it"
+  (interactive)
+  (switch-to-buffer (generate-new-buffer-name "*scratch*"))
+  (insert "; Scratch buffer, kill it when you're done\n\n")
+  (lisp-mode))
+
+;; Bind it.
+(global-set-key (kbd "C-c s") 'skx-scratch-buffer)
+
+```
 
 ## Initial Functions
 
