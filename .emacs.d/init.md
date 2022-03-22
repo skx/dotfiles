@@ -1083,13 +1083,20 @@ Typically when I export documents I work with them elsewhere, but the export opt
 I want those exports to open in `firefox` and `evince` respectively, the following snippet makes that happen:
 
 ```lisp
+(defun org-file-apps-html (file link)
+  (interactive)
+  (shell-command (format "%s %s"
+                         (if (file-exists-p "/usr/bin/firefx")
+                             "/usr/bin/firefox"
+                           "/opt/firefox/firefox")
+                         file)))
+
 (setq org-file-apps
     (quote
         ((auto-mode . emacs)
-         ("\\.x?html?\\'" . "/usr/bin/firefox %s")
-         ("\\.pdf\\'" . "/usr/bin/evince %s"))))
+         ("\\.x?html?\\'" . (lambda (file link) (org-file-apps-html file link)))
+         ("\\.pdf\\'" . "/usr/bin/evince %s") )))
 ```
-
 
 
 ### Org-Mode LaTex & PDF Export
