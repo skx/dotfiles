@@ -23,9 +23,6 @@ This is a handy function I use if I need to edit this file:
   "Load my init.md file."
   (interactive)
     (find-file (expand-file-name "~/.emacs.d/init.md")))
-
-;; Bind it.
-(global-set-key (kbd "C-c i") 'skx-load-init)
 ```
 
 Having easy access to a new lisp buffer is also useful, for experimentation:
@@ -37,10 +34,6 @@ Having easy access to a new lisp buffer is also useful, for experimentation:
   (switch-to-buffer (generate-new-buffer-name "*scratch*"))
   (insert "; Scratch buffer, kill it when you're done\n\n")
   (lisp-mode))
-
-;; Bind it.
-(global-set-key (kbd "C-c s") 'skx-scratch-buffer)
-
 ```
 
 ## Initial Functions
@@ -600,12 +593,9 @@ The following section of code lets us select a region and run `M-=` to
 align the section based upon the `=` sign:
 
 ```lisp
-    (defun align-equals (begin end)
-      (interactive "r")
-      (align-regexp begin end "\\(\\s-*\\)=" 1 1))
-
-
-    (global-set-key (kbd "M-=") 'align-equals)
+(defun align-equals (begin end)
+  (interactive "r")
+  (align-regexp begin end "\\(\\s-*\\)=" 1 1))
 ```
 
 
@@ -814,9 +804,6 @@ Now we're done with the general setup so we'll handle the more specific things h
 ;; this is what I think most people would expect
 (setq org-special-ctrl-a/e 't)
 
-;; Bring up the agenda.
-(global-set-key "\C-ca" 'org-agenda)
-
 ;; This hides the "*bold*", "/italic/" and "=preformatted=" markers:
 (setq org-hide-emphasis-markers t)
 
@@ -860,10 +847,6 @@ This is handled by my [org-diary](https://github.com/skx/org-diary) package, and
   (interactive)
     (find-file (expand-file-name "~/Private/Worklog/Diary.org"))
     (org-diary-today))
-
-;; Bind it.
-(global-set-key (kbd "C-c w") 'skx-load-diary)
-
 ```
 
 ## Org-Mode Code Execution
@@ -1256,6 +1239,15 @@ When we launch we need to configure the packages, if we've not done so:
   (package-install 'use-package))
 ```
 
+## Search
+
+I set "search-default-mode" to allow me to match `äiti` when searching for `aiti`, for example.
+
+```lisp
+(setq search-default-mode 'char-fold-to-regexp)
+```
+
+
 ## Spell-Checking
 
 I use `flyspell` as a spell-checker when editing text and org-mode files.  Sometimes it decides that words are errors, even when I know best.
@@ -1332,14 +1324,12 @@ The following snippet is useful for system-administration, allowing
 you to open a file for reading via `sudo`:
 
 ```lisp
-    (require 'tramp)
-    (defun sudo-find-file (file-name)
-        "Like find file, but opens the file as root."
-        (interactive "FSudo Find File: ")
-        (let ((tramp-file-name (concat "/sudo::" (expand-file-name file-name))))
-        (find-file tramp-file-name)))
-
-    (global-set-key (kbd "C-x F") 'sudo-find-file)
+(require 'tramp)
+(defun sudo-find-file (file-name)
+  "Like find file, but opens the file as root."
+  (interactive "FSudo Find File: ")
+  (let ((tramp-file-name (concat "/sudo::" (expand-file-name file-name))))
+    (find-file tramp-file-name)))
 ```
 
 Once you've opened the file it will be read-only, you can toggle that
@@ -1452,10 +1442,6 @@ The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so
 
     ;; Show the menubar only when running with graphics
     (menu-bar-mode (display-graphic-p))
-
-    ;; Ctrl +, or Ctrl - will change the text size.
-    (global-set-key (kbd "C-+") 'text-scale-increase)
-    (global-set-key (kbd "C--") 'text-scale-decrease)
 
     ;; Make sure our cursor doesn't get in the way.
     (require 'avoid)
@@ -1681,29 +1667,47 @@ I try to avoid too many keybindings that are non-standard, but there are
 some I've grown accustomed to:
 
 ```lisp
-    (global-set-key "\M-g" 'goto-line)
+;; Create the keymap for all my bindings.
+(defvar steve-mode-map (make-keymap)
+  "Keymap for steve-mode")
 
-    ;; Here we search forward with C-s, and backwards with C-r.
-    ;;
-    ;; NOTE: That I set "search-default-mode" to allow me to match
-    ;; `äiti` when searching for `aiti`, for example.
-    (setq search-default-mode 'char-fold-to-regexp)
+;; Next, create the minor mode, switch it on by default, make it global,
+;; and assign the keymap to it.
+(define-minor-mode steve-mode
+  "Minor mode for my personal keybindings."
+  :init-value t
+  :global t
+  :keymap steve-mode-map)
 
-    (global-set-key "\C-s" 'isearch-forward)
-    (global-set-key "\C-r" 'isearch-backward)
+;; Next, add the keymap to `emulation-mode-map-alists'
+(add-to-list 'emulation-mode-map-alists
+             `((steve-mode . ,steve-mode-map)))
 
-    (global-set-key "\M-e" 'eval-region-or-last-sexp)
-    (global-set-key "\M-'" 'imenu-list-smart-toggle)   ;; org/markdown sidebar
+;; Finally, bind the keys
+(define-key steve-mode-map (kbd "M-g")   'goto-line)
+(define-key steve-mode-map (kbd "C-c i") 'skx-load-init)
+(define-key steve-mode-map (kbd "C-c s") 'skx-scratch-buffer)
+(define-key steve-mode-map (kbd "C-c w") 'skx-load-diary)
+(define-key steve-mode-map (kbd "M-=")   'align-equals)
+(define-key steve-mode-map (kbd "C-x F") 'sudo-find-file)
+(define-key steve-mode-map (kbd "C-+") 'text-scale-increase)
+(define-key steve-mode-map (kbd "C--") 'text-scale-decrease)
+(define-key steve-mode-map (kbd "C-c a") 'org-agenda)
+(define-key steve-mode-map (kbd "C-s") 'isearch-forward)
+(define-key steve-mode-map (kbd "C-r") 'isearch-backward)
 
-    ;; kill the current-buffer with no prompting.
-    (global-set-key "\C-xk"
-        '(lambda ()
-            (interactive)
-                (kill-buffer (current-buffer))))
+;; org-mode & markdown-mode sidebar
+(define-key steve-mode-map (kbd "M-'") 'imenu-list-smart-toggle)
 
+; Allow the backtick key to work as I expected.
+(define-key steve-mode-map [dead-grave] "`")
 
-    ;; Prevent accidentally killing emacs.
-    (global-set-key [(control x) (control c)]
+; kill buffer
+(define-key steve-mode-map (kbd "C-x k") '(lambda () (interactive)
+  (kill-buffer (current-buffer))))
+
+; exit emacs
+(define-key steve-mode-map (kbd "C-x C-c") '(lambda () (interactive)
         '(lambda ()
             (interactive)
             (if (y-or-n-p-with-timeout "Do you really want to exit Emacs ? " 10 nil)
@@ -1713,24 +1717,11 @@ some I've grown accustomed to:
                         (if (fboundp 'uptime) (uptime))
                         (sleep-for 1)))
                   (save-buffers-kill-emacs)))
-            (message "emacs quit aborted")))
-```
+            (message "emacs quit aborted"))))
 
-One thing that often catches me out is the backgrounding behaviour on `Ctrl-z`,
-especially on a terminal, so this is explicitly disabled here:
-
-
-```lisp
-    ;; get rid of pesky "Ctrl-z" and "Ctrl-x Ctrl-z" annoying minimize
-    (global-set-key "\C-z" 'nil)
-    (global-set-key "\C-x\C-z" 'nil)
-```
-
-Finally since I'm in Finland I've found that I'm using foreign keyboard layouts a lot of the time.  One problem I have is the backtick character doesn't always work the way that I want - which is a particular problem in `markdown-mode`.
-
-```lisp
-   ;; Allow the backtick key to work as I expected.
-   (global-set-key [dead-grave] "`")
+; unset things
+(define-key steve-mode-map (kbd "C-z") 'nil)
+(define-key steve-mode-map (kbd "C-c C-z") 'nil)
 ```
 
 
@@ -1738,25 +1729,6 @@ Finally since I'm in Finland I've found that I'm using foreign keyboard layouts 
 
 A small section of things that might be nice to explore in the future.
 
-This looks nice:
-
-* https://github.com/syohex/emacs-git-gutter-fringe
-
-Usage via:
-
->(require 'git-gutter-fringe)
->
->(dolist (p '((git-gutter:added    . "#0c0")
->             (git-gutter:deleted  . "#c00")
->             (git-gutter:modified . "#c0c")))
->  (set-face-foreground (car p) (cdr p))
->  (set-face-background (car p) (cdr p)))
-
-* Keybindings via a minor-mode
-  * https://github.com/larstvei/dot-emacs#key-bindings
-  * https://stackoverflow.com/questions/683425/globally-override-key-binding-in-emacs
-  * See also
-    * https://github.com/Atman50/emacs-config/blob/master/README.org#i-use-ctrl-z-for-personal-bindings
 * https://github.com/integral-dw/org-superstar-mode
 * A massive `.emacs` file with good commentary:
   * https://svn.red-bean.com/repos/kfogel/trunk/.emacs
