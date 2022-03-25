@@ -1707,8 +1707,7 @@ some I've grown accustomed to:
   (kill-buffer (current-buffer))))
 
 ; exit emacs
-(define-key steve-mode-map (kbd "C-x C-c") '(lambda () (interactive)
-        '(lambda ()
+(define-key steve-mode-map (kbd "C-x C-c") '(lambda ()
             (interactive)
             (if (y-or-n-p-with-timeout "Do you really want to exit Emacs ? " 10 nil)
                 (progn
@@ -1717,11 +1716,11 @@ some I've grown accustomed to:
                         (if (fboundp 'uptime) (uptime))
                         (sleep-for 1)))
                   (save-buffers-kill-emacs)))
-            (message "emacs quit aborted"))))
+            (message "emacs quit aborted")))
 
 ; unset things
-(define-key steve-mode-map (kbd "C-z") 'nil)
-(define-key steve-mode-map (kbd "C-c C-z") 'nil)
+(define-key steve-mode-map (kbd "C-z")     '(lambda () (interactive)))
+(define-key steve-mode-map (kbd "C-c C-z") '(lambda () (interactive)))
 ```
 
 
@@ -1732,3 +1731,8 @@ A small section of things that might be nice to explore in the future.
 * https://github.com/integral-dw/org-superstar-mode
 * A massive `.emacs` file with good commentary:
   * https://svn.red-bean.com/repos/kfogel/trunk/.emacs
+
+
+```lisp
+(message "init.md loaded")
+```

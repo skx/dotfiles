@@ -47,7 +47,8 @@ execute directly.
             (re-search-forward "^```$" (point-max) t)
 
             ;; Evaluate it, and then keep going.
-            (eval-region l (match-beginning 0)))))
+            (if (< l (match-beginning 0))
+                (eval-region l (match-beginning 0))))))
     (message "Skipping file that doesn't exist %s" path)))
 
 
