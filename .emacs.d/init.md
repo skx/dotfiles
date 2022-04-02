@@ -755,6 +755,8 @@ Now we're done with the general setup so we'll handle the more specific things h
   (setq org-agenda-custom-commands
      '(("wi" "List of items closed in the past week."
         tags "+CLOSED>\"<-7d>\"/DONE")
+       ("wt" "Show today's stories"
+        search (format-time-string "%Y-%m-%d"))
        ("wo" "Outstanding items."
         todo ""
         ((org-agenda-skip-function 'skx/org-agenda-skip-complete))))))
