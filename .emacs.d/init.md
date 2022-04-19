@@ -384,6 +384,7 @@ Once the dependencies are present the following configures LSP, including a help
     (add-hook 'go-mode-hook #'lsp-go-setup-bindings))
 
 (with-feature (lsp-mode)
+  (setq lsp-auto-guess-root t)
   (skx/setup-lsp)
   (add-hook 'go-mode-hook #'lsp-deferred)
   (add-hook 'go-mode-hook #'yas-minor-mode))
