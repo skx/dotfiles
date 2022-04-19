@@ -380,14 +380,17 @@ Once the dependencies are present the following configures LSP, including a help
 (defun skx/setup-lsp ()
     (setq company-idle-delay 0)
     (setq company-minimum-prefix-length 1)
+    (setq lsp-auto-guess-root t)
     (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
     (add-hook 'go-mode-hook #'lsp-go-setup-bindings))
 
-(with-feature (lsp-mode)
-  (setq lsp-auto-guess-root t)
-  (skx/setup-lsp)
-  (add-hook 'go-mode-hook #'lsp-deferred)
-  (add-hook 'go-mode-hook #'yas-minor-mode))
+;; If we have `gopls` on our $PATH AND we have `lsp-mode` available ..
+;; Then setup LSP, and add the hooks for go-mode to use it.
+(if (executable-find "gopls")
+    (with-feature (lsp-mode)
+        (skx/setup-lsp)
+        (add-hook 'go-mode-hook #'lsp-deferred)
+        (add-hook 'go-mode-hook #'yas-minor-mode)))
 ```
 
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
