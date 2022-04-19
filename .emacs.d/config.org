@@ -26,7 +26,7 @@ This is a bit terrible, but also a bit awesome.
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/lang/lua-mode.el           | https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el                         | f0b7c81cd23712373edddaa5c84fab6a |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/markdown-mode.el      | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el              | f9595dde26aadf1a59272209b4eefc87 |
+| ~/.emacs.d/lang/markdown-mode.el      | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el              | 28e0137b34889fa2e70160c2479760d7 |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/lang/monkey.el             | https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el                           | 75c08fc655bf16b8c7e9cc146eb1f13f |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
@@ -34,7 +34,7 @@ This is a bit terrible, but also a bit awesome.
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/lang/terraform-mode.el     | https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el        | edd314e12d4f0472877cb406afd33435 |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/web-mode.el           | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                          | 73139f4b7dfd207306fc2193de631261 |
+| ~/.emacs.d/lang/web-mode.el           | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                          | 1b19a484aa21a3b3bec7646dc926e5c2 |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/misc/literate-calc-mode.el | https://raw.githubusercontent.com/sulami/literate-calc-mode.el/master/literate-calc-mode.el   | 736c0e10507488ee5bc137fd1c1c7744 |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
@@ -46,8 +46,8 @@ This is a bit terrible, but also a bit awesome.
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/org/org-tag-cloud.el       | https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el                   | 09cee384ac0e58ddb2abb67f59699dc3 |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/org/org-appear.el          | https://raw.githubusercontent.com/awth13/org-appear/master/org-appear.el                      | 4c4ca4961c36b1616f452b19e5d5bbb0 |
-| ~/.emacs.d/ui/hl-todo.el              | https://raw.githubusercontent.com/tarsius/hl-todo/master/hl-todo.el                           | af3e7242eb1a154fb043e260cfda8271 |
+| ~/.emacs.d/org/org-appear.el          | https://raw.githubusercontent.com/awth13/org-appear/master/org-appear.el                      | 481a4177d0117020cdbda5d71a0574c4 |
+| ~/.emacs.d/ui/hl-todo.el              | https://raw.githubusercontent.com/tarsius/hl-todo/master/hl-todo.el                           | 735c5e863430175c78f653c6faab0558 |
 #+TBLFM: $3='(download $2 $1)
 
 
