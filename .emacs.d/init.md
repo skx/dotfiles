@@ -1223,38 +1223,6 @@ Here we wrap all GPG_messages with "`#+BEGIN_EXAMPLE`" to format them neatly on 
 ```
 
 
-
-## Packages
-
-The following code disables TLS 1.3 to work around a known bug in GNU Emacs versions 26.1 and 26.2:
-
-```lisp
-(when (and (version< emacs-version "26.3") (>= libgnutls-version 30603))
-  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-```
-
-Now we can configure packages
-
-```lisp
-(require 'package)
-(setq package-enable-at-startup nil)
-
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
-
-(package-initialize)
-```
-
-When we launch we need to configure the packages, if we've not done so:
-
-```lisp
-(setq custom-file "~/.emacs.d/custom.el")
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-```
-
 ## Search
 
 I set "search-default-mode" to allow me to match `äiti` when searching for `aiti`, for example.
