@@ -78,13 +78,24 @@ Does not have an effect if `org-pretty-entities' is nil."
 
 (defcustom org-appear-autolinks nil
   "Non-nil enables automatic toggling of links.
-Does not have an effect if `org-link-descriptive' is nil."
-  :type 'boolean
+If set to the symbol `just-brackets', links will be shown with
+brackets around them without showing the link target.  Does not
+have an effect if `org-link-descriptive' is nil."
+  :type '(choice (const :tag "Ignore links" nil)
+		 (const :tag "Toggle full link" t)
+		 (const :tag "Toggle brackets" just-brackets))
   :group 'org-appear)
 
 (defcustom org-appear-autokeywords nil
   "Non-nil enables automatic toggling of keywords.
 Does not have an effect if `org-hidden-keywords' is nil."
+  :type 'boolean
+  :group 'org-appear)
+
+(defcustom org-appear-inside-latex nil
+  "Also applies toggling inside Latex fragments and environments.
+Sub- and superscript markers are toggled if `org-appear-autosubmarkers' is
+non-nil.  Entities are toggled if `org-appear-autoentities' is non-nil."
   :type 'boolean
   :group 'org-appear)
 
@@ -155,7 +166,8 @@ nil if the cursor was not on an element.")
 			   superscript))
 	(entity-elements '(entity))
 	(link-elements '(link))
-	(keyword-elements '(keyword)))
+	(keyword-elements '(keyword))
+	(latex-elements '(latex-fragment latex-environment)))
 
     ;; HACK: is there a better way to do this?
     (setq-local org-appear--prev-elem nil)
@@ -169,7 +181,9 @@ nil if the cursor was not on an element.")
     (when (and org-link-descriptive org-appear-autolinks)
       (setq org-appear-elements (append org-appear-elements link-elements)))
     (when (and org-hidden-keywords org-appear-autokeywords)
-      (setq org-appear-elements (append org-appear-elements keyword-elements)))))
+      (setq org-appear-elements (append org-appear-elements keyword-elements)))
+    (when org-appear-inside-latex
+      (setq org-appear-elements (append org-appear-elements latex-elements)))))
 
 (defun org-appear--post-cmd ()
   "This function is executed by `post-command-hook' in `org-appear-mode'.
@@ -296,6 +310,8 @@ Return nil if element cannot be parsed."
 			  'link)
 			 ((eq elem-type 'keyword)
 			  'keyword)
+			 ((memq elem-type '(latex-fragment latex-environment))
+			  'latex-fragment)
 			 (t nil)))
 	 (elem-start (org-element-property :begin elem))
 	 (elem-end (org-element-property :end elem))
@@ -330,8 +346,21 @@ Return nil if element cannot be parsed."
     (with-silent-modifications
       (cond ((eq elem-type 'entity)
 	     (decompose-region start end))
+	    ((memq elem-type '(latex-fragment latex-environment))
+	     (when org-appear-autosubmarkers
+	       (remove-text-properties start end '(invisible)))
+	     (when org-appear-autoentities
+	       (decompose-region start end)))
 	    ((eq elem-type 'keyword)
 	     (remove-text-properties start end '(invisible org-link)))
+	    ((and (eq elem-type 'link)
+		  (eq org-appear-autolinks 'just-brackets))
+	     (remove-text-properties visible-end
+				     (1+ visible-end)
+				     '(invisible org-link))
+	     (remove-text-properties (1- visible-start)
+				     visible-start
+				     '(invisible org-link)))
 	    (t
 	     (remove-text-properties start visible-start '(invisible org-link))
 	     (remove-text-properties visible-end end '(invisible org-link)))))))
@@ -365,7 +394,7 @@ When RENEW is non-nil, obtain element at point instead."
 	(cond ((eq elem-type 'entity)
 	       (compose-region start end (org-element-property :utf-8 elem))
 	       (font-lock-flush start end))
-	      ((eq elem-type 'keyword)
+	      ((memq elem-type '(keyword latex-fragment latex-environment))
 	       (font-lock-flush start end))
 	      (t
 	       (put-text-property start visible-start 'invisible 'org-link)
