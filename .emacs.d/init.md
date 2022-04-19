@@ -353,26 +353,40 @@ Once installed we can now configure the basic setup, ensuring that the mode is l
     (add-to-list 'auto-mode-alist (cons "\\.go\\'" 'go-mode))
 ```
 
-More interestingly we can add a hook to ensure that code is formatted prior to being saved.  If [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) is present it will be used, otherwise we'll fall back to the default `gofmt`-based formatting.
+Beyond the basic support for golang installed via that mode I've also configured LSP for this language, which provides smart completion & etc.
 
-In this hook we'll also allow [godef](https://github.com/rogpeppe/godef) to be used to jump to method definitions, via `M-Space` much like you'd expect with CTAGS (see the later note on using [using tags](#tags-support) directly):
+To complete this setup I have (manually) executed the following:
 
+#+NAME: install-go-lsp-stuff
+#+BEGIN_SRC sh
+$ sudo apt-get install elpa-lsp-mode elpa-company-lsp elpa-lsp-ui
+$ go install golang.org/x/tools/gopls@latest
+#+END_SRC
+
+Once the dependencies are present the following configures LSP, including a helper to format code on save & etc:
 
 ```lisp
-    (defun my-go-mode-hook ()
-      ;; prefer goimports, if present
-      (if (executable-find "goimports")
-        (setq gofmt-command "goimports"))
+;; Define a save-hook
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
 
-      ;; Format code when we save
-      (add-hook 'before-save-hook 'gofmt-before-save)
+;; Define local keymappings for go-mode
+(defun lsp-go-setup-bindings ()
+  (local-set-key (kbd "M-SPC") 'lsp-find-definition)
+  (local-set-key (kbd "M-b") 'pop-tag-mark))
 
-      ;; esc-space to jump to definition
-      (local-set-key (kbd "M-SPC") 'godef-jump)
-      ;; esc-b to jump (b)ack
-      (local-set-key (kbd "M-b") 'pop-tag-mark)
-    )
-    (add-hook 'go-mode-hook 'my-go-mode-hook)
+;; Define a function to setup the LSP configuration I want.
+(defun skx/setup-lsp ()
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 1)
+    (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+    (add-hook 'go-mode-hook #'lsp-go-setup-bindings))
+
+(with-feature (lsp-mode)
+  (skx/setup-lsp)
+  (add-hook 'go-mode-hook #'lsp-deferred)
+  (add-hook 'go-mode-hook #'yas-minor-mode))
 ```
 
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
