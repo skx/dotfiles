@@ -363,6 +363,13 @@ $ sudo apt-get install elpa-lsp-mode elpa-company-lsp elpa-lsp-ui
 $ go install golang.org/x/tools/gopls@latest
 #+END_SRC
 
+For python:
+
+#+NAME: install-python-lsp
+#+BEGIN_SRC sh
+$ sudo apt-get install python3-pyls
+#+END_SRC
+
 Once the dependencies are present the following configures LSP, including a helper to format code on save & etc:
 
 ```lisp
@@ -382,7 +389,9 @@ Once the dependencies are present the following configures LSP, including a help
     (setq company-minimum-prefix-length 1)
     (setq lsp-auto-guess-root t)
     (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-    (add-hook 'go-mode-hook #'lsp-go-setup-bindings))
+    (add-hook 'go-mode-hook #'lsp-go-setup-bindings)
+    (add-hook 'python-mode-hook #'lsp-go-install-save-hooks)
+    (add-hook 'python-mode-hook #'lsp-go-setup-bindings))
 
 ;; If we have `gopls` on our $PATH AND we have `lsp-mode` available ..
 ;; Then setup LSP, and add the hooks for go-mode to use it.
@@ -390,6 +399,8 @@ Once the dependencies are present the following configures LSP, including a help
     (with-feature (lsp-mode)
         (skx/setup-lsp)
         (add-hook 'go-mode-hook #'lsp-deferred)
+        (add-hook 'python-mode-hook #'lsp-deferred)
+        (add-hook 'python-mode-hook #'yas-minor-mode)
         (add-hook 'go-mode-hook #'yas-minor-mode)))
 ```
 
