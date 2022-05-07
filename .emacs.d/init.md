@@ -189,6 +189,25 @@ If multiple buffers use the same filename we'll prefix with the parent directory
 ```
 
 
+### Calendar setup
+
+`M-x calendar` will show a calendar with Finnish names:
+
+```lisp
+(setq calendar-week-start-day 1
+      calendar-day-name-array
+      ["sunnuntai" "maanantai" "tiistai" "keskiviikko"
+      "torstai" "perjantai" "lauantai"]
+      calendar-month-name-array
+      ["tammikuu" "helmikuu" "maaliskuu" "huhtikuu" "toukokuu"
+      "kesäkuu" "heinäkuu" "elokuu" "syyskuu"
+      "lokakuu" "marraskuu" "joulukuu"])
+
+(add-hook 'calendar-load-hook
+          (lambda ()
+            (calendar-set-date-style 'european)))
+```
+
 ### Calc Mode
 
 `literate-calc-mode` is a cute mode which allows constantly-updating calculations.  You can edit sums inside markdown, org-mode, and similar files, and see the results as overlays.
@@ -1557,7 +1576,6 @@ global things the way that I prefer them.
 
     ;; Highlight the region between point and mark at all times.
     (transient-mark-mode t)
-
 
     ;; Moving cursor down at bottom scrolls only a single line, not half page
     (setq scroll-step 1)
