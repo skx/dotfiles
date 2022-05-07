@@ -673,26 +673,6 @@ Using [column-enforce-mode](https://github.com/jordonbiondo/column-enforce-mode)
 The above section is enabled for all hosts, except the one system I have which has a hostname of `localhost.localdomain` - this is a system which is not configured for _real_ use..
 
 
-## Markdown Index
-
-The following snippet is useful when you're working with large markdown-files,
-although it is superceded somewhat by the inline menu which `imenu-list` provides, as noted later:
-
-```lisp
-    (defun markdown-index()
-     "Show (clickable) headings in the current buffer"
-     (interactive)
-     (occur "^#+"))
-```
-
-Now we can ensure that this is bound to `M-i` when `markdown-mode` is active:
-
-```lisp
-    (add-hook 'markdown-mode-hook
-     (lambda ()
-      (local-set-key (kbd "M-i") 'markdown-index)))
-```
-
 ## Org-Mode
 
 `org-mode` is a wonderful thing which allows Emacs to hold tables, TODO-lists, and much much more.  For the moment I'm keeping document-specific lisp and configuration within the appropriate document, but there are some things that make working with `org-mode` nicer which will live _here_.
@@ -1604,13 +1584,26 @@ global things the way that I prefer them.
 
 There is a neat package `imenu-list` which allows you to view a sidebar in the current frame, containing index-entries.
 
-This is used in the markdown-mode setup earlier to show you a list of headings.  Load it here:
+Here I configure it to be used for both `markdown-mode` and `org-mode`:
 
 ```lisp
-    (with-feature (imenu-list)
-      (setq imenu-list-focus-after-activation t
-            imenu-list-auto-resize t
-            imenu-list-position 'left))
+(defun skx/imenu-setup ()
+  ; setup defaults
+  (setq imenu-list-focus-after-activation t
+        imenu-list-auto-resize t
+        imenu-list-position 'left)
+
+  (add-hook 'markdown-mode-hook
+     (lambda ()
+      (local-set-key (kbd "M-i") 'imenu-list)))
+  (add-hook 'org-mode-hook
+     (lambda ()
+      (local-set-key (kbd "M-i") 'imenu-list)))
+)
+
+
+(with-feature (imenu-list)
+  (skx/imenu-setup))
 ```
 
 ## UTF-8
