@@ -373,25 +373,27 @@ $ sudo apt-get install python3-pyls
 Once the dependencies are present the following configures LSP, including a helper to format code on save & etc:
 
 ```lisp
-;; Define a save-hook
-(defun lsp-go-install-save-hooks ()
+;; Define a save-hook to format buffers on-save
+(defun skx/lsp-install-save-hooks ()
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
 
-;; Define local keymappings for go-mode
-(defun lsp-go-setup-bindings ()
+;; Define local keymappings for lsp-using modes
+(defun skx/lsp-go-setup-bindings ()
+  ; go to definition
   (local-set-key (kbd "M-SPC") 'lsp-find-definition)
-  (local-set-key (kbd "M-b") 'pop-tag-mark))
+  ; go back
+  (local-set-key (kbd "M-b")    'pop-tag-mark))
 
 ;; Define a function to setup the LSP configuration I want.
 (defun skx/setup-lsp ()
     (setq company-idle-delay 0)
     (setq company-minimum-prefix-length 1)
     (setq lsp-auto-guess-root t)
-    (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-    (add-hook 'go-mode-hook #'lsp-go-setup-bindings)
-    (add-hook 'python-mode-hook #'lsp-go-install-save-hooks)
-    (add-hook 'python-mode-hook #'lsp-go-setup-bindings))
+    (add-hook 'go-mode-hook #'skx/lsp-install-save-hooks)
+    (add-hook 'go-mode-hook #'skx/lsp-setup-bindings)
+    (add-hook 'python-mode-hook #'skx/lsp-install-save-hooks)
+    (add-hook 'python-mode-hook #'skx/lsp-setup-bindings))
 
 ;; If we have `gopls` on our $PATH AND we have `lsp-mode` available ..
 ;; Then setup LSP, and add the hooks for go-mode to use it.
@@ -400,6 +402,7 @@ Once the dependencies are present the following configures LSP, including a help
         (skx/setup-lsp)
         (add-hook 'go-mode-hook #'lsp-deferred)
         (add-hook 'python-mode-hook #'lsp-deferred)
+
         (add-hook 'python-mode-hook #'yas-minor-mode)
         (add-hook 'go-mode-hook #'yas-minor-mode)))
 ```
@@ -1477,6 +1480,13 @@ theme which is used for colours, and then secondly the colour of
 the cursor:
 
 ```lisp
+(setq-default cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
+              cursor-type '(hbar . 4)            ; Underline-shaped cursor
+              cursor-intangible-mode t           ; Enforce cursor intangibility
+              x-stretch-cursor t)                ; Stretch cursor to the glyph width
+
+(blink-cursor-mode 1)                            ; We want to blink
+
     ;; Change cursor color according to mode.
     ;;  read-only -> red
     ;;  insert    -> blue
