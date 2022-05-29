@@ -42,7 +42,7 @@ Common Lisp is required by some other later things, more detail here would
 be nice but to get started we'll just require that library:
 
 ```lisp
-    (require 'cl)
+(require 'cl)
 ```
 
 We also want to operate as a server, so we'll make sure that we start that
@@ -58,13 +58,12 @@ ensure that future use of `require` will find the files we're attempting
 to load:
 
 ```lisp
-    (defun add-to-load-path (d)
-       "If the supplied item is a directory then add it to the load-path"
-        (if (file-directory-p d)
-            (add-to-list 'load-path d)))
+(defun add-to-load-path (d)
+  "If the supplied item is a directory then add it to the load-path"
+  (if (file-directory-p d)
+    (add-to-list 'load-path d)))
 
-    (mapc 'add-to-load-path
-        (file-expand-wildcards "~/.emacs.d/*"))
+(mapc 'add-to-load-path (file-expand-wildcards "~/.emacs.d/*"))
 ```
 
 Now we define some utility-functions to load packages.  The following function will load a package and avoid raising an error if it isn't found:
@@ -88,6 +87,28 @@ successfully loaded we can then conditionally execute some code:
         If FEATURE can't be loaded, don't execute BODY."
         (when (noerr-require (car feature))
             (push 'progn body)))
+```
+
+And for completeness we'll define some useful macros for running things
+in different environments and hosts:
+
+```lisp
+(defmacro with-system (systype &rest body)
+  (if (equal system-type systype)
+      `(progn ,@body)))
+
+(defmacro with-host (host &rest body)
+  (if (equal system-name host)
+      `(progn ,@body)))
+
+(defmacro except-host (host &rest body)
+  (if (not (equal system-name host))
+      `(progn ,@body)))
+
+
+;(with-system gnu/linux (message "GNU/Linux system"))
+;(with-host   "frodo.home" (message "Home desktop"))
+;(except-host "frodo.home" (message "Not foo-bar"))
 ```
 
 The initial setup is now complete, so we can start loading packages, making
@@ -665,7 +686,7 @@ align the section based upon the `=` sign:
 Using [column-enforce-mode](https://github.com/jordonbiondo/column-enforce-mode) we can view lines that are "too long", in a clear fashion:
 
 ```lisp
-   (unless (string= system-name "localhost.localdomain")
+(except-host "localhost.localdomain"
     (with-feature (column-enforce-mode)
         (global-column-enforce-mode t)))
 ```
@@ -711,15 +732,6 @@ As noted above it is possible to evaluated blocks of script from within `org-mod
 ;; This is done for the CSS & Javascript export blocks
 (require 'ob-org)
 
-```
-
-We'll enable line-wrapping and spell-checking when we enter org-mode:
-
-```lisp
-(add-hook 'org-mode-hook
-    (lambda()
-        (flyspell-mode)
-        (toggle-truncate-lines)))
 ```
 
 We'll also improve the default list-management functionality:
@@ -1254,66 +1266,24 @@ I set "search-default-mode" to allow me to match `äiti` when searching for `ait
 
 ## Spell-Checking
 
-I use `flyspell` as a spell-checker when editing text and org-mode files.  Sometimes it decides that words are errors, even when I know best.
-
-The following Lisp allows the word at the point to be added to my personal dictionary:
+I use `flyspell` as a spell-checker when editing text and programming-mode files.
 
 ```lisp
-
+;; enable on-the-fly spell checking
 (setq flyspell-use-meta-tab nil)
 
-(eval-when-compile (require 'cl))
-
-(defun append-aspell-word (new-word)
-  (let ((header "personal_ws-1.1")
-        (file-name (substitute-in-file-name "$HOME/.aspell.en.pws"))
-        (read-words (lambda (file-name)
-                      (let ((all-lines (with-temp-buffer
-                                         (insert-file-contents file-name)
-                                         (split-string (buffer-string) "\n" t))))
-                        (if (null all-lines)
-                            ""
-                          (split-string (mapconcat 'identity (cdr all-lines) "\n")
-                                        nil
-                                        t))))))
-    (when (file-readable-p file-name)
-      (let* ((cur-words (eval (list read-words file-name)))
-             (all-words (delq header (cons new-word cur-words)))
-             (words (delq nil (remove-duplicates all-words :test 'string=))))
-        (with-temp-file file-name
-          (insert (concat header
-                          " en "
-                          (number-to-string (length words))
-                          "\n"
-                          (mapconcat 'identity (sort words #'string<) "\n"))))))
-    (unless (file-readable-p file-name)
-      (with-temp-file file-name
-        (insert (concat header " en 1\n" new-word "\n")))))
-  (ispell-kill-ispell t) ; restart ispell
-  (flyspell-mode)
-  (flyspell-mode))
-
-(defun append-aspell-current ()
-  "Add current word to aspell dictionary"
-  (interactive)
-  (append-aspell-word (thing-at-point 'word)))
-```
-
-Move the point over the "error", then run `M-x append-ispell-current`.  The word will be added to `~/.aspell.en.p*`, or whatever the appropriate file is (based upon your language).
-
-If a word appears multiple times in your document adding it to the ignored-list won't correct all the other errors:
-
-```lisp
-(defun flyspell-buffer-after-pdict-save (&rest _)
-  (flyspell-buffer))
-
-(advice-add 'ispell-pdict-save :after #'flyspell-buffer-after-pdict-save)
+;; ispell should not check code blocks in org mode
+(add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+(add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
+(add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+(add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
+(add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$"))
 ```
 
 Flyspell offers on-the-fly spell checking. We can enable flyspell for all text-modes with this snippet.
 
 ```lisp
-(add-hook 'text-mode-hook 'turn-on-flyspell)
+(add-hook 'text-mode-hook (lambda () (flyspell-mode 1)))
 ```
 
 To use flyspell for programming there is `flyspell-prog-mode`, that only enables spell checking for comments and strings. We can enable it for all programming modes using the prog-mode-hook.
@@ -1321,6 +1291,7 @@ To use flyspell for programming there is `flyspell-prog-mode`, that only enables
 ```lisp
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 ```
+
 
 ## System Administration
 
