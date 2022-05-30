@@ -657,11 +657,18 @@ The `skx-template` package allows that to be done in a simple fashion; when visi
 ### Language Mode Helpers - TODO Highlighting
 
 The following snippet of code ensures that `TODO` comments/lines are shown
-easily:
+easily, this also includes other examples such as:
+
+* FIXME: blah, blah.
+* TODO: here's some more stuff.
+* XXX Blah, blah.
+
 
 ```lisp
-(with-feature (hl-todo)
-  (setq hl-todo-keyword-faces
+(use-package hl-todo
+  :defer 4
+  :config
+    (setq hl-todo-keyword-faces
       '(("FIXME"   . "#ffff00")
         ("TODO"   . "#ffff00")
         ("XXX"   . "#ffff00")))
