@@ -36,6 +36,7 @@ Having easy access to a new lisp buffer is also useful, for experimentation:
   (lisp-mode))
 ```
 
+
 ## Initial Functions
 
 Common Lisp is required by some other later things, more detail here would
@@ -127,6 +128,30 @@ either the current expression, or the current selection:
 We'll bind this to a key, later.
 
 
+
+
+
+## Use-Package
+
+[use-package](https://github.com/jwiegley/use-package) is a package which allows
+you to defer loading packages, etc.
+
+I'm using this to speedup emacs startup, because it allows deferring package loads
+until emacs is idle.  For example the following would load the `uniquify` package,
+but only when emacs has been idle for two seconds:
+
+      (use-package uniquify
+        :defer 2
+        ..
+        )
+
+Here we load the package:
+
+```
+(require 'use-package)
+```
+
+
 ## Basic History
 
 I like to keep history of various tools beneath a transient directory, which I can remove whenever I like, rather than scattered around the filesystem.
@@ -205,8 +230,12 @@ minutes to suggest one to the user:
 If multiple buffers use the same filename we'll prefix with the parent directory:
 
 ```lisp
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'forward)
+
+(use-package uniquify
+  :defer 2
+  :init
+  (setq uniquify-buffer-name-style 'forward
+        uniquify-min-dir-content 2))
 ```
 
 
@@ -264,7 +293,10 @@ There is a handy [dockerfile-mode](https://github.com/spotify/dockerfile-mode) w
 Here we load it, and we can use `C-x C-b` to build the Dockerfile in the current buffer.
 
 ```lisp
-(require 'dockerfile-mode)
+(use-package dockerfile-mode
+  :defer 2
+  :mode
+  ("Dockerfile\\'" . dockerfile-mode))
 ```
 
 
@@ -278,12 +310,15 @@ One irritation is that by default "dotfiles" are shown, I usually prefer these t
 * Allows them to be toggled via `M-TAB`.
 
 ```lisp
-    (require 'dired-x)
-    (setq dired-omit-files "^\\...+$")
-    (add-hook 'dired-mode-hook (lambda ()
-      (local-set-key (kbd "M-TAB") 'dired-omit-mode)
-      (dired-omit-mode 1)))
-
+(use-package dired-x
+  :defer 4
+  :bind ("M-TAB" . dired-omit-mode)
+  :hook ((dired-mode . dired-omit-mode))
+  :config
+  (setq dired-omit-verbose nil)
+  ;; hide backup, autosave, *.*~ files
+  ;; omit mode can be toggled using `C-x M-o' in dired buffer.
+  (setq dired-omit-files "^\\...+$"))
 ```
 
 The `dired-git-info` package updates `dired` to allow you to view git commit information.  I bind that to `)`, which matches the toggling of detailed-information bound to `(` by default:
