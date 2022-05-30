@@ -321,15 +321,6 @@ One irritation is that by default "dotfiles" are shown, I usually prefer these t
   (setq dired-omit-files "^\\...+$"))
 ```
 
-The `dired-git-info` package updates `dired` to allow you to view git commit information.  I bind that to `)`, which matches the toggling of detailed-information bound to `(` by default:
-
-```lisp
-     (with-feature (dired-git-info)
-       (add-hook 'dired-mode-hook (lambda ()
-         (local-set-key (kbd ")") 'dired-git-info-mode))))
-```
-
-
 ## Language Modes
 
 Most of the time I spend in Emacs is for developing, and writing code.
@@ -342,32 +333,36 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
 
 
 ```lisp
+;; CFEngine
+(use-package cfengine
+  :defer 10
+  :mode ("\\.cf\\'" . cfengine-automode))
 
-    ;; CFEngine
-    (with-feature (cfengine)
-      (add-to-list 'auto-mode-alist '("\\.cf\\'" . cfengine-auto-mode)))
+;; Groovy
+(use-package groovy
+  :defer 10
+  :mode ("\\.groovy\\'" . groovy-mode))
 
-    ;; Groovy
-    (autoload 'groovy-mode "groovy-mode" "Major mode for editing Groovy code." t)
-    (add-to-list 'auto-mode-alist '("\\.groovy\\'" . groovy-mode))
+;; Lua
+(use-package lua-mode
+  :defer 10
+  :mode ("\\.lua\\'" . lua-mode))
 
-    ;; Lua
-    (with-feature (lua-mode)
-        (add-to-list 'auto-mode-alist '("\\.lua\\'" . lua-mode))
-        (add-to-list 'interpreter-mode-alist '(("lua"   . lua-mode))))
+;; Markdown
+(use-package markdown-mode
+  :defer 10
+  :mode (("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode)))
 
-    ;; Markdown
-    (with-feature (markdown-mode)
-        (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-        (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
+;; Puppet
+(use-package puppet-mode
+  :defer 10
+  :mode ("\\.pp$" . puppet-mode))
 
-    ;; Puppet
-    (with-feature (puppet-mode)
-        (add-to-list 'auto-mode-alist '("\\.pp$" . puppet-mode)))
-
-    ;; Ruby setup doesn't require loading a mode
-    (add-to-list 'auto-mode-alist '("\\.rb\\'" . ruby-mode))
-    (add-to-list 'interpreter-mode-alist '(("rb"   . ruby-mode)))
+;; Puppet
+(use-package ruby-mode
+  :defer 10
+  :mode ("\\.rb" . ruby-mode))
 ```
 
 The monkey programming language was introduced (and implemented!)
@@ -377,18 +372,19 @@ in the book "[Writing An Interpreter In Go](https://interpreterbook.com/)".
 enhancements, and comes complete with an emacs mode which we'll load here:
 
 ```lisp
-    (with-feature (monkey)
-        (setq auto-mode-alist
-            (append '(("\\.mon$" . monkey-mode)) auto-mode-alist)))
 
+;; Puppet
+(use-package monkey
+  :defer 20
+  :mode ("\\.mon" . monkey-mode))
 ```
 
 "`*.ino`" files are used by the Arduino IDE to compile code, and
 these files are C++ with magic-wrapping to make compilation happen:
 
 ```lisp
-    ;; Arduino input-files.
-    (add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
+;; Arduino input-files.
+(add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
 ```
 
 
@@ -397,10 +393,9 @@ these files are C++ with magic-wrapping to make compilation happen:
 Now we can configure basic formatting for C/C++:
 
 ```lisp
-    (setq c-default-style "linux")
-    (setq c-basic-offset 4)
-    (c-set-offset 'substatement-open 0)
-
+(setq c-default-style "linux")
+(setq c-basic-offset 4)
+(c-set-offset 'substatement-open 0)
 ```
 
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
@@ -424,8 +419,9 @@ In emacs-lisp-mode we can enable eldoc-mode to display information about a funct
 Once installed we can now configure the basic setup, ensuring that the mode is loaded for the editing of `*.go` files:
 
 ```lisp
-    (require 'go-mode)
-    (add-to-list 'auto-mode-alist (cons "\\.go\\'" 'go-mode))
+(use-package go-mode
+  :defer 10
+  :mode ("\\.go" . go-mode))
 ```
 
 Beyond the basic support for golang installed via that mode I've also configured LSP for this language, which provides smart completion & etc.
@@ -496,24 +492,24 @@ too - as these files almost always contain perl test-cases in my
 experience:
 
 ```lisp
-    ;;  We always prefer CPerl mode to Perl mode.
-    (fset 'perl-mode 'cperl-mode)
+;;  We always prefer CPerl mode to Perl mode.
+(fset 'perl-mode 'cperl-mode)
 
-    ;; Load .t files as perl too - as these are usually test-cases
-    (setq auto-mode-alist (append '(("\\.t$" . cperl-mode)) auto-mode-alist))
+;; Load .t files as perl too - as these are usually test-cases
+(setq auto-mode-alist (append '(("\\.t$" . cperl-mode)) auto-mode-alist))
 ```
 
 Now we want to make sure that the code is formatted according to my tastes:
 
 ```lisp
-    ;;  BSD Style brace placement, with tab=4 spaces.
-    (defun my-cperl-mode-hook ()
-       (setq cperl-indent-level 4)
-       (setq cperl-brace-offset -2)
-       (setq cperl-label-offset 0))
+;;  BSD Style brace placement, with tab=4 spaces.
+(defun my-cperl-mode-hook ()
+  (setq cperl-indent-level 4)
+  (setq cperl-brace-offset -2)
+  (setq cperl-label-offset 0))
 
-    ;;  When starting load my hooks
-    (add-hook 'cperl-mode-hook 'my-cperl-mode-hook t)
+;;  When starting load my hooks
+(add-hook 'cperl-mode-hook 'my-cperl-mode-hook t)
 ```
 
 I also install a post-save hook which shows if the perl we're writing
@@ -523,7 +519,7 @@ is well-formed.
 in `BEGIN{ .. }` blocks.
 
 ```lisp
-    (noerr-require 'perl-syntax-check)
+(noerr-require 'perl-syntax-check)
 ```
 
 The last Perl-specific thing I have is `M-x perltidy` which will
@@ -559,10 +555,10 @@ Using the function we've just defined we can now make sure that we tidy
 our perl-buffers just prior to saving, if we have a `perltidy` executable:
 
 ```lisp
-    (add-hook 'cperl-mode-hook
-        (lambda ()
-            (if (executable-find "perltidy")
-                (add-hook 'before-save-hook 'perltidy nil t))))
+(add-hook 'cperl-mode-hook
+  (lambda ()
+   (if (executable-find "perltidy")
+    (add-hook 'before-save-hook 'perltidy nil t))))
 ```
 
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
@@ -574,8 +570,8 @@ Note that I also setup [code-folding](#language-mode-helpers---code-folding) lat
 I'm having fun doing "retro" things with a [Z80 processor](https://en.wikipedia.org/wiki/Zilog_Z80), so this mode loads the appropriate mode for that.
 
 ```lisp
-    (require `z80-mode)
-    (add-to-list 'auto-mode-alist (cons "\\.z80\\'" 'z80-mode))
+(require `z80-mode)
+(add-to-list 'auto-mode-alist (cons "\\.z80\\'" 'z80-mode))
 
 (add-hook 'z80-mode-hook (lambda ()
        (set (make-local-variable 'comment-start) "//")
@@ -599,25 +595,17 @@ problem - of wanting to mix HTML-mode along with Javascript-mode for example,
 I use [web-mode](http://web-mode.org/):
 
 ```lisp
-    (require 'web-mode)
-    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-```
-
-The default choices seem to have tags be almost invisible, so we'll
-explicitly set them to pink, and configure the indentation too:
-
-```lisp
-    (set-face-attribute 'web-mode-html-tag-bracket-face nil :foreground "Pink1")
-    ;; Highlighting the current element helps the fight against divitus.
-    (setq web-mode-enable-current-element-highlight t)
-
-    ;; All modes should use the same indentation.
-    (setq web-mode-markup-indent-offset 2)
-    (setq web-mode-css-indent-offset 2)
-    (setq web-mode-code-indent-offset 2)
-
+(use-package web-mode
+  :defer 10
+  :mode (("\\.html\\'" . web-mode)
+         ("\\.php\\'"  . web-mode)
+         ("\\.erb\\'" . web-mode))
+  :init
+   (set-face-attribute 'web-mode-html-tag-bracket-face nil :foreground "Pink1")
+   (setq web-mode-enable-current-element-highlight t)
+   (setq web-mode-markup-indent-offset 2)
+   (setq web-mode-css-indent-offset 2)
+   (setq web-mode-code-indent-offset 2))
 ```
 
 ### Language Modes - YAML Mode
@@ -625,9 +613,10 @@ explicitly set them to pink, and configure the indentation too:
 YAML is used in Gitlab CI, and similar places.
 
 ```lisp
-(require 'yaml-mode)
-(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-(add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode))
+(use-package yaml-mode
+  :defer 10
+  :mode (("\\.yml\\'"   . yaml-mode)
+         ("\\.yaml\\'"  . yaml-mode)))
 ```
 
 ### Language Mode Helpers - Code Folding
