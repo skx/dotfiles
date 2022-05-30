@@ -147,7 +147,7 @@ but only when emacs has been idle for two seconds:
 
 Here we load the package:
 
-```
+```lisp
 (require 'use-package)
 ```
 
@@ -599,13 +599,14 @@ I use [web-mode](http://web-mode.org/):
   :defer 10
   :mode (("\\.html\\'" . web-mode)
          ("\\.php\\'"  . web-mode)
-         ("\\.erb\\'" . web-mode))
+         ("\\.erb\\'"  . web-mode))
   :init
    (set-face-attribute 'web-mode-html-tag-bracket-face nil :foreground "Pink1")
    (setq web-mode-enable-current-element-highlight t)
    (setq web-mode-markup-indent-offset 2)
    (setq web-mode-css-indent-offset 2)
-   (setq web-mode-code-indent-offset 2))
+   (setq web-mode-code-indent-offset 2)
+ )
 ```
 
 ### Language Modes - YAML Mode
