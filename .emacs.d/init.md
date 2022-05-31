@@ -29,7 +29,7 @@ Having easy access to a new lisp buffer is also useful, for experimentation:
 
 ```lisp
 (defun skx-scratch-buffer()
-  "Create a unique scratch-buffer, and swithc to it"
+  "Create a unique scratch-buffer, and switch to it"
   (interactive)
   (switch-to-buffer (generate-new-buffer-name "*scratch*"))
   (insert "; Scratch buffer, kill it when you're done\n\n")
@@ -39,24 +39,19 @@ Having easy access to a new lisp buffer is also useful, for experimentation:
 
 ## Initial Functions
 
-Common Lisp is required by some other later things, more detail here would
-be nice but to get started we'll just require that library:
+Common Lisp is required by some other later things, more detail here would be nice but to get started we'll just require that library:
 
 ```lisp
 (require 'cl)
 ```
 
-We also want to operate as a server, so we'll make sure that we start that
-before we go any further:
+We also want to operate as a server, so we'll make sure that we start that before we go any further:
 
 ```lisp
 (server-start)
 ```
 
-The first thing we need to do is make sure that the various subdirectories
-beneath the `~/.emacs/` directory are added to the load-path.  This will
-ensure that future use of `require` will find the files we're attempting
-to load:
+The first thing we need to do is make sure that the various subdirectories beneath the `~/.emacs/` directory are added to the load-path.  This will ensure that future use of `require` will find the files we're attempting to load:
 
 ```lisp
 (defun add-to-load-path (d)
@@ -70,53 +65,18 @@ to load:
 Now we define some utility-functions to load packages.  The following function will load a package and avoid raising an error if it isn't found:
 
 ```lisp
-    (defun noerr-require (feature)
-        "`require' FEATURE, but don't invoke any Lisp errors.
-        If FEATURE cannot be loaded, this function will print an error
-        message through `message' and return nil. It otherwise behaves
-        exactly as `require'."
-        (ignore-errors
-           (require feature (symbol-name feature) t)))
+(defun noerr-require (feature)
+   "`require' FEATURE, but don't invoke any Lisp errors.
+   If FEATURE cannot be loaded, this function will print an error
+   message through `message' and return nil. It otherwise behaves
+   exactly as `require'."
+   (ignore-errors
+     (require feature (symbol-name feature) t)))
 ```
 
-With the previous method in-place we can now ensure that if a package is
-successfully loaded we can then conditionally execute some code:
+The initial setup is now complete, so we can start loading packages, making configuration-changes & etc.
 
-```lisp
-    (defmacro with-feature (feature &rest body)
-        "Require FEATURE and execute BODY.
-        If FEATURE can't be loaded, don't execute BODY."
-        (when (noerr-require (car feature))
-            (push 'progn body)))
-```
-
-And for completeness we'll define some useful macros for running things
-in different environments and hosts:
-
-```lisp
-(defmacro with-system (systype &rest body)
-  (if (equal system-type systype)
-      `(progn ,@body)))
-
-(defmacro with-host (host &rest body)
-  (if (equal system-name host)
-      `(progn ,@body)))
-
-(defmacro except-host (host &rest body)
-  (if (not (equal system-name host))
-      `(progn ,@body)))
-
-
-;(with-system gnu/linux (message "GNU/Linux system"))
-;(with-host   "frodo.home" (message "Home desktop"))
-;(except-host "frodo.home" (message "Not foo-bar"))
-```
-
-The initial setup is now complete, so we can start loading packages, making
-configuration-changes & etc.
-
-Finally for interactive evaluation this is a handy function to evaluate
-either the current expression, or the current selection:
+Finally for interactive evaluation this is a handy function to evaluate either the current expression, or the current selection:
 
 ```lisp
 (defun eval-region-or-last-sexp ()
@@ -133,12 +93,9 @@ We'll bind this to a key, later.
 
 ## Use-Package
 
-[use-package](https://github.com/jwiegley/use-package) is a package which allows
-you to defer loading packages, etc.
+[use-package](https://github.com/jwiegley/use-package) is a package which allows you to defer loading packages, etc.
 
-I'm using this to speedup emacs startup, because it allows deferring package loads
-until emacs is idle.  For example the following would load the `uniquify` package,
-but only when emacs has been idle for two seconds:
+I'm using this to speedup emacs startup, because it allows deferring package loads until emacs is idle.  For example the following would load the `uniquify` package, but only when emacs has been idle for two seconds:
 
       (use-package uniquify
         :defer 2
@@ -220,7 +177,9 @@ Regular breaks are good, so we configure an alarm to go off every thirty
 minutes to suggest one to the user:
 
 ```lisp
-(with-feature (break-time)
+(use-package break-time
+  :defer 2
+  :custom
   (break-time-start))
 ```
 
@@ -419,9 +378,17 @@ In emacs-lisp-mode we can enable eldoc-mode to display information about a funct
 Once installed we can now configure the basic setup, ensuring that the mode is loaded for the editing of `*.go` files:
 
 ```lisp
+(defun my-go-before-save ()
+  "Format buffer and organize imports in Go mode."
+  (when (eq major-mode 'go-mode)
+    (lsp-organize-imports)
+    (lsp-format-buffer)))
+
+
 (use-package go-mode
   :defer 10
-  :mode ("\\.go" . go-mode))
+  :mode ("\\.go" . go-mode)
+  :hook (before-save . my-go-before-save))
 ```
 
 Beyond the basic support for golang installed via that mode I've also configured LSP for this language, which provides smart completion & etc.
@@ -450,7 +417,7 @@ Once the dependencies are present the following configures LSP, including a help
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
 
 ;; Define local keymappings for lsp-using modes
-(defun skx/lsp-go-setup-bindings ()
+(defun skx/lsp-setup-bindings ()
   ; go to definition
   (local-set-key (kbd "M-SPC") 'lsp-find-definition)
   ; go back
@@ -468,14 +435,12 @@ Once the dependencies are present the following configures LSP, including a help
 
 ;; If we have `gopls` on our $PATH AND we have `lsp-mode` available ..
 ;; Then setup LSP, and add the hooks for go-mode to use it.
-(if (executable-find "gopls")
-    (with-feature (lsp-mode)
-        (skx/setup-lsp)
-        (add-hook 'go-mode-hook #'lsp-deferred)
-        (add-hook 'python-mode-hook #'lsp-deferred)
-
-        (add-hook 'python-mode-hook #'yas-minor-mode)
-        (add-hook 'go-mode-hook #'yas-minor-mode)))
+(use-package lsp-mode
+  :if (executable-find "gopls")
+  :custom
+   (skx/setup-lsp)
+  :hook ((go-mode python-mode) . lsp-deferred)
+  )
 ```
 
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
@@ -601,7 +566,6 @@ I use [web-mode](http://web-mode.org/):
          ("\\.php\\'"  . web-mode)
          ("\\.erb\\'"  . web-mode))
   :init
-   (set-face-attribute 'web-mode-html-tag-bracket-face nil :foreground "Pink1")
    (setq web-mode-enable-current-element-highlight t)
    (setq web-mode-markup-indent-offset 2)
    (setq web-mode-css-indent-offset 2)
@@ -718,9 +682,11 @@ align the section based upon the `=` sign:
 Using [column-enforce-mode](https://github.com/jordonbiondo/column-enforce-mode) we can view lines that are "too long", in a clear fashion:
 
 ```lisp
-(except-host "localhost.localdomain"
-    (with-feature (column-enforce-mode)
-        (global-column-enforce-mode t)))
+(use-package column-enforce-mode
+  :defer 2
+  :config
+  (add-hook 'prog-mode-hook 'column-enforce-mode)
+  (add-hook 'text-mode-hook 'column-enforce-mode))
 ```
 
 The above section is enabled for all hosts, except the one system I have which has a hostname of `localhost.localdomain` - this is a system which is not configured for _real_ use..
@@ -752,25 +718,24 @@ I put together the [org-nested](https://github.com/skx/org-nested) package to al
 As noted above it is possible to evaluated blocks of script from within `org-mode`, but shell-scripting is disabled by default so we need to enable this explicitly:
 
 ```lisp
-;; This works with the older-version of org-mode, as installed upon frodo.home
-(with-feature (ob-sh)
-              (org-babel-do-load-languages 'org-babel-load-languages '((sh . t))))
-
-;; This is the preferred approach, which works on modern release of emacs and org-mode.
-(with-feature (ob-shell)
-              (org-babel-do-load-languages 'org-babel-load-languages '((shell . t))))
+(use-package ob-shell
+  :commands
+  org-babel-execute:sh
+  org-babel-expand-body:sh
+  org-babel-execute:bash
+  org-babel-expand-body:bash)
 
 ;; Ensure that we can export org-blocks
 ;; This is done for the CSS & Javascript export blocks
-(require 'ob-org)
+;;(require 'ob-org)
 
 ```
 
 We'll also improve the default list-management functionality:
 
 ```lisp
-(with-feature (org-autolist)
-   (add-hook 'org-mode-hook (lambda () (org-autolist-mode))))
+(use-package org-autolist
+  :hook (org-mode-hook . org-autolist-mode))
 ```
 
 When following links `C-RETURN` moves back:
@@ -826,8 +791,27 @@ Now we're done with the general setup so we'll handle the more specific things h
 (defun skx/org-agenda-skip-complete ()
   (org-agenda-skip-entry-if 'regexp ":noexport:\\|100%"))
 
-(with-feature (org-agenda)
-  (setq org-agenda-custom-commands
+(use-package org-agenda
+  :ensure nil
+  :after org
+  :bind
+  ("C-c a" . org-agenda)
+  :custom
+
+  ;; Our agenda-view will span two weeks by default.
+  (org-agenda-span 14)
+
+  ;; But the agenda will start on the current day.
+  ( org-agenda-start-on-weekday nil)
+
+  ;; We don't show tasks that are complete
+  (org-agenda-skip-deadline-if-done t)
+  (org-agenda-skip-scheduled-if-done t)
+
+  ;; When showing TODO we show the headline from which the item came.
+  (org-agenda-prefix-format "%-12:c %b")
+
+  (org-agenda-custom-commands
      '(("wi" "List of items closed in the past week."
         tags "+CLOSED>\"<-7d>\"/DONE")
        ("wq" "Quick (log) view"
@@ -837,18 +821,8 @@ Now we're done with the general setup so we'll handle the more specific things h
         search (format-time-string "%Y-%m-%d"))
        ("wo" "Outstanding items."
         todo ""
-        ((org-agenda-skip-function 'skx/org-agenda-skip-complete))))))
-
-;;
-;; Our agenda-view will span two weeks by default.
-(setq org-agenda-span 14)
-
-;; But the agenda will start on the current day.
-(setq org-agenda-start-on-weekday nil)
-
-;; We don't show tasks that are complete
-(setq org-agenda-skip-deadline-if-done t)
-(setq org-agenda-skip-scheduled-if-done t)
+        ((org-agenda-skip-function 'skx/org-agenda-skip-complete)))))
+)
 
 ;; RETURN will follow links in org-mode files
 (setq org-return-follows-link  t)
@@ -871,8 +845,6 @@ Now we're done with the general setup so we'll handle the more specific things h
     ("CANCELED"   . (:foreground "pink" :weight bold))))
 
 
-;; When showing TODO we show the headline from which the item came.
-(setq org-agenda-prefix-format "%-12:c %b")
 
 ;; Indentation in org-buffers matches the header-level
 (setq org-startup-indented t)
@@ -1604,8 +1576,9 @@ Here I configure it to be used for both `markdown-mode` and `org-mode`:
       (local-set-key (kbd "M-i") 'imenu-list)))
 )
 
-
-(with-feature (imenu-list)
+(use-package imenu-list
+  :defer 2
+  :init
   (skx/imenu-setup))
 ```
 
