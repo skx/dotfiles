@@ -686,7 +686,9 @@ The next thing that is globally useful is to allow searches for internal links t
 I put together the [org-nested](https://github.com/skx/org-nested) package to allow refining links easily.  Allowing links to be augmented by refinements.  This is now loaded:
 
 ```lisp
-(require 'org-nested)
+(use-package org-nested
+  :after org
+  :defer 2)
 ```
 
 As noted above it is possible to evaluated blocks of script from within `org-mode`, but shell-scripting is disabled by default so we need to enable this explicitly:
@@ -731,9 +733,10 @@ which are not, and kills exporting.  We want to ignore that behaviour:
 `org-mode` is __all__ about lists!  So one thing that is nice is to visually update the display of the list-prefixes, via unicode characters.  We'll use `org-bullets` for that:
 
 ```lisp
-(require 'org-bullets)
-(add-hook 'org-mode-hook (lambda ()
-    (org-bullets-mode 1)))
+(use-package org-bullets
+  :after org
+  :defer 2
+  :hook (org-mode . org-bullets-mode))
 ```
 
 
@@ -961,7 +964,9 @@ By default `org-mode` will prompt you to confirm that you want execution to happ
 I put together a simple tag-cloud helper package, which we'll now load:
 
 ```lisp
-(require 'org-tag-cloud)
+(use-package org-tag-cloud
+  :after org
+  :defer 2)
 ```
 
 To make it useful we'll ensure that we disable warnings about eval which would otherwise be shown when following such a link.
