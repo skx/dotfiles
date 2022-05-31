@@ -25,7 +25,7 @@ This is a handy function I use if I need to edit this file:
     (find-file (expand-file-name "~/.emacs.d/init.md")))
 ```
 
-Having easy access to a new lisp buffer is also useful, for experimentation:
+On a related note having easy access to a new lisp buffer is also useful, so I've defined the following to give me a new "scratch" buffer:
 
 ```lisp
 (defun skx-scratch-buffer()
@@ -39,19 +39,15 @@ Having easy access to a new lisp buffer is also useful, for experimentation:
 
 ## Initial Functions
 
-Common Lisp is required by some things later in this file.  More detail here would be nice but in order to get started we'll just require that library:
-
-```lisp
-(require 'cl)
-```
-
-We also want to operate as a server, so we'll make sure that we start that before we go any further:
+We want to operate as a server, so we'll make sure that we start that before we go any further:
 
 ```lisp
 (server-start)
 ```
 
-The first thing we need to do is make sure that the various subdirectories beneath the `~/.emacs/` directory are added to the load-path.  This will ensure that future use of `require` will find the files we're attempting to load:
+Operating as a server means that we can reuse the single Emacs instance, without having to worry about restarting new copies (and the potential speed-hit that would cost).
+
+With the server-startup out of the way the first thing we need to do is make sure that the various subdirectories beneath the `~/.emacs/` directory are added to the load-path.  This will ensure that future use of `require` will find the files we're attempting to load:
 
 ```lisp
 (defun add-to-load-path (dir)
@@ -77,6 +73,7 @@ Here we load the package which we'll then use for further configuration:
 
 ```lisp
 (require 'use-package)
+(setq use-package-compute-statistics t)
 ```
 
 
@@ -111,23 +108,22 @@ Now we can configure the history:
 (savehist-mode 1)
 ```
 
+
 ## Backup Files
 
 I'm annoyed by backups and similar.  So I disable them all:
 
 ```lisp
+;; Disable backups
+(setq backup-inhibited t)
+(setq make-backup-files nil)
 
-    ;; Disable backups
-    (setq backup-inhibited t)
-    (setq make-backup-files nil)
+;; Disable auto-save
+(setq auto-save-default nil)
+(setq auto-save-interval (* 60 60 24))
 
-    ;; Disable auto-save
-    (setq auto-save-default nil)
-    (setq auto-save-interval (* 60 60 24))
-
-    ;; Remove lockfiles
-    (setq create-lockfiles nil)
-
+;; Remove lockfiles
+(setq create-lockfiles nil)
 ```
 
 
@@ -160,7 +156,6 @@ minutes to suggest one to the user:
 If multiple buffers use the same filename we'll prefix with the parent directory:
 
 ```lisp
-
 (use-package uniquify
   :defer 2
   :init
@@ -241,7 +236,7 @@ One irritation is that by default "dotfiles" are shown, I usually prefer these t
 
 ```lisp
 (use-package dired-x
-  :defer 4
+  :defer 2
   :bind ("M-TAB" . dired-omit-mode)
   :hook ((dired-mode . dired-omit-mode))
   :config
@@ -265,33 +260,33 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
 ```lisp
 ;; CFEngine
 (use-package cfengine
-  :defer 10
+  :defer 2
   :mode ("\\.cf\\'" . cfengine-automode))
 
 ;; Groovy
 (use-package groovy
-  :defer 10
+  :defer 2
   :mode ("\\.groovy\\'" . groovy-mode))
 
 ;; Lua
 (use-package lua-mode
-  :defer 10
+  :defer 2
   :mode ("\\.lua\\'" . lua-mode))
 
 ;; Markdown
 (use-package markdown-mode
-  :defer 10
+  :defer 2
   :mode (("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode)))
 
 ;; Puppet
 (use-package puppet-mode
-  :defer 10
+  :defer 2
   :mode ("\\.pp$" . puppet-mode))
 
 ;; Puppet
 (use-package ruby-mode
-  :defer 10
+  :defer 2
   :mode ("\\.rb" . ruby-mode))
 ```
 
@@ -305,7 +300,7 @@ enhancements, and comes complete with an emacs mode which we'll load here:
 
 ;; Puppet
 (use-package monkey
-  :defer 20
+  :defer 2
   :mode ("\\.mon" . monkey-mode))
 ```
 
@@ -357,7 +352,7 @@ Once installed we can now configure the basic setup, ensuring that the mode is l
 
 
 (use-package go-mode
-  :defer 10
+  :defer 2
   :mode ("\\.go" . go-mode)
   :hook (before-save . my-go-before-save))
 ```
@@ -504,20 +499,22 @@ Note that I also setup [code-folding](#language-mode-helpers---code-folding) lat
 I'm having fun doing "retro" things with a [Z80 processor](https://en.wikipedia.org/wiki/Zilog_Z80), so this mode loads the appropriate mode for that.
 
 ```lisp
-(require `z80-mode)
-(add-to-list 'auto-mode-alist (cons "\\.z80\\'" 'z80-mode))
+(defun skx/z80-mode()
+  (set (make-local-variable 'comment-start) "//")
+  (set (make-local-variable 'comment-end) "")
+  (set (make-local-variable 'hs-block-start-regexp) "^; ?{")
+  (set (make-local-variable 'hs-block-end-regexp) "^; ?}")
+  (hs-minor-mode t)
+  (set 'hs-block-start-regexp "^; ?{{")
+  (set 'hs-block-end-regexp "^; ?}}")
+  (local-set-key (kbd "M-C-i") 'hs-toggle-hiding)
+  (local-set-key (kbd "M--") 'hs-hide-all)
+  (local-set-key (kbd "M-+") 'hs-show-all))
 
-(add-hook 'z80-mode-hook (lambda ()
-       (set (make-local-variable 'comment-start) "//")
-       (set (make-local-variable 'comment-end) "")
-       (set (make-local-variable 'hs-block-start-regexp) "^; ?{")
-       (set (make-local-variable 'hs-block-end-regexp) "^; ?}")
-       (hs-minor-mode t)
-       (set 'hs-block-start-regexp "^; ?{{")
-       (set 'hs-block-end-regexp "^; ?}}")
-       (local-set-key (kbd "M-C-i") 'hs-toggle-hiding)
-       (local-set-key (kbd "M--") 'hs-hide-all)
-       (local-set-key (kbd "M-+") 'hs-show-all)))
+(use-package z80-mode
+  :defer 2
+  :mode ("\\.z80$" . z80-mode)
+  :hook ((z80-mode . skx/z80-mode)))
 
 ```
 
@@ -530,7 +527,7 @@ I use [web-mode](http://web-mode.org/):
 
 ```lisp
 (use-package web-mode
-  :defer 10
+  :defer 2
   :mode (("\\.html\\'" . web-mode)
          ("\\.php\\'"  . web-mode)
          ("\\.erb\\'"  . web-mode))
@@ -548,7 +545,7 @@ YAML is used in Gitlab CI, and similar places.
 
 ```lisp
 (use-package yaml-mode
-  :defer 10
+  :defer 2
   :mode (("\\.yml\\'"   . yaml-mode)
          ("\\.yaml\\'"  . yaml-mode)))
 ```
@@ -562,14 +559,14 @@ This also binds `Esc-TAB` to toggle the block under the point, and `Esc--`
 and `Esc-+` to hide/show all:
 
 ```lisp
-    (defun enable-hs-mode-hook()
-      (hs-minor-mode 1)
-      (local-set-key (kbd "M-C-i") 'hs-toggle-hiding)
-      (local-set-key (kbd "M--") 'hs-hide-all)
-      (local-set-key (kbd "M-+") 'hs-show-all))
+(defun enable-hs-mode-hook()
+  (hs-minor-mode 1)
+  (local-set-key (kbd "M-C-i") 'hs-toggle-hiding)
+  (local-set-key (kbd "M--") 'hs-hide-all)
+  (local-set-key (kbd "M-+") 'hs-show-all))
 
-    ;; Enable code-folding for the common languages I use.
-    (add-hook 'prog-mode-hook 'enable-hs-mode-hook)
+;; Enable code-folding for the common languages I use.
+(add-hook 'prog-mode-hook 'enable-hs-mode-hook)
 ```
 
 
@@ -600,7 +597,7 @@ easily, this also includes other examples such as:
 
 ```lisp
 (use-package hl-todo
-  :defer 4
+  :defer 2
   :config
     (setq hl-todo-keyword-faces
       '(("FIXME"   . "#ffff00")
