@@ -39,7 +39,7 @@ Having easy access to a new lisp buffer is also useful, for experimentation:
 
 ## Initial Functions
 
-Common Lisp is required by some other later things, more detail here would be nice but to get started we'll just require that library:
+Common Lisp is required by some things later in this file.  More detail here would be nice but in order to get started we'll just require that library:
 
 ```lisp
 (require 'cl)
@@ -54,55 +54,26 @@ We also want to operate as a server, so we'll make sure that we start that befor
 The first thing we need to do is make sure that the various subdirectories beneath the `~/.emacs/` directory are added to the load-path.  This will ensure that future use of `require` will find the files we're attempting to load:
 
 ```lisp
-(defun add-to-load-path (d)
+(defun add-to-load-path (dir)
   "If the supplied item is a directory then add it to the load-path"
-  (if (file-directory-p d)
-    (add-to-list 'load-path d)))
+  (if (file-directory-p dir)
+    (add-to-list 'load-path dir)))
 
 (mapc 'add-to-load-path (file-expand-wildcards "~/.emacs.d/*"))
 ```
 
-Now we define some utility-functions to load packages.  The following function will load a package and avoid raising an error if it isn't found:
-
-```lisp
-(defun noerr-require (feature)
-   "`require' FEATURE, but don't invoke any Lisp errors.
-   If FEATURE cannot be loaded, this function will print an error
-   message through `message' and return nil. It otherwise behaves
-   exactly as `require'."
-   (ignore-errors
-     (require feature (symbol-name feature) t)))
-```
-
 The initial setup is now complete, so we can start loading packages, making configuration-changes & etc.
 
-Finally for interactive evaluation this is a handy function to evaluate either the current expression, or the current selection:
+[use-package](https://github.com/jwiegley/use-package) is a helpful library which allows you to keep all configuration related to a single package in a self-contained block, and do so much more.
 
-```lisp
-(defun eval-region-or-last-sexp ()
-  (interactive)
-  (if (region-active-p) (call-interactively 'eval-region)
-    (call-interactively 'eval-last-sexp)))
-```
-
-We'll bind this to a key, later.
-
-
-
-
-
-## Use-Package
-
-[use-package](https://github.com/jwiegley/use-package) is a package which allows you to defer loading packages, etc.
-
-I'm using this to speedup emacs startup, because it allows deferring package loads until emacs is idle.  For example the following would load the `uniquify` package, but only when emacs has been idle for two seconds:
+I'm using `use-package` to speedup emacs startup, because it allows deferring package loads until emacs is idle.  For example the following would load the `uniquify` package, but only when emacs has been idle for two seconds:
 
       (use-package uniquify
         :defer 2
         ..
         )
 
-Here we load the package:
+Here we load the package which we'll then use for further configuration:
 
 ```lisp
 (require 'use-package)
@@ -449,7 +420,7 @@ Note that I also setup [code-folding](#language-mode-helpers---code-folding) lat
 
 ### Language Modes - Perl
 
-I do a lot of my coding in Perl, and this is configured here.
+I used to do a lot of my coding in Perl, and this is configured here.
 
 First of all we want to ensure that we use `cperl-mode`, rather than
 `perl-mode`, and we wish to ensure that `*.t` are formatted in this mode
@@ -477,14 +448,12 @@ Now we want to make sure that the code is formatted according to my tastes:
 (add-hook 'cperl-mode-hook 'my-cperl-mode-hook t)
 ```
 
-I also install a post-save hook which shows if the perl we're writing
-is well-formed.
+I also install a post-save hook which shows if the perl we're writing is well-formed.
 
-**NOTE**: This can be abused as `perl -c ...` will evaluate code found
-in `BEGIN{ .. }` blocks.
+**NOTE**: This can be abused as `perl -c ...` will evaluate code found in `BEGIN{ .. }` blocks.
 
 ```lisp
-(noerr-require 'perl-syntax-check)
+(use-package perl-syntax-check)
 ```
 
 The last Perl-specific thing I have is `M-x perltidy` which will
@@ -1401,7 +1370,7 @@ by [MPD](http://www.musicpd.org/).  There are several different MPD
 client-modes in Emacs, this is my own:
 
 ```lisp
-    (noerr-require 'mpc)
+(use-package mpc)
 ```
 
 

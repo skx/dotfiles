@@ -15,3 +15,5 @@
    (t nil)))
 
 (add-hook 'after-save-hook 'cw_save_check)
+
+(provide 'perl-syntax-check)
