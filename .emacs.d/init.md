@@ -197,9 +197,17 @@ If multiple buffers use the same filename we'll prefix with the parent directory
 There are several packages out there providing "completion".  The most common are `ivy`, `helm`, and `ido`.  I'm using the latter:
 
 ```lisp
-(ido-mode 1)
-(setq ido-enable-flex-matching t)
-(ido-everywhere)
+;; IDO
+(use-package ido
+  :defer 2
+  :config
+  (setq ido-everywhere t
+    ido-use-filename-at-point t
+    ido-virtual-buffers t
+    ido-use-faces t
+    ido-default-buffer-method 'selected-window
+    ido-auto-merge-work-directories-length -1)
+  (ido-mode))
 ```
 
 ## Custom Variables
