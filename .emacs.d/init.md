@@ -559,7 +559,8 @@ It is often useful to auto-insert content when visiting a particular kind of fil
 The `skx-template` package allows that to be done in a simple fashion; when visiting a file for the first time it will insert a snippet if it exists.
 
 ```lisp
-(require 'skx-template)
+(use-package skx-template
+  :defer 2)
 ```
 
 ### Language Mode Helpers - TODO Highlighting
@@ -816,15 +817,11 @@ Now we're done with the general setup so we'll handle the more specific things h
 Since we're hiding the emphasis markers it can be hard to edit text which is formatted.  To handle that we use [org-appear](https://github.com/awth13/org-appear):
 
 ```lisp
-; load the library
-(require 'org-appear)
-
-; Ensure that we toggle link-markup as well as bold/italic/etc.
-(setq org-appear-autolinks t)
-
-; enable it in the modes we care about.
-(add-hook 'org-diary-mode-hook 'org-appear-mode)
-(add-hook 'org-mode-hook 'org-appear-mode)
+(use-package org-appear
+  :after org
+  :config
+  (setq org-appear-autolinks t)
+  :hook ((org-mode org-diary-mode) . org-appear-mode))
 ```
 
 ## Org-Mode Diary
