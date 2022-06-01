@@ -535,14 +535,14 @@ This also binds `Esc-TAB` to toggle the block under the point, and `Esc--`
 and `Esc-+` to hide/show all:
 
 ```lisp
-(defun enable-hs-mode-hook()
-  (hs-minor-mode 1)
-  (local-set-key (kbd "M-C-i") 'hs-toggle-hiding)
-  (local-set-key (kbd "M--") 'hs-hide-all)
-  (local-set-key (kbd "M-+") 'hs-show-all))
-
-;; Enable code-folding for the common languages I use.
-(add-hook 'prog-mode-hook 'enable-hs-mode-hook)
+(use-package hs-minor-mode
+  :hook prog-mode
+  :bind
+    (
+    ("C-M-i" . #'hs-toggle-hiding)
+    ("M--" . #'hs-hide-all)
+    ("M-+" . #'hs-show-all)
+    ))
 ```
 
 
