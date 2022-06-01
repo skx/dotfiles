@@ -536,6 +536,7 @@ and `Esc-+` to hide/show all:
 
 ```lisp
 (use-package hs-minor-mode
+  :defer 2
   :hook prog-mode
   :bind
     (
@@ -663,6 +664,7 @@ As noted above it is possible to evaluated blocks of script from within `org-mod
 
 ```lisp
 (use-package ob-shell
+  :defer 2
   :commands
   org-babel-execute:sh
   org-babel-expand-body:sh
@@ -679,6 +681,8 @@ We'll also improve the default list-management functionality:
 
 ```lisp
 (use-package org-autolist
+  :after org
+  :defer 2
   :hook (org-mode-hook . org-autolist-mode))
 ```
 
@@ -737,6 +741,7 @@ Now we're done with the general setup so we'll handle the more specific things h
   (org-agenda-skip-entry-if 'regexp ":noexport:\\|100%"))
 
 (use-package org-agenda
+  :defer 2
   :ensure nil
   :after org
   :bind
@@ -1161,13 +1166,15 @@ Sometimes org-mode files contain secrets, things that you don't want to make vis
 You can run `M-x org-decrypt-entries` to make them visible, but re-encrypt any time you save:
 
 ```lisp
-(require 'org-crypt)
-(add-hook 'org-mode-hook
-          (lambda()
-            (add-hook 'before-save-hook 'org-encrypt-entries nil t)
-            (setq org-tags-exclude-from-inheritance (quote ("crypt")))
-            (setq org-crypt-key "root@localhost")
-            (setq auto-save-default nil)))
+(use-package org-crypt
+  :defer 2
+  :ensure nil  ;; included with org-mode
+  :after org
+  :config
+  (org-crypt-use-before-save-magic)
+  (setq org-tags-exclude-from-inheritance (quote ("crypt")))
+  :custom
+  (org-crypt-key "root@localhost"))
 ```
 
 The downside to encrypting contents is that you'll have a random GPG-message in your exported document.  There are two solutions here:
@@ -1348,7 +1355,8 @@ by [MPD](http://www.musicpd.org/).  There are several different MPD
 client-modes in Emacs, this is my own:
 
 ```lisp
-(use-package mpc)
+(use-package mpc
+  :defer 2)
 ```
 
 
