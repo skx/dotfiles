@@ -183,15 +183,6 @@ If multiple buffers use the same filename we'll prefix with the parent directory
             (calendar-set-date-style 'european)))
 ```
 
-### Calc Mode
-
-`literate-calc-mode` is a cute mode which allows constantly-updating calculations.  You can edit sums inside markdown, org-mode, and similar files, and see the results as overlays.
-
-```lisp
-(require 'literate-calc-mode)
-```
-
-
 ## Completion
 
 There are several packages out there providing "completion".  The most common are `ivy`, `helm`, and `ido`.  I'm using the latter:
