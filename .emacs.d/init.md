@@ -447,7 +447,10 @@ I also install a post-save hook which shows if the perl we're writing is well-fo
 **NOTE**: This can be abused as `perl -c ...` will evaluate code found in `BEGIN{ .. }` blocks.
 
 ```lisp
-(use-package perl-syntax-check)
+(use-package perl-syntax-check
+  :defer 2
+  :if (executable-find "perl")
+)
 ```
 
 The last Perl-specific thing I have is `M-x perltidy` which will
@@ -458,37 +461,11 @@ configuration file I have stored in my dotfiles:
 
 
 ```lisp
-(defun perltidy()
-  "Tidy the contents of the current buffer via `perltidy'"
-  (interactive)
-  (setq temp-point (point))
-  (shell-command-on-region
-   ;; beginning and end of buffer
-   (point-min)
-   (point-max)
-   ;; command and parameters
-   "perltidy"
-   ;; output buffer
-   (current-buffer)
-   ;; replace?
-   t
-   ;; name of the error buffer
-   "*Error Buffer*"
-   ;; show error buffer?
-   t)
-  (goto-char temp-point))
+(use-package perl-tidy-on-save
+  :defer 2
+  :if (executable-find "perltidy")
+  )
 ```
-
-Using the function we've just defined we can now make sure that we tidy
-our perl-buffers just prior to saving, if we have a `perltidy` executable:
-
-```lisp
-(add-hook 'cperl-mode-hook
-  (lambda ()
-   (if (executable-find "perltidy")
-    (add-hook 'before-save-hook 'perltidy nil t))))
-```
-
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
 
 
