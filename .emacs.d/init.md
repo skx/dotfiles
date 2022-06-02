@@ -16,26 +16,28 @@ files if they are present, which are written in a similar literate fashion.
 Hopefully this is neat, and allows my configuration to be self-documenting,
 and easily understood.
 
-This is a handy function I use if I need to edit this file:
+
+## Startup Tweaks
+
+Because I use emacs as a server I tend to start it once per day, but even so a faster startup is always appreciated.
+
+To keep an eye on the startup-time we'll record how long it takes to complete:
 
 ```lisp
-(defun skx-load-init()
-  "Load my init.md file."
-  (interactive)
-    (find-file (expand-file-name "~/.emacs.d/init.md")))
+;; Use a hook so the message doesn't get clobbered by other messages.
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs ready in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+
+; Set the garbage-collection threshold to something high.
+;
+; This will ensure we don't stall as we're loading.
+(setq gc-cons-threshold (* 256 1024 1024))
 ```
-
-On a related note having easy access to a new lisp buffer is also useful, so I've defined the following to give me a new "scratch" buffer:
-
-```lisp
-(defun skx-scratch-buffer()
-  "Create a unique scratch-buffer, and switch to it"
-  (interactive)
-  (switch-to-buffer (generate-new-buffer-name "*scratch*"))
-  (insert "; Scratch buffer, kill it when you're done\n\n")
-  (lisp-mode))
-```
-
 
 ## Initial Functions
 
@@ -1210,6 +1212,29 @@ Here we wrap all GPG_messages with "`#+BEGIN_EXAMPLE`" to format them neatly on 
 ```
 
 
+## Quick File Access
+
+This is a handy function I use if I need to edit _this_ initialization file:
+
+```lisp
+(defun skx-load-init()
+  "Load my init.md file."
+  (interactive)
+    (find-file (expand-file-name "~/.emacs.d/init.md")))
+```
+
+On a related note having easy access to a new lisp buffer is also useful, so I've defined the following to give me a new "scratch" buffer:
+
+```lisp
+(defun skx-scratch-buffer()
+  "Create a unique scratch-buffer, and switch to it"
+  (interactive)
+  (switch-to-buffer (generate-new-buffer-name "*scratch*"))
+  (insert "; Scratch buffer, kill it when you're done\n\n")
+  (lisp-mode))
+```
+
+
 ## Search
 
 I set "search-default-mode" to allow me to match `äiti` when searching for `aiti`, for example.
@@ -1224,27 +1249,22 @@ I set "search-default-mode" to allow me to match `äiti` when searching for `ait
 I use `flyspell` as a spell-checker when editing text and programming-mode files.
 
 ```lisp
-;; enable on-the-fly spell checking
-(setq flyspell-use-meta-tab nil)
+(use-package flyspell
+  :defer 2
+  :init
+  (progn
+    (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+    (add-hook 'text-mode-hook 'flyspell-mode)
+    )
+  :config
+  ;; ispell should not check code blocks in org mode
+  (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
+  (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+  (add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
+  (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$"))
+  )
 
-;; ispell should not check code blocks in org mode
-(add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
-(add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
-(add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
-(add-to-list 'ispell-skip-region-alist '("^#\\+begin_example " . "#\\+end_example$"))
-(add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$"))
-```
-
-Flyspell offers on-the-fly spell checking. We can enable flyspell for all text-modes with this snippet.
-
-```lisp
-(add-hook 'text-mode-hook (lambda () (flyspell-mode 1)))
-```
-
-To use flyspell for programming there is `flyspell-prog-mode`, that only enables spell checking for comments and strings. We can enable it for all programming modes using the prog-mode-hook.
-
-```lisp
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)
 ```
 
 
@@ -1685,5 +1705,11 @@ A small section of things that might be nice to explore in the future.
 
 
 ```lisp
-(message "init.md loaded")
+(message "init.md loaded in %s" (emacs-init-time))
+
+; Restore our garbage-collection threshold to something smaller.
+;
+; This means it will happen more frequently, but each one will be
+; shorter.
+(setq gc-cons-threshold (* 1 1024 1024))
 ```
