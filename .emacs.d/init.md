@@ -1173,15 +1173,6 @@ Here we wrap all GPG_messages with "`#+BEGIN_EXAMPLE`" to format them neatly on 
 (add-hook 'org-export-before-parsing-hook 'skx/html-quote-pgp)
 ```
 
-### Org-Mode UTF
-
-```lisp
-(setq org-export-coding-system 'utf-8)
-(prefer-coding-system 'utf-8)
-(set-charset-priority 'unicode)
-(setq default-process-coding-system '(utf-8-unix . utf-8-unix))
-```
-
 
 ## Quick File Access
 
@@ -1532,9 +1523,12 @@ Here I configure it to be used for both `markdown-mode` and `org-mode`:
 UTF-8 is the future, we should greet it with open-arms.
 
 ```lisp
-    (set-terminal-coding-system 'utf-8)
-    (set-keyboard-coding-system 'utf-8)
-    (prefer-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+(set-charset-priority 'unicode)
+(set-keyboard-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(setq default-process-coding-system '(utf-8-unix . utf-8-unix))
+(setq org-export-coding-system 'utf-8)
 ```
 
 
