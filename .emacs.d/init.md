@@ -1129,35 +1129,6 @@ One other problem is that code blocks don't export neatly.  To resolve that you 
 In addition to the block you'll need `apt-get install python-pygments`.
 
 
-### Org-Mode Timestamping
-
-The following allows any `#+LAST_MODIFIED` headers to be updated on file-save:
-
-```lisp
-(defun skx/update-org-modified-property ()
-  "If a file contains a '#+LAST_MODIFIED' property update it to contain
-  the current date/time"
-  (interactive)
-  (save-excursion
-    (widen)
-    (goto-char (point-min))
-    (when (re-search-forward "^#\\+LAST_MODIFIED:" (point-max) t)
-      (progn
-        (kill-line)
-        (insert (format-time-string " %d/%m/%Y %H:%M:%S") )))))
-
-```
-
-It is made available like so:
-
-```lisp
-(defun skx-org-mode-before-save-hook ()
-  (when (eq major-mode 'org-mode)
-    (skx/update-org-modified-property)))
-
-(add-hook 'before-save-hook #'skx-org-mode-before-save-hook)
-```
-
 ### Org-Mode Secrets
 
 Sometimes org-mode files contain secrets, things that you don't want to make visible to other people.  One common solution is to encrypt the contents of particular regions with GPG.
@@ -1247,6 +1218,8 @@ I set "search-default-mode" to allow me to match `äiti` when searching for `ait
 ## Spell-Checking
 
 I use `flyspell` as a spell-checker when editing text and programming-mode files.
+
+Typos and errors will be underlined, and `M-TAB` or middle-click can be used to correct errors which are shown.
 
 ```lisp
 (use-package flyspell
@@ -1600,23 +1573,23 @@ We like to remove trailing whitespace, and define a function to
 collapse muliple newlines into one, across a region.
 
 ```lisp
-    ;; We want to see trailing whitespace
-    (setq-default show-trailing-whitespace t)
+;; We want to see trailing whitespace
+(setq-default show-trailing-whitespace t)
 
-    ;; Show non-existent lines with a special glyph in the left fringe:
-    (setq-default indicate-empty-lines t)
+;; Show non-existent lines with a special glyph in the left fringe:
+(setq-default indicate-empty-lines t)
 
-    ;; We want to remove trailing whitespace when a file is saved.
-    (require 'whitespace)
-    (add-hook 'write-file-hooks 'delete-trailing-whitespace)
+;; We want to remove trailing whitespace when a file is saved.
+(require 'whitespace)
+(add-hook 'write-file-hooks 'delete-trailing-whitespace)
 
-    ;; But many Unix system-files require a trailing newline to work
-    ;; correctly, for example `crontab` files.  So make sure that's OK
-    (setq require-final-newline t)
+;; But many Unix system-files require a trailing newline to work
+;; correctly, for example `crontab` files.  So make sure that's OK
+(setq require-final-newline t)
 
-    (defun collapse-blank-lines(start end)
-     (interactive "r")
-     (replace-regexp "^\n\\{2,\\}" "\n" nil start end))
+(defun collapse-blank-lines(start end)
+  (interactive "r")
+  (replace-regexp "^\n\\{2,\\}" "\n" nil start end))
 ```
 
 When running Emacs upon a terminal, rather than graphically, lines that
