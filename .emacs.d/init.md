@@ -1277,8 +1277,10 @@ Since we're living in the future nowadays a lot of system-administration is movi
 One of the tools I use most frequently for that is [Hashicorp](https://www.hashicorp.com/)'s [terraform](https://www.terraform.io/), and here we'll configure our buffers to be auto-formatted when we save them:
 
 ```lisp
-    (require 'terraform-mode)
-    (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode)
+(use-package terraform-mode
+  :defer 2
+  :config
+  (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode))
 ```
 
 
@@ -1328,7 +1330,7 @@ The following section helper ensures that files are given `+x` permissions
 when they're saved, if they contain a valid shebang line:
 
 ```lisp
-    (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
+(add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 ```
 
 Finally we allow Emacs to control our music playback, which is supplied
@@ -1348,19 +1350,21 @@ I prefer to keep a reasonably minimal look, so I disable the toolbar and scroll-
 The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so I'll leave that enabled unless I'm running in a terminal.
 
 ```lisp
-    (require 'scroll-bar)
+(require 'scroll-bar)
 
-    ;; Disable the scroll-bars, and the tool-bar.
-    (dolist (mode
-        '(scroll-bar-mode tool-bar-mode))
+;; Disable the scroll-bars, and the tool-bar.
+(dolist (mode
+  '(scroll-bar-mode tool-bar-mode))
       (funcall mode 0))
 
-    ;; Show the menubar only when running with graphics
-    (menu-bar-mode (display-graphic-p))
+;; Show the menubar only when running with graphics
+(menu-bar-mode (display-graphic-p))
 
-    ;; Make sure our cursor doesn't get in the way.
-    (require 'avoid)
-    (mouse-avoidance-mode 'cat-and-mouse)
+;; Make sure our cursor doesn't get in the way.
+(use-package avoid
+  :defer 2
+  :config
+  (mouse-avoidance-mode 'cat-and-mouse))
 ```
 
 Once the basics have been setup the next step is to configure some colours:
@@ -1378,10 +1382,10 @@ Once the basics have been setup the next step is to configure some colours:
 Now we've tweaked the GUI we can setup the clipboard integration:
 
 ```lisp
-    ;; Copying in emacs should allow pasting into gnome-terminal, etc.
-    (setq x-select-enable-clipboard t)
-    (setq x-select-enable-primary t)
-    (setq mouse-drag-copy-region t)
+;; Copying in emacs should allow pasting into gnome-terminal, etc.
+(setq x-select-enable-clipboard t)
+(setq x-select-enable-primary t)
+(setq mouse-drag-copy-region t)
 ```
 
 Once we've removed things that we don't like the next section is
