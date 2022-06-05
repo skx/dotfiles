@@ -938,7 +938,9 @@ I put together a simple tag-cloud helper package, which we'll now load:
 ```lisp
 (use-package org-tag-cloud
   :after org
-  :defer 2)
+  :defer 2
+  :config
+   (add-hook 'org-mode-hook 'skx-org-mode-hook-eval-ok))
 ```
 
 To make it useful we'll ensure that we disable warnings about eval which would otherwise be shown when following such a link.
