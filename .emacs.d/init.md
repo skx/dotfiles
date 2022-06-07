@@ -686,7 +686,7 @@ We'll also improve the default list-management functionality:
 (use-package org-autolist
   :after org
   :defer 2
-  :hook (org-mode-hook . org-autolist-mode))
+  :hook (org-mode . org-autolist-mode))
 ```
 
 When following links `C-RETURN` moves back:
@@ -948,8 +948,8 @@ To make it useful we'll ensure that we disable warnings about eval which would o
 ```lisp
 ; Allow eval-links
 (defun skx-org-mode-hook-eval-ok ()
-    (make-variable-buffer-local 'org-confirm-elisp-link-function)
-    (setq org-confirm-elisp-link-function nil))
+    (make-variable-buffer-local 'org-link-elisp-skip-confirm-regexp)
+    (setq org-link-elisp-skip-confirm-regexp "org-tags-view"))
 ```
 
 
