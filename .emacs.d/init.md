@@ -1251,29 +1251,6 @@ you to open a file for reading via `sudo`:
 Once you've opened the file it will be read-only, you can toggle that
 with `Ctrl-x Ctrl-v`.
 
-Because I tend to be working all day it is interesting to see how
-long Emacs has been running.  The following function will show that,
-and can be invoked via `M-x uptime`.
-
-```lisp
-    (require 'time-date)
-
-    (defvar emacs-up-time (current-time)
-    "Time at which Emacs started up.")
-
-    (defun uptime ()
-      "Displays the uptime of GNU Emacs."
-      (interactive)
-      (let* ((now (current-time))
-         (second (floor (- (time-to-seconds now)
-                           (time-to-seconds emacs-up-time))))
-         (minute (floor second 60))
-         (hour (floor minute 60))
-         (day (floor hour 24)))
-         (message "Emacs up %s day(s), %02d:%02d"
-         day (% hour 24) (% minute 60))))
-```
-
 Since we're living in the future nowadays a lot of system-administration is moving towards a cloud-based setup.
 
 One of the tools I use most frequently for that is [Hashicorp](https://www.hashicorp.com/)'s [terraform](https://www.terraform.io/), and here we'll configure our buffers to be auto-formatted when we save them:
@@ -1657,7 +1634,7 @@ some I've grown accustomed to:
                 (progn
                   (if window-system
                       (progn
-                        (if (fboundp 'uptime) (uptime))
+                        (if (fboundp 'emacs-uptime) (message "Emacs uptime %s" (emacs-uptime)))
                         (sleep-for 1)))
                   (save-buffers-kill-emacs)))
             (message "emacs quit aborted")))
