@@ -1264,45 +1264,6 @@ One of the tools I use most frequently for that is [Hashicorp](https://www.hashi
 
 
 
-
-## Tags Support
-
-Many lanagues have support for tags/etags/ctags
-
-For example on a Python project you might run something like this to create/update a `TAGS` file:
-
-      $ find . -name "*.py" | xargs ctags -e
-
-If you don't have `ctags` then `etags` with no arguments will also do the right thing:
-
-      $ find . -name '*.el' | xargs etags
-
-```lisp
-;; Default (fedora)
-(setq ctags-cmd "/usr/bin/ctags -e")
-
-;; Debian
-(if (file-exists-p "/usr/bin/etags")
-    (setq ctags-cmd "/usr/bin/etags"))
-
-(defun create-tags (dir-name)
-  "Create tags file"
-  (interactive "DDirectory: ")
-  (shell-command (format "/bin/sh -c \"cd %s && %s\"" dir-name ctags-cmd)))
-```
-
-Once you've done that the following will allow the `TAGS`-file to be located, walking up to 10 directories above the location of your currently-open file:
-
-
-```lisp
-    (require 'etags-table)
-    (setq etags-table-search-up-depth 10)
-```
-
-With all that stuff out of the way it should now be possible to use `M-.` to jump to the definition of the _thing_ under the point.
-
-
-
 ## Unix Setup
 
 The following section helper ensures that files are given `+x` permissions
