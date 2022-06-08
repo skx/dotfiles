@@ -834,13 +834,13 @@ every day.
 This is handled by my [org-diary](https://github.com/skx/org-diary) package, and here we load it and allow quick access to my journal:
 
 ```lisp
-;; Load the library-file.
-(require 'org-diary)
-
-;; Add a new tag to all entries, after creating them.
-(add-hook 'org-diary-after-new-entry-hook
-          (lambda()
-            (org-set-tags (format-time-string "%Y_week_%V"))))
+(use-package org-diary
+  :defer 2
+  :config
+  ;; Add a new tag to all entries, after creating them.
+  (add-hook 'org-diary-after-new-entry-hook
+              (lambda()
+                (org-set-tags (format-time-string "%Y_week_%V")))))
 
 ;; Create a helper to load the diary.
 (defun skx-load-diary()
@@ -1236,21 +1236,6 @@ Typos and errors will be underlined, and `M-TAB` or middle-click can be used to 
 
 ## System Administration
 
-The following snippet is useful for system-administration, allowing
-you to open a file for reading via `sudo`:
-
-```lisp
-(require 'tramp)
-(defun sudo-find-file (file-name)
-  "Like find file, but opens the file as root."
-  (interactive "FSudo Find File: ")
-  (let ((tramp-file-name (concat "/sudo::" (expand-file-name file-name))))
-    (find-file tramp-file-name)))
-```
-
-Once you've opened the file it will be read-only, you can toggle that
-with `Ctrl-x Ctrl-v`.
-
 Since we're living in the future nowadays a lot of system-administration is moving towards a cloud-based setup.
 
 One of the tools I use most frequently for that is [Hashicorp](https://www.hashicorp.com/)'s [terraform](https://www.terraform.io/), and here we'll configure our buffers to be auto-formatted when we save them:
@@ -1290,7 +1275,7 @@ I prefer to keep a reasonably minimal look, so I disable the toolbar and scroll-
 The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so I'll leave that enabled unless I'm running in a terminal.
 
 ```lisp
-(require 'scroll-bar)
+;(require 'scroll-bar)
 
 ;; Disable the scroll-bars, and the tool-bar.
 (dolist (mode
@@ -1507,27 +1492,23 @@ following  allows that to be done neatly - select the region and run
 
 ## Whitespace Handling
 
-We like to remove trailing whitespace, and define a function to
-collapse muliple newlines into one, across a region.
+We like to remove trailing whitespace when we save files, and we
+make it visible by default:
 
 ```lisp
-;; We want to see trailing whitespace
-(setq-default show-trailing-whitespace t)
+(use-package whitespace
+  :defer  2
+  :config
 
-;; Show non-existent lines with a special glyph in the left fringe:
-(setq-default indicate-empty-lines t)
+   ; show trailing whitespace
+   (setq-default show-trailing-whitespace t)
 
-;; We want to remove trailing whitespace when a file is saved.
-(require 'whitespace)
-(add-hook 'write-file-hooks 'delete-trailing-whitespace)
+   ; remove trailing whitespace on-save
+   (add-hook 'write-file-hooks 'delete-trailing-whitespace)
 
-;; But many Unix system-files require a trailing newline to work
-;; correctly, for example `crontab` files.  So make sure that's OK
-(setq require-final-newline t)
+   ; but make sure we keep a final newline
+   (setq require-final-newline t))
 
-(defun collapse-blank-lines(start end)
-  (interactive "r")
-  (replace-regexp "^\n\\{2,\\}" "\n" nil start end))
 ```
 
 When running Emacs upon a terminal, rather than graphically, lines that
