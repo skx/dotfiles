@@ -637,6 +637,15 @@ This variable must be set before loading markdown-mode."
   :safe 'booleanp
   :package-version '(markdown-mode . "2.5"))
 
+(defcustom markdown-fontify-whole-heading-line nil
+  "Non-nil means fontify the whole line for headings.
+This is useful when setting a background color for the
+markdown-header-face-* faces."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.5"))
+
 
 ;;; Markdown-Specific `rx' Macro ==============================================
 
@@ -2228,6 +2237,11 @@ Depending on your font, some reasonable choices are:
 
 ;;; Compatibility =============================================================
 
+(defun markdown--pandoc-reference-p ()
+  (let ((bounds (bounds-of-thing-at-point 'word)))
+    (when (and bounds (char-before (car bounds)))
+      (= (char-before (car bounds)) ?@))))
+
 (defun markdown-flyspell-check-word-p ()
   "Return t if `flyspell' should check word just before point.
 Used for `flyspell-generic-check-word-predicate'."
@@ -2243,7 +2257,8 @@ Used for `flyspell-generic-check-word-predicate'."
                                         markdown-markup-face
                                         markdown-plain-url-face
                                         markdown-inline-code-face
-                                        markdown-url-face)))
+                                        markdown-url-face))
+            (markdown--pandoc-reference-p))
         (prog1 nil
           ;; If flyspell overlay is put, then remove it
           (let ((bounds (bounds-of-thing-at-point 'word)))
@@ -3426,13 +3441,17 @@ SEQ may be an atom or a sequence."
                    (add-text-properties
                     (match-beginning 3) (match-end 3) rule-props)))
         ;; atx heading
-        (add-text-properties
-         (match-beginning 4) (match-end 4) left-markup-props)
-        (add-text-properties
-         (match-beginning 5) (match-end 5) heading-props)
-        (when (match-end 6)
+        (if markdown-fontify-whole-heading-line
+            (let ((header-end (min (point-max) (1+ (match-end 0)))))
+              (add-text-properties
+               (match-beginning 0) header-end heading-props))
           (add-text-properties
-           (match-beginning 6) (match-end 6) right-markup-props))))
+           (match-beginning 4) (match-end 4) left-markup-props)
+          (add-text-properties
+           (match-beginning 5) (match-end 5) heading-props)
+          (when (match-end 6)
+            (add-text-properties
+             (match-beginning 6) (match-end 6) right-markup-props)))))
     t))
 
 (defun markdown-fontify-tables (last)
@@ -9650,7 +9669,7 @@ rows and columns and the column alignment."
 
 ;;; ElDoc Support =============================================================
 
-(defun markdown-eldoc-function ()
+(defun markdown-eldoc-function (&rest _ignored)
   "Return a helpful string when appropriate based on context.
 * Report URL when point is at a hidden URL.
 * Report language name when point is a code block with hidden markup."
@@ -9790,8 +9809,10 @@ rows and columns and the column alignment."
   ;; Cause use of ellipses for invisible text.
   (add-to-invisibility-spec '(outline . t))
   ;; ElDoc support
-  (add-function :before-until (local 'eldoc-documentation-function)
-                #'markdown-eldoc-function)
+  (if (boundp 'eldoc-documentation-functions)
+      (add-hook 'eldoc-documentation-functions #'markdown-eldoc-function nil t)
+    (add-function :before-until (local 'eldoc-documentation-function)
+                  #'markdown-eldoc-function))
   ;; Inhibiting line-breaking:
   ;; Separating out each condition into a separate function so that users can
   ;; override if desired (with remove-hook)

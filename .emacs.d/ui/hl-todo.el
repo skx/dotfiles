@@ -1,29 +1,27 @@
-;;; hl-todo.el --- highlight TODO and similar keywords  -*- lexical-binding: t -*-
+;;; hl-todo.el --- Highlight TODO and similar keywords  -*- lexical-binding:t -*-
 
-;; Copyright (C) 2013-2022  Jonas Bernoulli
+;; Copyright (C) 2013-2022 Jonas Bernoulli
 
 ;; Author: Jonas Bernoulli <jonas@bernoul.li>
 ;; Homepage: https://github.com/tarsius/hl-todo
 ;; Keywords: convenience
 
-;; Package-Requires: ((emacs "25"))
+;; Package-Requires: ((emacs "25.1") (compat "28.1.1.0"))
 
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
+;; This file is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published
+;; by the Free Software Foundation, either version 3 of the License,
+;; or (at your option) any later version.
 ;;
 ;; This file is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
 ;;
-;; For a full copy of the GNU General Public License
-;; see <http://www.gnu.org/licenses/>.
-
-;; This file is not part of GNU Emacs.
+;; You should have received a copy of the GNU General Public License
+;; along with this file.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -53,9 +51,12 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'compat)
 
-(eval-when-compile
-  (require 'subr-x))
+(eval-when-compile (require 'subr-x))
+
+(defvar grep-find-template)
+(declare-function grep-read-files "grep" (regexp))
 
 (defgroup hl-todo nil
   "Highlight TODO and similar keywords in comments and strings."
@@ -120,7 +121,7 @@ located inside a string."
     ("HACK"   . "#d0bf8f")
     ("TEMP"   . "#d0bf8f")
     ("FIXME"  . "#cc9393")
-    ("XXX+"   . "#cc9393"))
+    ("XXXX*"  . "#cc9393"))
   "An alist mapping keywords to colors/faces used to display them.
 
 Each entry has the form (KEYWORD . COLOR).  KEYWORD is used as
@@ -137,8 +138,15 @@ This package, like most of Emacs, does not use POSIX regexp
 backtracking.  See info node `(elisp)POSIX Regexp' for why that
 matters.  If you have two keywords \"TODO-NOW\" and \"TODO\", then
 they must be specified in that order.  Alternatively you could
-use \"TODO\\(-NOW\\)?\"."
-  :package-version '(hl-todo . "3.0.0")
+use \"TODO\\(-NOW\\)?\".
+
+If you use the command `hl-todo-rgrep', rewrite KEYWORDs to
+use \"*\" instead of \"+\" and generally make sure they are valid
+as Emacs regexps and as basic regular expressions as understood
+by Grep.  If you customize variables in the `grep' group, or use
+a Grep implementation other than GNU's, then that may break
+`hl-todo-rgrep'."
+  :package-version '(hl-todo . "3.5.0")
   :group 'hl-todo
   :type '(repeat (cons (string :tag "Keyword")
                        (choice :tag "Face   "
@@ -340,6 +348,30 @@ string or comment."
   (interactive)
   (with-syntax-table hl-todo--syntax-table
     (occur (hl-todo--regexp))))
+
+;;;###autoload
+(defun hl-todo-rgrep (regexp &optional files dir confirm)
+  "Use `rgrep' to find all TODO or similar keywords.
+This actually finds a superset of the highlighted keywords,
+because it uses a regexp instead of a more sophisticated
+matcher.  It also finds occurrences that are not within a
+string or comment.  See `rgrep' for the meaning of REGEXP,
+FILES, DIR and CONFIRM, except that the type of prefix
+argument does not matter; with any prefix you can edit the
+constructed shell command line before it is executed.
+Also see option `hl-todo-keyword-faces'."
+  (interactive
+   (progn
+     (require 'grep)
+     (grep-compute-defaults)
+     (unless grep-find-template
+       (error "grep.el: No `grep-find-template' available"))
+     (let ((regexp (with-temp-buffer (hl-todo--regexp))))
+       (list regexp
+             (grep-read-files regexp)
+             (read-directory-name "Base directory: " nil default-directory t)
+             current-prefix-arg))))
+  (rgrep regexp files dir confirm))
 
 ;;;###autoload
 (defun hl-todo-insert (keyword)

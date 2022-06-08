@@ -26,7 +26,7 @@ This is a bit terrible, but also a bit awesome.
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/lang/lua-mode.el           | https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el                         | f0b7c81cd23712373edddaa5c84fab6a |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/markdown-mode.el      | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el              | 28e0137b34889fa2e70160c2479760d7 |
+| ~/.emacs.d/lang/markdown-mode.el      | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el              | fe9d95b06020a01e2515df5f2c91b763 |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/lang/monkey.el             | https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el                           | 75c08fc655bf16b8c7e9cc146eb1f13f |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
@@ -34,11 +34,11 @@ This is a bit terrible, but also a bit awesome.
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/lang/terraform-mode.el     | https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el        | edd314e12d4f0472877cb406afd33435 |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/web-mode.el           | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                          | 1b19a484aa21a3b3bec7646dc926e5c2 |
+| ~/.emacs.d/lang/web-mode.el           | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                          | 78d5a78641dc440f736027e75b87a2eb |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/misc/literate-calc-mode.el | https://raw.githubusercontent.com/sulami/literate-calc-mode.el/master/literate-calc-mode.el   | 736c0e10507488ee5bc137fd1c1c7744 |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/org/org-autolist.el        | https://raw.githubusercontent.com/calvinwyoung/org-autolist/master/org-autolist.el            | 9096d6320c366cd6d8615f7885948062 |
+| ~/.emacs.d/org/org-autolist.el        | https://raw.githubusercontent.com/calvinwyoung/org-autolist/master/org-autolist.el            | e97c43c9bc9dc0ddb62e9b50eb32e10e |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/org/org-diary.el           | https://raw.githubusercontent.com/skx/org-diary/master/org-diary.el                           | 58f9ae89e7a3cf3091e9034d3c3f8065 |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
@@ -47,7 +47,7 @@ This is a bit terrible, but also a bit awesome.
 | ~/.emacs.d/org/org-tag-cloud.el       | https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el                   | 09cee384ac0e58ddb2abb67f59699dc3 |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/org/org-appear.el          | https://raw.githubusercontent.com/awth13/org-appear/master/org-appear.el                      | 481a4177d0117020cdbda5d71a0574c4 |
-| ~/.emacs.d/ui/hl-todo.el              | https://raw.githubusercontent.com/tarsius/hl-todo/master/hl-todo.el                           | 735c5e863430175c78f653c6faab0558 |
+| ~/.emacs.d/ui/hl-todo.el              | https://raw.githubusercontent.com/tarsius/hl-todo/master/hl-todo.el                           | 2987b717df83a3638d9a0ac0bde27f0c |
 #+TBLFM: $3='(download $2 $1)
 
 
