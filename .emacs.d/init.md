@@ -1111,7 +1111,7 @@ One other problem is that code blocks don't export neatly.  To resolve that you 
 
 ```lisp
 (require 'org)
-(require 'ox-latex)
+;(require 'ox-latex)
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq org-latex-listings 'minted)
 
