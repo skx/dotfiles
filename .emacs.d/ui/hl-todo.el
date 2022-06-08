@@ -1,27 +1,29 @@
-;;; hl-todo.el --- Highlight TODO and similar keywords  -*- lexical-binding:t -*-
+;;; hl-todo.el --- highlight TODO and similar keywords  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2013-2022 Jonas Bernoulli
+;; Copyright (C) 2013-2022  Jonas Bernoulli
 
 ;; Author: Jonas Bernoulli <jonas@bernoul.li>
 ;; Homepage: https://github.com/tarsius/hl-todo
 ;; Keywords: convenience
 
-;; Package-Requires: ((emacs "25.1") (compat "28.1.1.0"))
+;; Package-Requires: ((emacs "25"))
 
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 
-;; This file is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published
-;; by the Free Software Foundation, either version 3 of the License,
-;; or (at your option) any later version.
+;; This file is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
 ;;
 ;; This file is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
 ;;
-;; You should have received a copy of the GNU General Public License
-;; along with this file.  If not, see <https://www.gnu.org/licenses/>.
+;; For a full copy of the GNU General Public License
+;; see <http://www.gnu.org/licenses/>.
+
+;; This file is not part of GNU Emacs.
 
 ;;; Commentary:
 
@@ -51,9 +53,9 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'compat)
 
-(eval-when-compile (require 'subr-x))
+(eval-when-compile
+  (require 'subr-x))
 
 (defvar grep-find-template)
 (declare-function grep-read-files "grep" (regexp))
