@@ -48,8 +48,7 @@ To keep an eye on the startup-time we'll record how long it takes to complete:
 We want to operate as a server, so we'll make sure that we start that before we go any further:
 
 ```lisp
-(unless (server-running-p)
-  (server-start))
+(server-start)
 ```
 
 Operating as a server means that we can reuse the single Emacs instance, without having to worry about restarting new copies (and the potential speed-hit that would cost).
