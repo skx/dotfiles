@@ -36,7 +36,11 @@ To keep an eye on the startup-time we'll record how long it takes to complete:
 ; Set the garbage-collection threshold to something high.
 ;
 ; This will ensure we don't stall as we're loading.
-(setq gc-cons-threshold (* 256 1024 1024))
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; Reset garbage collector limit after init process has ended (8Mb)
+(add-hook 'after-init-hook
+          #'(lambda () (setq gc-cons-threshold (* 8 1024 1024))))
 ```
 
 ## Initial Functions
@@ -44,7 +48,8 @@ To keep an eye on the startup-time we'll record how long it takes to complete:
 We want to operate as a server, so we'll make sure that we start that before we go any further:
 
 ```lisp
-(server-start)
+(unless (server-running-p)
+  (server-start))
 ```
 
 Operating as a server means that we can reuse the single Emacs instance, without having to worry about restarting new copies (and the potential speed-hit that would cost).
@@ -1383,7 +1388,11 @@ global things the way that I prefer them.
     (column-number-mode)
 
     ;; Avoid the annoying startup message.
-    (setq inhibit-startup-message t)
+    (setq-default
+      inhibit-startup-screen t               ; Disable start-up screen
+      inhibit-startup-message t              ; Disable startup message
+      inhibit-startup-echo-area-message t    ; Disable initial echo message
+    )
 
     ;; Uncompress files as they're loaded.
     (auto-compression-mode t)
@@ -1598,10 +1607,4 @@ A small section of things that might be nice to explore in the future.
 
 ```lisp
 (message "init.md loaded in %s" (emacs-init-time))
-
-; Restore our garbage-collection threshold to something smaller.
-;
-; This means it will happen more frequently, but each one will be
-; shorter.
-(setq gc-cons-threshold (* 1 1024 1024))
 ```
