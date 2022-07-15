@@ -237,19 +237,20 @@ Emacs has a built-in file/directory browser which is available via `M-x dired`, 
 One irritation is that by default "dotfiles" are shown, I usually prefer these to be hidden by default.  The following section does two things:
 
 * Hides dotfiles by default.
-* Allows them to be toggled via `M-TAB`.
+* Allows them to be toggled via `TAB` which is more memorable than the default binding
+  * `C-x M-o`.
 
 ```lisp
 (use-package dired-x
   :defer 2
-  :bind ("M-TAB" . dired-omit-mode)
+  :bind (:map dired-mode-map
+           ("TAB" . dired-omit-mode))
   :hook ((dired-mode . dired-omit-mode))
   :config
-  (setq dired-omit-verbose nil)
-  ;; hide backup, autosave, *.*~ files
-  ;; omit mode can be toggled using `C-x M-o' in dired buffer.
-  (setq dired-omit-files "^\\...+$"))
+    (setq dired-omit-verbose nil)
+    (setq dired-omit-files "^\\...+$"))
 ```
+
 
 ## Language Modes
 
