@@ -1596,6 +1596,42 @@ some I've grown accustomed to:
 ```
 
 
+## Github
+
+Opening a github project is something I do often, and in my case I
+have all my repositories cloned beneath ~/Repos/github.com, for example:
+
+* `~/Repos/github.com/skx/foo`
+* `~/Repos/github.com/skx/bar`
+* `~/Repos/github.com/user/one`
+* `~/Repos/github.com/user/two`
+
+
+
+```lisp
+
+(require 'subr-x) ; for string-remove-prefix
+
+(defvar github-prefix "~/Repos/github.com/")
+
+(defun github-project ()
+  "Open a github project"
+  (interactive)
+  (let ((pr nil))
+    (setq pr (ido-completing-read "Select project: " (get-github-projects github-prefix)))
+    (if pr
+        (dired (concat github-prefix pr))
+      (message "Nothing selected"))))
+
+(defun get-github-projects (prefix)
+  (map 'list
+       (lambda (x) (string-remove-prefix prefix x))
+       (file-expand-wildcards (concat prefix "*/*"))))
+
+(define-key steve-mode-map (kbd "C-c g") 'github-project)
+```
+
+
 ## XXXX - TODO
 
 A small section of things that might be nice to explore in the future.
