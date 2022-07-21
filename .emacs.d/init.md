@@ -628,6 +628,41 @@ align the section based upon the `=` sign:
 
 
 
+## Github
+
+Opening a github project is something I do often, and in my case I
+have all my repositories cloned beneath ~/Repos/github.com, for example:
+
+* `~/Repos/github.com/skx/foo`
+* `~/Repos/github.com/skx/bar`
+* `~/Repos/github.com/user/one`
+* `~/Repos/github.com/user/two`
+
+
+
+```lisp
+
+(require 'subr-x) ; for string-remove-prefix
+
+(defvar github-prefix "~/Repos/github.com/" "Root of github projects.")
+
+(defun skx-github-project ()
+  "Open a github project, with completion."
+  (interactive)
+  (let ((pr nil))
+    (setq pr (ido-completing-read "Select project: " (get-github-projects github-prefix)))
+    (if pr
+        (dired (concat github-prefix pr))
+      (message "Nothing selected"))))
+
+(defun get-github-projects (prefix)
+  (map 'list
+       (lambda (x) (string-remove-prefix prefix x))
+       (file-expand-wildcards (concat prefix "*/*"))))
+```
+
+
+
 ## Long Lines
 
 Using [column-enforce-mode](https://github.com/jordonbiondo/column-enforce-mode) we can view lines that are "too long", in a clear fashion:
@@ -1556,17 +1591,26 @@ some I've grown accustomed to:
              `((steve-mode . ,steve-mode-map)))
 
 ;; Finally, bind the keys
+
+;; utilities
 (define-key steve-mode-map (kbd "M-g")   'goto-line)
+(define-key steve-mode-map (kbd "M-=")   'align-equals)
+
+;; Open specific files; init, scratch, github-repo, diary
+(define-key steve-mode-map (kbd "C-c g") 'skx-github-project)
 (define-key steve-mode-map (kbd "C-c i") 'skx-load-init)
 (define-key steve-mode-map (kbd "C-c s") 'skx-scratch-buffer)
 (define-key steve-mode-map (kbd "C-c w") 'skx-load-diary)
-(define-key steve-mode-map (kbd "M-=")   'align-equals)
-(define-key steve-mode-map (kbd "C-x F") 'sudo-find-file)
+
+
+;; change sizes
 (define-key steve-mode-map (kbd "C-+") 'text-scale-increase)
 (define-key steve-mode-map (kbd "C--") 'text-scale-decrease)
-(define-key steve-mode-map (kbd "C-c a") 'org-agenda)
 (define-key steve-mode-map (kbd "C-s") 'isearch-forward)
 (define-key steve-mode-map (kbd "C-r") 'isearch-backward)
+
+;; agenda
+(define-key steve-mode-map (kbd "C-c a") 'org-agenda)
 
 ;; org-mode & markdown-mode sidebar
 (define-key steve-mode-map (kbd "M-'") 'imenu-list-smart-toggle)
@@ -1593,42 +1637,6 @@ some I've grown accustomed to:
 ; unset things
 (define-key steve-mode-map (kbd "C-z")     '(lambda () (interactive)))
 (define-key steve-mode-map (kbd "C-c C-z") '(lambda () (interactive)))
-```
-
-
-## Github
-
-Opening a github project is something I do often, and in my case I
-have all my repositories cloned beneath ~/Repos/github.com, for example:
-
-* `~/Repos/github.com/skx/foo`
-* `~/Repos/github.com/skx/bar`
-* `~/Repos/github.com/user/one`
-* `~/Repos/github.com/user/two`
-
-
-
-```lisp
-
-(require 'subr-x) ; for string-remove-prefix
-
-(defvar github-prefix "~/Repos/github.com/")
-
-(defun github-project ()
-  "Open a github project"
-  (interactive)
-  (let ((pr nil))
-    (setq pr (ido-completing-read "Select project: " (get-github-projects github-prefix)))
-    (if pr
-        (dired (concat github-prefix pr))
-      (message "Nothing selected"))))
-
-(defun get-github-projects (prefix)
-  (map 'list
-       (lambda (x) (string-remove-prefix prefix x))
-       (file-expand-wildcards (concat prefix "*/*"))))
-
-(define-key steve-mode-map (kbd "C-c g") 'github-project)
 ```
 
 
