@@ -244,7 +244,8 @@ One irritation is that by default "dotfiles" are shown, I usually prefer these t
 (use-package dired-x
   :defer 2
   :bind (:map dired-mode-map
-           ("TAB" . dired-omit-mode))
+           ("TAB" . dired-omit-mode)      ; Toggle hiding dotfiles.
+           ("DEL" . dired-jump))          ; Go up a directory.
   :hook ((dired-mode . dired-omit-mode))
   :config
     (setq dired-omit-verbose nil)
