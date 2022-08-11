@@ -696,6 +696,12 @@ The next thing that is globally useful is to allow searches for internal links t
   (setq org-link-search-must-match-exact-headline nil)
 ```
 
+One of things that makes `org-mode` so useful is the tagging support, this next section ensures that tags are sorted alphabetically:
+
+```lisp
+(setq org-tags-sort-function 'org-string-collate-lessp)
+```
+
 I put together the [org-nested](https://github.com/skx/org-nested) package to allow refining links easily.  Allowing links to be augmented by refinements.  This is now loaded:
 
 ```lisp
