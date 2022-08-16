@@ -78,6 +78,7 @@ I'm using `use-package` to speedup emacs startup, because it allows deferring pa
 Here we load the package which we'll then use for further configuration:
 
 ```lisp
+(setq use-package-verbose t use-package-expand-minimally nil)
 (require 'use-package)
 (setq use-package-compute-statistics t)
 ```
@@ -242,7 +243,7 @@ One irritation is that by default "dotfiles" are shown, I usually prefer these t
 
 ```lisp
 (use-package dired-x
-  :defer 2
+;  :defer 2
   :bind (:map dired-mode-map
            ("TAB" . dired-omit-mode)      ; Toggle hiding dotfiles.
            ("DEL" . dired-jump))          ; Go up a directory.
