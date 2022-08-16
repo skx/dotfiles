@@ -1264,6 +1264,7 @@ Typos and errors will be underlined, and `M-TAB` or middle-click can be used to 
 
 ```lisp
 (use-package flyspell
+  :if (executable-find "ispell")
   :defer 2
   :init
   (progn
