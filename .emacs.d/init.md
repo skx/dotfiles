@@ -1119,13 +1119,16 @@ Typically when I export documents I work with them elsewhere, but the export opt
 I want those exports to open in `firefox` and `evince` respectively, the following snippet makes that happen:
 
 ```lisp
+(defun skx/find-browser ()
+  (cond
+    ((file-exists-p "/usr/bin/firefox")     "/usr/bin/firefox")
+    ((file-exists-p "/opt/firefox/firefox") "/opt/firefox/firefox")
+    ((executable-find "firefox")            (executable-find "firefox"))
+  ))
+
 (defun org-file-apps-html (file link)
   (interactive)
-  (shell-command (format "%s %s"
-                         (if (file-exists-p "/usr/bin/firefx")
-                             "/usr/bin/firefox"
-                           "/opt/firefox/firefox")
-                         file)))
+  (shell-command (format "%s %s" (skx/find-browser) file)))
 
 (setq org-file-apps
     (quote
