@@ -680,6 +680,27 @@ Using [column-enforce-mode](https://github.com/jordonbiondo/column-enforce-mode)
 The above section is enabled for all hosts, except the one system I have which has a hostname of `localhost.localdomain` - this is a system which is not configured for _real_ use..
 
 
+
+## Mac OS
+
+Macs are weird, so I've had to make some changes so that keybindings work as expected.
+
+
+```lisp
+(setq mac-option-modifier nil
+      mac-command-modifier 'meta
+      x-select-enable-clipboard t)
+```
+
+On top of that I wanted to make sure that the default font-sizes are "big":
+
+```lisp
+(add-hook 'emacs-startup-hook
+  (lambda()
+    (set-face-attribute 'default (selected-frame) :height 150)))
+```
+
+
 ## Org-Mode
 
 `org-mode` is a wonderful thing which allows Emacs to hold tables, TODO-lists, and much much more.  For the moment I'm keeping document-specific lisp and configuration within the appropriate document, but there are some things that make working with `org-mode` nicer which will live _here_.
@@ -1129,6 +1150,7 @@ I want those exports to open in `firefox` and `evince` respectively, the followi
   (cond
     ((file-exists-p "/usr/bin/firefox")     "/usr/bin/firefox")
     ((file-exists-p "/opt/firefox/firefox") "/opt/firefox/firefox")
+    ((file-exists-p "/Applications/Firefox.app/Contents/MacOS/firefox") "/Applications/Firefox.app/Contents/MacOS/firefox")
     ((executable-find "firefox")            (executable-find "firefox"))
   ))
 
@@ -1651,6 +1673,12 @@ some I've grown accustomed to:
                         (sleep-for 1)))
                   (save-buffers-kill-emacs)))
             (message "emacs quit aborted")))
+
+(define-key steve-mode-map (kbd "C-v")
+    '(lambda ()
+        (interactive)
+        (call-process-region (point) (if mark-active (mark) (point)) "pbpaste" t t)))
+
 
 ; unset things
 (define-key steve-mode-map (kbd "C-z")     '(lambda () (interactive)))
