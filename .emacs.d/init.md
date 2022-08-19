@@ -691,6 +691,12 @@ One of the nice things about org-mode is that it lets you contain embedded snipp
   (setq org-src-fontify-natively t)
 ```
 
+When I'm opening a document all code/example blocks will be hidden by default:
+
+```lisp
+(add-hook 'org-mode-hook 'org-hide-block-all)
+```
+
 The next thing that is globally useful is to allow searches for internal links to match sub-strings of headlines, rather than requiring complete matches:
 
 ```lisp
