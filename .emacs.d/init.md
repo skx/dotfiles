@@ -1278,6 +1278,28 @@ On a related note having easy access to a new lisp buffer is also useful, so I'v
 ```
 
 
+## Recent Files
+
+Here we keep track of recent files that have been opened:
+
+```lisp
+(use-package recentf
+  :bind
+  :config
+  (recentf-mode 1)
+  (setq recentf-max-menu-items 25)
+  (setq recentf-max-saved-items 10))
+```
+
+Now we can view a list of recently-opened files via `C-c r`:
+
+```lisp
+(use-package recentf-buffer
+  :bind
+    (("C-c r" . recentf-open-files-in-simply-buffer)))
+```
+
+
 ## Search
 
 I set "search-default-mode" to allow me to match `äiti` when searching for `aiti`, for example.
