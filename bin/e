@@ -2,13 +2,23 @@
 #
 #  Simple emacs/emacsclient wrapper.
 #
+#  Tested on Macos, and GNU/Linux
+#
+#
 
 
 #
-# Not running under X11/X.org?
+# If we're not running under X11, and there is a system
+# binary then just load the real thing.
+#
+# This works well for me, because on Mac OS X we have our
+# installation of GNU Emacs beneath /opt/..., via homebrew.
+#
 #
 if [ -z "$DISPLAY" ]; then
-    exec /usr/bin/emacs $*
+    if [ -x /usr/bin/emacs ]; then
+        exec /usr/bin/emacs $*
+    fi
 fi
 
 
