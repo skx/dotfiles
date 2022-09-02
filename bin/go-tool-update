@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# utilities for code/emacs
+go install github.com/rogpeppe/godef@latest
+go install golang.org/x/tools/cmd/goimports@latest
+go install golang.org/x/tools/gopls@latest
+
+# linters & etc
+go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+go install golang.org/x/lint/golint@latest
+go install golang.org/x/tools/go/analysis/passes/nilness/cmd/nilness@latest
+go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
+go install honnef.co/go/tools/cmd/staticcheck@latest
+
+# my tools
+go install github.com/skx/aws-utils@latest
+go install github.com/skx/implant@latest
+go install github.com/skx/sysbox@latest
+
+# text-editor
+go install github.com/evanmiller/hecate@latest
+
+# html/css minifier
+go install github.com/tdewolff/minify/cmd/minify@latest
+
+# json utility
+go install github.com/tomnomnom/gron@latest
