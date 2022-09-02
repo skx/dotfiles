@@ -2,8 +2,10 @@
 # Ensure we find ~/bin and the homebrew utilities
 #
 export PATH=/opt/homebrew/bin:$PATH
+export PATH=$HOME/Repos/github.com/skx/dotfiles/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
 export PATH=$HOME/bin:$PATH
+
 
 #
 # Setup TAB-completion for ZSH
