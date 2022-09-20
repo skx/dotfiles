@@ -26,3 +26,7 @@ go install github.com/tdewolff/minify/cmd/minify@latest
 
 # json utility
 go install github.com/tomnomnom/gron@latest
+
+# Terraform linter
+go install github.com/terraform-linters/tflint@latest
+
