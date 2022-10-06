@@ -789,6 +789,22 @@ which are not, and kills exporting.  We want to ignore that behaviour:
   :hook (org-mode . org-bullets-mode))
 ```
 
+Org examples are useful, here we define a function to wrap the selection with source-block
+
+```lisp
+(defun skx-org-src (beg end name)
+  (interactive "r\nsName for this source block?")
+  (save-excursion
+    (narrow-to-region beg end)
+    (set-mark nil)
+    (goto-char (point-min))
+    (if (not (= 0 (length name)))
+        (insert (concat "\n#+NAME:" name)))
+    (insert "\n#+BEGIN_SRC\n")
+    (goto-char (point-max))
+    (insert "\n#+END_SRC\n")
+    (widen)))
+```
 
 Now we're done with the general setup so we'll handle the more specific things here:
 
@@ -1659,6 +1675,7 @@ some I've grown accustomed to:
 (define-key steve-mode-map (kbd "M-=")   'align-equals)
 
 ;; Open specific files; init, scratch, github-repo, diary
+(define-key steve-mode-map (kbd "C-c r") 'skx-org-src)
 (define-key steve-mode-map (kbd "C-c g") 'skx-github-project)
 (define-key steve-mode-map (kbd "C-c i") 'skx-load-init)
 (define-key steve-mode-map (kbd "C-c s") 'skx-scratch-buffer)
