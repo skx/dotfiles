@@ -1675,7 +1675,7 @@ some I've grown accustomed to:
 (define-key steve-mode-map (kbd "M-=")   'align-equals)
 
 ;; Open specific files; init, scratch, github-repo, diary
-(define-key steve-mode-map (kbd "C-c r") 'skx-org-src)
+(define-key steve-mode-map (kbd "C-c e") 'skx-org-src)
 (define-key steve-mode-map (kbd "C-c g") 'skx-github-project)
 (define-key steve-mode-map (kbd "C-c i") 'skx-load-init)
 (define-key steve-mode-map (kbd "C-c s") 'skx-scratch-buffer)
