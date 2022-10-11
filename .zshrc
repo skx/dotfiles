@@ -2,6 +2,7 @@
 # Ensure we find ~/bin and the homebrew utilities
 #
 export PATH=/opt/homebrew/bin:$PATH
+export PATH=/opt/homebrew/opt/mysql-client/bin:$PATH
 export PATH=$HOME/Repos/github.com/skx/dotfiles/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
 export PATH=$HOME/bin:$PATH
@@ -54,3 +55,10 @@ alias -g rgrep='grep -R '
 if [ -e ~/.zshrc.local ] ; then
     source ~/.zshrc.local
 fi
+
+#
+# Avoid Escape-backspace from deleting the previous token, instead
+# delete components as with bash.
+#
+autoload -U select-word-style
+select-word-style bash
