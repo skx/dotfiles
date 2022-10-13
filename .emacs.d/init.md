@@ -917,6 +917,14 @@ Since we're hiding the emphasis markers it can be hard to edit text which is for
   :hook ((org-mode org-diary-mode) . org-appear-mode))
 ```
 
+Since we're living in the future we can use `org-mouse` for checking boxes, etc:
+
+```lisp
+(use-package org-mouse
+  :after org)
+```
+
+
 ## Org-Mode Diary
 
 I keep a work-log where I write down tasks and notes about my working-life
