@@ -272,7 +272,7 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
   :mode ("\\.cf\\'" . cfengine-automode))
 
 ;; Groovy
-(use-package groovy
+(use-package groovy-mode
   :defer 2
   :mode ("\\.groovy\\'" . groovy-mode))
 
