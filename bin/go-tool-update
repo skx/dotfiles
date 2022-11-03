@@ -12,6 +12,7 @@ go install golang.org/x/tools/go/analysis/passes/nilness/cmd/nilness@latest
 go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
 go install honnef.co/go/tools/cmd/staticcheck@latest
 go install golang.org/x/vuln/cmd/govulncheck@latest
+go install github.com/skx/alphavet/cmd/alphavet@latest
 
 # my tools
 go install github.com/skx/aws-utils@latest
