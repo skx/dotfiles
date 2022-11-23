@@ -22,7 +22,7 @@ go install github.com/skx/sysbox@latest
 # Languages
 go install github.com/skx/yal@latest
 go install github.com/skx/gobasic@latest
-go install github.com/skx/evalfilter/cmd/evalfilter@latest
+go install github.com/skx/evalfilter/v2/cmd/evalfilter@latest
 go install github.com/skx/foth/foth@latest
 go install github.com/skx/critical@latest
 
