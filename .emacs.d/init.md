@@ -413,6 +413,8 @@ Once the dependencies are present the following configures LSP, including a help
   :if (executable-find "gopls")
   :custom
    (skx/setup-lsp)
+  :init
+   (setq lsp-keymap-prefix "C-c l")
   :hook ((go-mode python-mode) . lsp-deferred)
   )
 ```
@@ -716,6 +718,13 @@ When I'm opening a document all code/example blocks will be hidden by default:
 
 ```lisp
 (add-hook 'org-mode-hook 'org-hide-block-all)
+```
+
+Lines will be wrapped to the width of the buffer too:
+
+
+```lisp
+(add-hook 'text-mode-hook 'visual-line-mode)
 ```
 
 The next thing that is globally useful is to allow searches for internal links to match sub-strings of headlines, rather than requiring complete matches:
