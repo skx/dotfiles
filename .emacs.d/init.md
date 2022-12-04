@@ -855,7 +855,7 @@ Now we're done with the general setup so we'll handle the more specific things h
   (org-agenda-span 14)
 
   ;; But the agenda will start on the current day.
-  ( org-agenda-start-on-weekday nil)
+  (org-agenda-start-on-weekday nil)
 
   ;; We don't show tasks that are complete
   (org-agenda-skip-deadline-if-done t)
@@ -1241,6 +1241,25 @@ One other problem is that code blocks don't export neatly.  To resolve that you 
 ```
 
 In addition to the block you'll need `apt-get install python-pygments`.
+
+
+### Org-Mode Random Headline
+
+This function will open a random headline in an indirect buffer:
+
+```lisp
+(defun org-random-heading (top-level)
+    "Open random top-level heading from current Org buffer in new indirect buffer.
+    When TOP-LEVEL is non-nil, only go to top-level headings."
+    (interactive "P")
+    (goto-char (+ (point-min) (random (- (point-max) (point-min)))))
+    (if (org-before-first-heading-p)
+        (outline-next-heading)
+      (org-back-to-heading)
+      (when top-level
+          (cl-loop while (org-up-heading-safe))))
+    (org-tree-to-indirect-buffer))
+```
 
 
 ### Org-Mode Secrets
