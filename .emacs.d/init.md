@@ -235,6 +235,12 @@ Here we load it, and we can use `C-x C-b` to build the Dockerfile in the current
 
 Emacs has a built-in file/directory browser which is available via `M-x dired`, and which I use very often.
 
+We highlight the current line when we're using dired:
+
+```lisp
+(add-hook 'dired-after-readin-hook 'hl-line-mode)
+```
+
 One irritation is that by default "dotfiles" are shown, I usually prefer these to be hidden by default.  The following section does two things:
 
 * Hides dotfiles by default.
@@ -243,7 +249,7 @@ One irritation is that by default "dotfiles" are shown, I usually prefer these t
 
 ```lisp
 (use-package dired-x
-;  :defer 2
+  :defer 2
   :bind (:map dired-mode-map
            ("TAB" . dired-omit-mode)      ; Toggle hiding dotfiles.
            ("DEL" . dired-jump))          ; Go up a directory.
@@ -675,11 +681,14 @@ Using [column-enforce-mode](https://github.com/jordonbiondo/column-enforce-mode)
 (use-package column-enforce-mode
   :defer 2
   :config
-  (add-hook 'prog-mode-hook 'column-enforce-mode)
-  (add-hook 'text-mode-hook 'column-enforce-mode))
+    (add-hook 'prog-mode-hook 'column-enforce-mode)
+    (add-hook 'text-mode-hook 'column-enforce-mode)
+  :unless
+    (string-equal system-type "darwin"))
 ```
 
-The above section is enabled for all hosts, except the one system I have which has a hostname of `localhost.localdomain` - this is a system which is not configured for _real_ use..
+The above section is enabled for all hosts, except the one system I use which is a MacOS laptop, and has a `system-type` setting of "darwin".
+
 
 
 
