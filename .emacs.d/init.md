@@ -170,6 +170,16 @@ If multiple buffers use the same filename we'll prefix with the parent directory
         uniquify-min-dir-content 2))
 ```
 
+When opening the list of buffers I want to highlight the current line and
+switch to the list immediately:
+
+```lisp
+(add-hook 'Buffer-menu-mode-hook #'(lambda ()
+    ; Highlight the current line
+    (hl-line-mode 1)
+    ; Switch to the buffer immediately.
+    (switch-to-buffer "*Buffer List*")))
+```
 
 ### Calendar setup
 
@@ -241,6 +251,17 @@ We highlight the current line when we're using dired:
 (add-hook 'dired-after-readin-hook 'hl-line-mode)
 ```
 
+We also want to ensure that we have only a single dired-buffer, no matter how we navigate around within it.
+
+There are lots of online posts about this, for example:
+
+* https://www.emacswiki.org/emacs/DiredReuseDirectoryBufferg
+
+This seems to work for me:
+
+```lisp
+(setf dired-kill-when-opening-new-dired-buffer t)
+```
 One irritation is that by default "dotfiles" are shown, I usually prefer these to be hidden by default.  The following section does two things:
 
 * Hides dotfiles by default.
