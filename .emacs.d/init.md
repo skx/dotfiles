@@ -727,9 +727,22 @@ Macs are weird, so I've had to make some changes so that keybindings work as exp
 On top of that I wanted to make sure that the default font-sizes are "big":
 
 ```lisp
-(add-hook 'emacs-startup-hook
-  (lambda()
-    (set-face-attribute 'default (selected-frame) :height 150)))
+; We get the default size like so.
+; (face-attribute 'default :height (selected-frame))
+
+(defun td/adapt-font-size (&optional frame)
+  "Attempt to make the font sizes bigger on larger displays."
+  (let* ((attrs (frame-monitor-attributes frame))
+         (size (alist-get 'mm-size attrs))
+         (geometry (alist-get 'geometry attrs))
+         (ppi (/ (caddr geometry) (/ (car size) 25.4))))
+;         (message "PPI %s Size %s" ppi size)
+    (if (> ppi 120)
+        (set-face-attribute 'default frame :height 200)
+      (set-face-attribute 'default frame :height 150))))
+
+(add-hook 'emacs-startup-hook (lambda () (td/adapt-font-size)))
+(add-hook 'after-make-frame-functions (lambda () (td/adapt-font-size)))
 ```
 
 
