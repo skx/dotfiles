@@ -736,13 +736,13 @@ On top of that I wanted to make sure that the default font-sizes are "big":
          (size (alist-get 'mm-size attrs))
          (geometry (alist-get 'geometry attrs))
          (ppi (/ (caddr geometry) (/ (car size) 25.4))))
-;         (message "PPI %s Size %s" ppi size)
+         (message "PPI:%s Size:%s Geometry:%s" ppi size geometry)
     (if (> ppi 120)
         (set-face-attribute 'default frame :height 200)
       (set-face-attribute 'default frame :height 150))))
 
 (add-hook 'emacs-startup-hook (lambda () (td/adapt-font-size)))
-(add-hook 'after-make-frame-functions (lambda () (td/adapt-font-size)))
+(add-hook 'after-make-frame-functions (lambda (x) (td/adapt-font-size)))
 ```
 
 
