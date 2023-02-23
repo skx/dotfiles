@@ -214,7 +214,10 @@ There are several packages out there providing "completion".  The most common ar
     ido-virtual-buffers t
     ido-use-faces t
     ido-default-buffer-method 'selected-window
-    ido-auto-merge-work-directories-length -1)
+    ido-auto-merge-work-directories-length -1
+    ido-file-extensions-order '(".org" ".md" ".txt" ".html" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf" ".py")
+    ido-ignore-files '("\\.pdf"  "\\.tex")
+    )
   (ido-mode))
 ```
 
