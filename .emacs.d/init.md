@@ -216,9 +216,17 @@ There are several packages out there providing "completion".  The most common ar
     ido-default-buffer-method 'selected-window
     ido-auto-merge-work-directories-length -1
     ido-file-extensions-order '(".org" ".md" ".txt" ".html" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf" ".py")
-    ido-ignore-files '("\\.pdf"  "\\.tex")
+    ido-ignore-extensions t
     )
   (ido-mode))
+```
+
+When `ido-ignore-extensions` is set to a true value then files are ignored from the general purpose `completion-ignored-extensions` list.  This covers most things, but we can add to it:
+
+```lisp
+(push ".pdf" completion-ignored-extensions)
+(push ".tex" completion-ignored-extensions)
+(push ".last" completion-ignored-extensions)
 ```
 
 ## Custom Variables
