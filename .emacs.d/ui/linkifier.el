@@ -25,14 +25,24 @@
 ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
 ;; MA 02111-1307, USA.
 
-;; Setup the regexp to destination mappings.
+;; Setup the regexp to destination mappings.  These consist of pairs of
+;; entries - the first entry is a regular expression, the second is the
+;; destination for the link.
 ;;
-;; Note that "\<XXX\>" means that we only match XXX when not surrounded
-;; by "word constituent" characters - we could also use \b for the same
-;; purpose.
-(setq linkifier-patterns '(
-                           ("\\\<XXX-[0-9]+\\\>" "https://jira.example.com/browse/%s")
-                           ("\\\<BUG-[0-9]+\\\>" "https://bugzilla.example.com/show?id=%s")))
+;; For example we have "XXX-1234" going to Jira, and BUG-1234 going
+;; to bugzilla with the following configuration:
+;;
+;;    (setq linkifier-patterns '(
+;;          ("\\\<XXX-[0-9]+\\\>" "https://jira.example.com/browse/%s")
+;;          ("\\\<BUG-[0-9]+\\\>" "https://bugzilla.example.com/show?id=%s")))
+;;
+;;
+;;     Note that "\<XXX\>" means that we only match XXX when
+;;     not surrounded by "word constituent" characters.
+;;
+;; The default is nil as the destinations and patterns are entirely
+;; site & user-specific.
+(defvar linkifier-patterns nil)
 
 ;; Ensure we have a type for our buttons.
 (define-button-type 'linkifier)

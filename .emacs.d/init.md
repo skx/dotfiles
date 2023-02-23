@@ -1004,11 +1004,17 @@ This is handled by my [org-diary](https://github.com/skx/org-diary) package, and
               (lambda()
                 (org-set-tags (format-time-string "%Y_week_%V")))))
 
+
+(require 'linkifier)
+
 ;; Create a helper to load the diary.
 (defun skx-load-diary()
   "Load my diary/work-log, and scroll to today's entry."
   (interactive)
     (find-file (expand-file-name "~/Private/Worklog/Diary.org"))
+    (make-variable-buffer-local 'linkifier-patterns)
+    (setq linkifier-patterns '(("\\\<INFRA-[0-9]+\\\>" "https://metacoregames.atlassian.net/browse/%s")))
+    (linkifier-mode t)
     (org-diary-today))
 ```
 
