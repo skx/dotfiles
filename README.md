@@ -8,7 +8,7 @@ This is my _dotfiles_ repository.  Visitors to this repository seem to be primar
   * This file is read at startup-time by Emacs, and executes the content of the markdown file.
   * It will also load some org-mode files, if they exist.
 
-The `bash` setup is pretty minimal, the startup files just source every file located beneath [~/.bash/](bash/) (and `~/.bash.local` if it exists).  This allows me to group setup in a small number of files which is easier to organize.
+The `bash` setup is pretty minimal, the startup files just source every file located beneath [.bash/](~/.bash/) (and `~/.bash.local` if it exists).  This allows me to group setup in a small number of files which is easier to organize.
 
 
 # Using The Repository
