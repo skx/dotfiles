@@ -1,12 +1,37 @@
 # dotfiles
 
-This is my _dotfiles_ repository.  Visitors to this repository seem to be primarily interested in my GNU/Emacs setup, which is handled in a somewhat "literate" fashion, by virtual of being written in Markdown format:
+This is my _dotfiles_ repository.
+
+## Emacs Setup
+
+Visitors to this repository seem to be primarily interested in my GNU/Emacs setup, which is handled in a somewhat "literate" fashion, by virtual of being written in Markdown format:
 
 * [.emacs.d/init.md](.emacs.d/init.md)
   * This is a markdown file which contains most of my emacs setup.
 * [.emacs.d/init.el](.emacs.d/init.el)
   * This file is read at startup-time by Emacs, and executes the content of the markdown file.
   * It will also load some org-mode files, if they exist.
+
+The contents of the emacs directory are laid out in a logical fashion:
+
+* [Language modes](.emacs.d/lang/)
+  * cfengine, docker, go, hcl, etc, etc.
+* Org-Mode Stuff
+  *
+* Misc. stuff
+  * Show recent files, report when I should take a break, etc.
+* User interface
+  * [ui/column-enforce-mode.el](.emacs.d/ui/column-enforce-mode.el) - Flag lines being too long
+  * [ui/hl-todo.el](.emacs.d/ui/hl-todo.el) - Highlight TODO-comments.
+  * [ui/linkifier.el](.emacs.d/ui/linkifier.el) - Turn text matching regular expressions into links/buttons
+* Unix stuff
+  * MPC (music player control)
+  * Autoformat, and lint, perl files on-save.
+* Use Package
+  * A clone of the [use-package repository](https://github.com/jwiegley/use-package), to keep this repository self-contained.
+
+
+### Shell Setup
 
 The `bash` setup is pretty minimal, the startup files just source every file located beneath [~/.bash/](.bash/) (and `~/.bash.local` if it exists).  This allows me to group setup in a small number of files which is easier to organize.
 
