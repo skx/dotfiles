@@ -16,15 +16,14 @@ The contents of the emacs directory are laid out in a logical fashion:
 
 * [Language modes](.emacs.d/lang/)
   * cfengine, docker, go, hcl, etc, etc.
-* Org-Mode Stuff
-  *
-* Misc. stuff
+* [Org-Mode Stuff](.emacs.d/org)
+* [Misc. stuff](.emacs.d/misc)
   * Show recent files, report when I should take a break, etc.
-* User interface
+* [User interface](.emacs.d/misc)
   * [ui/column-enforce-mode.el](.emacs.d/ui/column-enforce-mode.el) - Flag lines being too long
   * [ui/hl-todo.el](.emacs.d/ui/hl-todo.el) - Highlight TODO-comments.
   * [ui/linkifier.el](.emacs.d/ui/linkifier.el) - Turn text matching regular expressions into links/buttons
-* Unix stuff
+* [Unix stuff](.emacs.d/unix)
   * MPC (music player control)
   * Autoformat, and lint, perl files on-save.
 * Use Package
