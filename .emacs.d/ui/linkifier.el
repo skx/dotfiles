@@ -3,7 +3,7 @@
 ;;
 ;; Copyright (C) 2023 Steve Kemp
 ;;
-;; Version: 0.1
+;; Version: 0.2
 ;; Keywords: links, web, utility, regexp
 ;; Author: Steve Kemp <steve@steve.fi>
 ;;
@@ -40,6 +40,31 @@
 ;;     Note that "\<XXX\>" means that we only match XXX when
 ;;     not surrounded by "word constituent" characters.
 ;;
+;;
+;; Capture Groups:
+;;
+;; By default we expand "%s" within the destination as the literal
+;; text of the button, which works for things like jira/bugzilla,
+;; however it is possible to use a capture-group to ensure that
+;; we only expand part of the match.
+;;
+;; For example consider the following two config-items for looking
+;; at hacker-news stories, or youtube videos:
+;;
+;;     ("\\\<HN-\\([0-9]+\\)\\\>"            "https://news.ycombinator.com/item?id=%s")
+;;     ("\\\<YOUTUBE-\\([0-9a-zA-Z]+\\)\\\>" "https://www.youtube.com/watch?v=%s")
+;;
+;; Here we're using a capture-group \\(...\\) to ensure that we only
+;; capture the parameter, which is then added to the link.  Without
+;; this we'd end up sending the user to destinations such as:
+;;
+;;          https://news.ycombinator.com/item?id=HN-34907651
+;;          https://www.youtube.com/watch?v=YOUTUBE-RyTlSAkoGJg
+;;
+;; The "HN-" and "YOUTUBE-" prefixes would obviously cause the resulting
+;; pages to return 404.
+;;
+
 ;; The default is nil as the destinations and patterns are entirely
 ;; site & user-specific.
 (defvar linkifier-patterns nil)
@@ -58,14 +83,23 @@
         (save-excursion
           (goto-char beg)
           (while (re-search-forward regexp end t)
-            (make-button (match-beginning 0)
-                         (match-end 0)
-                         'dest destination
-                         'type 'linkifier
-                         'action `(lambda (button)
-                                    (browse-url (format (car (button-get button 'dest)) (button-get button 'text))))
-                         'follow-link t
-                         'text (match-string 0))))))
+
+            ;; default to using the whole match (i.e. "XXXX-1234")
+            ;; but if there is a capture group, then use the value of the
+            ;; first captured variable.
+            (let ((match (match-string 0)))
+              (if (match-string 1)
+                  (setq match (match-string 1)))
+
+              (make-button (match-beginning 0)
+                           (match-end 0)
+                           'dest destination   ; from the config
+                           'match match        ; either literal button-text or first capture value
+                           'type 'linkifier
+                           'action `(lambda (button)
+                                      (browse-url (format (car (button-get button 'dest)) (button-get button 'match))))
+                           'follow-link t
+                           'text (match-string 0)))))))
 
 (define-minor-mode linkifier-mode nil nil nil nil
   "`linkifier-mode` is a simple minor mode for turning text matching a
