@@ -19,7 +19,7 @@ The contents of the emacs directory are laid out in a logical fashion:
 * [Org-Mode Stuff](.emacs.d/org)
 * [Misc. stuff](.emacs.d/misc)
   * Show recent files, report when I should take a break, etc.
-* [User interface](.emacs.d/misc)
+* [User interface](.emacs.d/ui)
   * [ui/column-enforce-mode.el](.emacs.d/ui/column-enforce-mode.el) - Flag lines being too long
   * [ui/hl-todo.el](.emacs.d/ui/hl-todo.el) - Highlight TODO-comments.
   * [ui/linkifier.el](.emacs.d/ui/linkifier.el) - Turn text matching regular expressions into links/buttons
