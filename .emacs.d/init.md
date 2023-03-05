@@ -748,8 +748,8 @@ On top of that I wanted to make sure that the default font-sizes are "big":
 One of the nice things about org-mode is that it lets you contain embedded snippets of various programming languages which can be evaluated, executed and otherwise processed.  The following snippets ensure that these blocks can be highlighted and indented as expected:
 
 ```lisp
-  (setq org-src-tab-acts-natively t)
-  (setq org-src-fontify-natively t)
+(setq org-src-tab-acts-natively t)
+(setq org-src-fontify-natively t)
 ```
 
 When I'm opening a document all code/example blocks will be hidden by default:
@@ -760,7 +760,6 @@ When I'm opening a document all code/example blocks will be hidden by default:
 
 Lines will be wrapped to the width of the buffer too:
 
-
 ```lisp
 (add-hook 'text-mode-hook 'visual-line-mode)
 ```
@@ -768,7 +767,7 @@ Lines will be wrapped to the width of the buffer too:
 The next thing that is globally useful is to allow searches for internal links to match sub-strings of headlines, rather than requiring complete matches:
 
 ```lisp
-  (setq org-link-search-must-match-exact-headline nil)
+(setq org-link-search-must-match-exact-headline nil)
 ```
 
 One of things that makes `org-mode` so useful is the tagging support, this next section ensures that tags are sorted alphabetically:
@@ -811,7 +810,7 @@ We'll also improve the default list-management functionality:
   :hook (org-mode . org-autolist-mode))
 ```
 
-When following links `C-RETURN` moves back:
+When following links `C-RETURN` moves backwards, after following links:
 
 ```lisp
 (add-hook 'org-mode-hook (lambda ()
@@ -916,7 +915,7 @@ Now we're done with the general setup so we'll handle the more specific things h
 )
 
 ;; RETURN will follow links in org-mode files
-(setq org-return-follows-link  t)
+(setq org-return-follows-link t)
 
 ;; When exporting code then we get highlighting
 (setq org-latex-listings t)
@@ -934,7 +933,6 @@ Now we're done with the general setup so we'll handle the more specific things h
     ("INPROGRESS" . (:foreground "purple" :weight bold))
     ("SPILLOVER" . (:foreground "red" :weight bold))
     ("CANCELED"   . (:foreground "pink" :weight bold))))
-
 
 
 ;; Indentation in org-buffers matches the header-level
@@ -1473,8 +1471,6 @@ I prefer to keep a reasonably minimal look, so I disable the toolbar and scroll-
 The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so I'll leave that enabled unless I'm running in a terminal.
 
 ```lisp
-;(require 'scroll-bar)
-
 ;; Disable the scroll-bars, and the tool-bar.
 (dolist (mode
   '(scroll-bar-mode tool-bar-mode))
@@ -1635,10 +1631,18 @@ Here I configure it to be used for both `markdown-mode` and `org-mode`:
         imenu-list-auto-resize t
         imenu-list-position 'left)
 
+  ; markdown mode
   (add-hook 'markdown-mode-hook
      (lambda ()
       (local-set-key (kbd "M-i") 'imenu-list)))
+
+  ; org-mode
   (add-hook 'org-mode-hook
+     (lambda ()
+      (local-set-key (kbd "M-i") 'imenu-list)))
+
+  ; programming modes, generally
+  (add-hook 'prog-mode-hook
      (lambda ()
       (local-set-key (kbd "M-i") 'imenu-list)))
 )
@@ -1761,7 +1765,6 @@ some I've grown accustomed to:
 (define-key steve-mode-map (kbd "C-c s") 'skx-scratch-buffer)
 (define-key steve-mode-map (kbd "C-c w") 'skx-load-diary)
 
-
 ;; change sizes
 (define-key steve-mode-map (kbd "C-+") 'text-scale-increase)
 (define-key steve-mode-map (kbd "C--") 'text-scale-decrease)
@@ -1772,7 +1775,7 @@ some I've grown accustomed to:
 (define-key steve-mode-map (kbd "C-c a") 'org-agenda)
 
 ;; org-mode & markdown-mode sidebar
-(define-key steve-mode-map (kbd "M-'") 'imenu-list-smart-toggle)
+(define-key steve-mode-map (kbd "M-'") 'imenu-list-smart-toggleq)
 
 ; Allow the backtick key to work as I expected.
 (define-key steve-mode-map [dead-grave] "`")
