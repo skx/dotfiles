@@ -794,11 +794,13 @@ As noted above it is possible to evaluated blocks of script from within `org-mod
   org-babel-expand-body:sh
   org-babel-execute:bash
   org-babel-expand-body:bash)
+```
 
-;; Ensure that we can export org-blocks
-;; This is done for the CSS & Javascript export blocks
-;;(require 'ob-org)
+Ensure that we can export org-blocks.  This is necessary for the CSS & Javascript export blocks in my various dairy-files.
 
+```lisp
+(use-package ob-org
+  :defer 2)
 ```
 
 We'll also improve the default list-management functionality:
