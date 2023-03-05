@@ -708,26 +708,6 @@ have all my repositories cloned beneath ~/Repos/github.com, for example:
 ```
 
 
-
-## Long Lines
-
-Using [column-enforce-mode](https://github.com/jordonbiondo/column-enforce-mode) we can view lines that are "too long", in a clear fashion:
-
-```lisp
-(use-package column-enforce-mode
-  :defer 2
-  :config
-    (add-hook 'prog-mode-hook 'column-enforce-mode)
-    (add-hook 'text-mode-hook 'column-enforce-mode)
-  :unless
-    (string-equal system-type "darwin"))
-```
-
-The above section is enabled for all hosts, except the one system I use which is a MacOS laptop, and has a `system-type` setting of "darwin".
-
-
-
-
 ## Mac OS
 
 Macs are weird, so I've had to make some changes so that keybindings work as expected.
