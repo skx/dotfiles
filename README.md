@@ -12,7 +12,7 @@ Visitors to this repository seem to be primarily interested in my GNU/Emacs setu
   * This file is read at startup-time by Emacs, and executes the content of the markdown file.
   * It will also load some org-mode files, if they exist.
 
-The contents of the emacs directory are laid out in a logical fashion:
+The contents of the emacs directory are laid out in a logical collection of sub-directories.  Some specific files are highlighted here, but there might be others of interest located beneath the given directories.
 
 * [Language modes](.emacs.d/lang/)
   * cfengine, docker, go, hcl, etc, etc.
@@ -21,7 +21,6 @@ The contents of the emacs directory are laid out in a logical fashion:
 * [Misc. stuff](.emacs.d/misc)
   * Show recent files, report when I should take a break, etc.
 * [User interface](.emacs.d/ui)
-  * [ui/column-enforce-mode.el](.emacs.d/ui/column-enforce-mode.el) - Flag lines being too long
   * [ui/hl-todo.el](.emacs.d/ui/hl-todo.el) - Highlight TODO-comments.
   * [ui/linkifier.el](.emacs.d/ui/linkifier.el) - Turn text matching regular expressions into links/buttons
 * [Unix stuff](.emacs.d/unix)
