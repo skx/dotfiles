@@ -27,6 +27,7 @@
 ;; for example I use the following configuration:
 ;;
 ;;    (use-package org-eval
+;;      :after org
 ;;      :defer 2
 ;;      :init
 ;;        (setq org-eval-prefix-list (list (expand-file-name "~/Private/"))

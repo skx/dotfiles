@@ -1010,6 +1010,7 @@ The following configuration enables the contents of a block named `skx-startbloc
 
 ```lisp
 (use-package org-eval
+  :after org
   :defer 2
   :init
   (setq org-eval-prefix-list (list (expand-file-name "~/Private/"))
