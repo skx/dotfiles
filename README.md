@@ -17,6 +17,7 @@ The contents of the emacs directory are laid out in a logical fashion:
 * [Language modes](.emacs.d/lang/)
   * cfengine, docker, go, hcl, etc, etc.
 * [Org-Mode Stuff](.emacs.d/org)
+  * [org-eval.el](.emacs.d/org/org-eval.el) Execute the contents of named blocks on file-load or save
 * [Misc. stuff](.emacs.d/misc)
   * Show recent files, report when I should take a break, etc.
 * [User interface](.emacs.d/ui)

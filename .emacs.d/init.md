@@ -1007,59 +1007,12 @@ Another useful change to org-mode is allowing the ability to execute the Emacs l
 The following configuration enables the contents of a block named `skx-startblock` to be executed automatically when the file is loaded, and the block `skx-saveblock` to be evaluated once _before_ a file is saved:
 
 ```lisp
-(defvar skx-org-eval-safe-list
-    (list
-        (expand-file-name "~/Private/"))
-"A list of directories beneath which org-files can be evaluated with no prompting.")
-
-(defun regexp-match-list(regexp list)
-  "Return nil unless the regexp matches at least one of the list items."
-  (delq nil (mapcar (lambda(x) (string-match x regexp )) list)))
-
-(defun skx-org-eval-startblock ()
-  "Evaluate the content of a code-block named 'skx-startblock' in the current
-  org-document, if present.
-
-  Emacs would usually prompt for permission as a safety precaution,
-  but if the buffer is associated with a filename matching any
-  of the patterns inside the list skx-org-eval-safe-list we
-  just allow it.
-  "
-  (skx-org-eval-named-block "skx-startblock"))
-
-(defun skx-org-eval-saveblock ()
-  "Evaluate the content of a code-block named 'skx-saveblock' in the current
-  org-document, if present.
-
-  Emacs would usually prompt for permission as a safety precaution,
-  but if the buffer is associated with a filename matching any
-  of the patterns inside the list skx-org-eval-safe-list we
-  just allow it.
-  "
-  (skx-org-eval-named-block "skx-saveblock"))
-
-
-(defun skx-org-eval-named-block(name)
-  "Execute the named block, if it exists, from within the current file."
-  (save-excursion
-    (org-save-outline-visibility t
-      (if (member name (org-babel-src-block-names))
-          (if (regexp-match-list (buffer-file-name) skx-org-eval-safe-list)
-              (progn
-                (setq-local org-confirm-babel-evaluate nil)
-                (org-babel-goto-named-src-block name)
-                (org-babel-execute-src-block)))))))
-
-
-;; Load the start-block on startup
-(add-hook 'org-mode-hook 'skx-org-eval-startblock)
-
-;; evaluation the save-block on save
-(defun skx-org-mode-before-save-hook-eval ()
-  (when (eq major-mode 'org-mode)
-    (skx-org-eval-saveblock)))
-
-(add-hook 'before-save-hook #'skx-org-mode-before-save-hook-eval)
+(use-package org-eval
+  :defer 2
+  :init
+  (setq org-eval-prefix-list (list (expand-file-name "~/Private/"))
+        org-eval-loadblock-name "skx-startblock"
+        org-eval-saveblock-name "skx-saveblock" ))
 ```
 
 To use these facilities define blocks like so in your org-mode files:
@@ -1078,7 +1031,7 @@ To use these facilities define blocks like so in your org-mode files:
 #+END_SRC
 ```
 
-By default `org-mode` will prompt you to confirm that you want execution to happen, but we use `safe-skx-org-eval-startblock` to enable whitelisting particular file-patterns - if there is a match there will be no need to answer `y` to the prompt.
+By default `org-mode` will prompt you to confirm that you want execution to happen, but we use `org-eval-prefix-list` to enable whitelisting particular prefix-directories, which means there is no need to answer `y` to the prompt.
 
 
 ### Org-Mode tag cloud
