@@ -1155,15 +1155,15 @@ The following function allows extracting the value of a global header from the c
   (defun skx/org-global-prop( name )
     "Get the value from the global property with the given name, e.g. 'AUTHOR', 'TITLE', etc."
     (save-excursion
-      (outline-show-all)
-      (goto-line 0)
-      (if (re-search-forward (concat "^#\\+" name ":") nil t)
+      (org-save-outline-visibility t
+        (outline-show-all)
+        (goto-line 0)
+        (if (re-search-forward (concat "^#\\+" name ":") nil t)
           (progn
             (setq start (point))
             (re-search-forward "$")
             (setq end (point))
-            (string-trim (buffer-substring-no-properties start end))))
-      ))
+            (string-trim (buffer-substring-no-properties start end)))))))
 ```
 
 
