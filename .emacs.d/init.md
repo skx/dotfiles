@@ -203,7 +203,14 @@ switch to the list immediately:
 
 ## Completion
 
-There are several packages out there providing "completion".  The most common are `ivy`, `helm`, and `ido`.  I'm using the latter:
+There are several packages out there providing "completion".  The most common are `ivy`, `helm`, and `ido`.
+
+I'm using `ido` - the only thing to note for myself is that when running `C-x C-f`, to load a file, you can use keybindings to edit things:
+
+* `C-d` - Edit in dired-mode.
+* `C-e` - Edit the whole prompt.
+* See the help for `ido-find-file` for a complete list.
+
 
 ```lisp
 ;; IDO
@@ -344,8 +351,6 @@ in the book "[Writing An Interpreter In Go](https://interpreterbook.com/)".
 enhancements, and comes complete with an emacs mode which we'll load here:
 
 ```lisp
-
-;; Puppet
 (use-package monkey
   :defer 2
   :mode ("\\.mon" . monkey-mode))
@@ -408,18 +413,16 @@ Beyond the basic support for golang installed via that mode I've also configured
 
 To complete this setup I have (manually) executed the following:
 
-#+NAME: install-go-lsp-stuff
-#+BEGIN_SRC sh
+```sh
 $ sudo apt-get install elpa-lsp-mode elpa-company-lsp elpa-lsp-ui
 $ go install golang.org/x/tools/gopls@latest
-#+END_SRC
+```
 
 For python:
 
-#+NAME: install-python-lsp
-#+BEGIN_SRC sh
+```sh
 $ sudo apt-get install python3-pyls
-#+END_SRC
+```
 
 Once the dependencies are present the following configures LSP, including a helper to format code on save & etc:
 
