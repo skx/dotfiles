@@ -1,6 +1,6 @@
 ;;; use-package-ensure-system-package.el --- auto install system packages  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2017 Justin Talbott
+;; Copyright (C) 2022 Free Software Foundation, Inc.
 
 ;; Author: Justin Talbott <justin@waymondo.com>
 ;; Keywords: convenience, tools, extensions
@@ -8,8 +8,19 @@
 ;; Version: 0.2
 ;; Package-Requires: ((use-package "2.1") (system-packages "1.0.4"))
 ;; Filename: use-package-ensure-system-package.el
-;; License: GNU General Public License version 3, or (at your option) any later version
-;;
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 ;;
@@ -25,9 +36,11 @@
 (eval-when-compile
   (declare-function system-packages-get-command "system-packages"))
 
+(defvar use-package-ensure-system-package--custom-packages '()
+  "List of custom packages installed.")
 
 (defun use-package-ensure-system-package-consify (arg)
-  "Turn `arg' into a cons of (`package-name' . `install-command')."
+  "Turn ARG into a cons of (`package-name' . `install-command')."
   (cond
    ((stringp arg)
     (cons arg `(system-packages-install ,arg)))
@@ -38,15 +51,22 @@
      ((not (cdr arg))
       (use-package-ensure-system-package-consify (car arg)))
      ((stringp (cdr arg))
-      (cons (car arg) `(async-shell-command ,(cdr arg))))
+      (progn
+	(push (cdr arg) use-package-ensure-system-package--custom-packages)
+	(cons (car arg) `(async-shell-command ,(cdr arg)))))
      (t
       (cons (car arg)
 	    `(system-packages-install ,(symbol-name (cdr arg)))))))))
 
+(defun use-package-ensure-system-package-update-custom-packages ()
+  (interactive)
+  (dolist (cmd use-package-ensure-system-package--custom-packages)
+    (async-shell-command cmd)))
+
 ;;;###autoload
 (defun use-package-normalize/:ensure-system-package (_name-symbol keyword args)
-  "Turn `arg' into a list of cons-es of (`package-name' . `install-command')."
-  (use-package-only-one (symbol-name keyword) args
+  "Turn ARGS into a list of conses of (`package-name' . `install-command')."
+  (use-package-as-one (symbol-name keyword) args
     (lambda (_label arg)
       (cond
        ((and (listp arg) (listp (cdr arg)))

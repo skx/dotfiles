@@ -1,0 +1,12 @@
+*~
+/*-autoloads.el
+/*.elc
+/*.html
+/*.info
+/*.pdf
+/config.mk
+/dir
+/doc/content/*
+/stats/
+/use-package/
+.dir-locals-2.el

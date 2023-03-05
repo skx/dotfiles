@@ -43,7 +43,7 @@ help:
 	$(info make clean-lisp       - clean elisp)
 	$(info make clean-docs       - clean docs)
 	$(info make clean-archives   - clean release tarball)
-	$(info make clean-all        - clean everything except tracked texi)
+	$(info make clean-all        - clean everything)
 	$(info make clean-stats      - clean stats)
 	$(info )
 	$(info Test)
@@ -56,7 +56,6 @@ help:
 	$(info Release Management)
 	$(info ==================)
 	$(info )
-	$(info make texi             - regenerate texi from org)
 	$(info make stats            - regenerate statistics)
 	$(info make authors          - regenerate AUTHORS.md)
 	$(info make preview-stats    - preview statistics)
@@ -64,8 +63,6 @@ help:
 	$(info make preview-manuals  - preview manuals)
 	$(info make publish-manuals  - publish manuals)
 	$(info make dist             - create tarballs)
-	$(info make bump-versions    - bump versions for release)
-	$(info make bump-snapshots   - bump versions after release)
 	@printf "\n"
 
 ## Build #############################################################
@@ -109,12 +106,12 @@ test:
 	(ert-run-tests-batch-and-exit))"
 
 test-interactive:
-	@$(EMACSBIN) -Q $(LOAD_PATH) --eval "(progn\
+	@$(EMACS) -Q $(LOAD_PATH) --eval "(progn\
 	(load-file \"use-package-tests.el\")\
 	(ert t))"
 
 emacs-Q: clean-lisp
-	@$(EMACSBIN) -Q $(LOAD_PATH) --debug-init --eval "(progn\
+	@$(EMACS) -Q $(LOAD_PATH) --debug-init --eval "(progn\
 	(setq debug-on-error t)\
 	(require 'use-package))"
 
@@ -141,9 +138,6 @@ clean-stats:
 	@$(RMDIR) $(statsdir)
 
 ## Release management ################################################
-
-texi:
-	@$(MAKE) -f Makefile.doc texi
 
 stats:
 	@$(MAKE) -f Makefile.doc stats
@@ -175,26 +169,3 @@ use-package-$(VERSION).tar.gz: lisp info
 	@$(CP) $(DIST_ROOT_FILES) use-package-$(VERSION)
 	@$(TAR) cz --mtime=./use-package-$(VERSION) -f use-package-$(VERSION).tar.gz use-package-$(VERSION)
 	@$(RMDIR) use-package-$(VERSION)
-
-define set_manual_version
-(let ((version (split-string "$(USE_PACKAGE_VERSION)" "\\.")))
-  (setq version (concat (car version) "." (cadr version)))
-  (dolist (file (list "use-package"))
-    (with-current-buffer (find-file-noselect (format "%s.org" file))
-      (goto-char (point-min))
-      (re-search-forward "^#\\+SUBTITLE: for version ")
-      (delete-region (point) (line-end-position))
-      (insert version)
-      (save-buffer))))
-endef
-export set_manual_version
-
-bump-versions: bump-versions-1 texi
-bump-versions-1:
-	@$(BATCH) --eval "(progn\
-        $$set_manual_version)"
-
-bump-snapshots:
-	@$(BATCH) --eval "(progn\
-        $$set_package_requires)"
-	git commit -a -m "Reset Package-Requires for Melpa"

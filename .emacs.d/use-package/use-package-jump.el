@@ -1,37 +1,29 @@
 ;;; use-package-jump.el --- Attempt to jump to a use-package declaration  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2012-2017 John Wiegley
+;; Copyright (C) 2012-2022 Free Software Foundation, Inc.
 
 ;; Author: John Wiegley <johnw@newartisans.com>
 ;; Maintainer: John Wiegley <johnw@newartisans.com>
-;; Created: 17 Jun 2012
-;; Modified: 3 Dec 2017
-;; Version: 1.0
-;; Package-Requires: ((emacs "24.3") (use-package "2.4"))
-;; Keywords: dotemacs startup speed config package
-;; URL: https://github.com/jwiegley/use-package
 
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License as
-;; published by the Free Software Foundation; either version 3, or (at
-;; your option) any later version.
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
-;; This program is distributed in the hope that it will be useful, but
-;; WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;; General Public License for more details.
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
 ;; Provides the command `M-x use-package-jump-to-package-form', however it
 ;; only works if the package being jumped to was required during
-;; initialization. If it was delay-loaded, it will not work. Improvements are
-;; needed.
+;; initialization.  If it was delay-loaded, it will not work.
+;; Improvements are needed.
 
 ;;; Code:
 
@@ -48,11 +40,10 @@ Returns an absolute file path or nil if none is found."
 
 ;;;###autoload
 (defun use-package-jump-to-package-form (package)
-  "Attempt to find and jump to the `use-package' form that loaded
-PACKAGE. This will only find the form if that form actually
-required PACKAGE. If PACKAGE was previously required then this
-function will jump to the file that originally required PACKAGE
-instead."
+  "Attempt to find and jump to the `use-package' form that loaded PACKAGE.
+This will only find the form if that form actually required
+PACKAGE.  If PACKAGE was previously required then this function
+will jump to the file that originally required PACKAGE instead."
   (interactive (list (completing-read "Package: " features)))
   (let* ((package (if (stringp package) (intern package) package))
          (requiring-file (use-package-find-require package))

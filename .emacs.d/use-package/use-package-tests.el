@@ -1,28 +1,23 @@
 ;;; use-package-tests.el --- Tests for use-package.el  -*- lexical-binding: t; -*-
 
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License as
-;; published by the Free Software Foundation; either version 3, or (at
-;; your option) any later version.
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
-;; This program is distributed in the hope that it will be useful, but
-;; WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;; General Public License for more details.
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
-
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 ;;; Commentary:
 
-;;
-
-
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 (require 'ert)
 (require 'use-package)
 
@@ -98,20 +93,6 @@
               (insert ?\n ?\` (pp-to-string (macroexpand-1 decl))))))))))
 
 (bind-key "C-c C-u" #'fix-expansion emacs-lisp-mode-map)
-
-(eval-when-compile
-  (defun plist-delete (plist property)
-    "Delete PROPERTY from PLIST"
-    (let (p)
-      (while plist
-        (if (not (eq property (car plist)))
-            (setq p (plist-put p (car plist) (nth 1 plist))))
-        (setq plist (cddr plist)))
-      p))
-
-  ;; `cl-flet' does not work for some of the mocking we do below, while `flet'
-  ;; always does.
-  (setplist 'flet (plist-delete (symbol-plist 'flet) 'byte-obsolete-info)))
 
 (ert-deftest use-package-test-recognize-function ()
   (should (use-package-recognize-function nil t))
@@ -232,9 +213,9 @@
       (require 'foo nil nil))))
 
 (ert-deftest use-package-test-normalize/:ensure ()
-  (flet ((norm (&rest args)
-               (apply #'use-package-normalize/:ensure
-                      'foopkg :ensure args)))
+  (cl-flet ((norm (&rest args)
+                  (apply #'use-package-normalize/:ensure
+                         'foopkg :ensure args)))
     (should (equal (norm '(t)) '(t)))
     (should (equal (norm '(nil)) '(nil)))
     (should (equal (norm '(sym)) '(sym)))
@@ -333,11 +314,11 @@
 
 (ert-deftest use-package-test/:ensure-11 ()
   (let (tried-to-install)
-    (flet ((use-package-ensure-elpa
-            (name ensure state &optional no-refresh)
-            (when ensure
-              (setq tried-to-install name)))
-           (require (&rest ignore)))
+    (cl-letf (((symbol-function #'use-package-ensure-elpa)
+               (lambda (name ensure state &optional no-refresh)
+                 (when ensure
+                   (setq tried-to-install name))))
+              ((symbol-function #'require) #'ignore))
       (use-package foo :ensure t)
       (should (eq tried-to-install 'foo)))))
 
@@ -737,9 +718,9 @@
       (add-to-list 'interpreter-mode-alist '("interp" . fun)))))
 
 (ert-deftest use-package-test-normalize/:mode ()
-  (flet ((norm (&rest args)
-               (apply #'use-package-normalize/:mode
-                      'foopkg :mode args)))
+  (cl-flet ((norm (&rest args)
+                  (apply #'use-package-normalize/:mode
+                         'foopkg :mode args)))
     (should (equal (norm '(".foo"))
                    '((".foo" . foopkg))))
     (should (equal (norm '(".foo" ".bar"))
@@ -889,6 +870,12 @@
           (gnus-harvest-install))
         t))))
 
+(ert-deftest use-package-test/:autoload-1 ()
+  (match-expansion
+   (use-package foo :autoload bar)
+   `(unless (fboundp 'bar)
+      (autoload #'bar "foo"))))
+
 (ert-deftest use-package-test/:defines-1 ()
   (match-expansion
    (use-package foo :defines bar)
@@ -993,20 +980,22 @@
                                  (load "foo" nil t))))))))
 
 (ert-deftest use-package-test-normalize/:hook ()
-  (flet ((norm (&rest args)
-               (apply #'use-package-normalize/:hook
-                      'foopkg :hook args)))
+  (cl-flet ((norm (&rest args)
+                  (apply #'use-package-normalize/:hook
+                         'foopkg :hook args)))
     (should-error (norm nil))
     (should (equal (norm '(bar))
+                   '((bar . foopkg-mode))))
+    (should (equal (norm '((bar . foopkg)))
                    '((bar . foopkg))))
     (should (equal (norm '((bar . baz)))
                    '((bar . baz))))
     (should (equal (norm '(((bar baz) . quux)))
                    '(((bar baz) . quux))))
     (should (equal (norm '(bar baz))
-                   '(((bar baz) . foopkg))))
+                   '(((bar baz) . foopkg-mode))))
     (should (equal (norm '((bar baz) (quux bow)))
-                   '(((bar baz) . foopkg) ((quux bow) . foopkg))))
+                   '(((bar baz) . foopkg-mode) ((quux bow) . foopkg-mode))))
     (should (equal (norm '((bar . baz) (quux . bow)))
                    '((bar . baz) (quux . bow))))
     (should (equal (norm '(((bar1 bar2) . baz) ((quux1 quux2) . bow)))
@@ -1117,9 +1106,9 @@
            (add-hook 'emacs-lisp-mode-hook #'(lambda nil (function))))))))
 
 (ert-deftest use-package-test-normalize/:custom ()
-  (flet ((norm (&rest args)
-               (apply #'use-package-normalize/:custom
-                      'foopkg :custom args)))
+  (cl-flet ((norm (&rest args)
+                  (apply #'use-package-normalize/:custom
+                         'foopkg :custom args)))
     (should-error (norm nil))
     (should-error (norm '(bar)))
     ;; (should-error (norm '((foo bar baz quux))))
@@ -1162,7 +1151,27 @@
   (match-expansion
    (use-package foo :custom-face (foo ((t (:background "#e4edfc")))))
    `(progn
-      (custom-set-faces (backquote (foo ((t (:background "#e4edfc"))))))
+      (apply #'face-spec-set (backquote (foo ((t (:background "#e4edfc"))))))
+      (require 'foo nil nil))))
+
+(ert-deftest use-package-test/:custom-face-2 ()
+  (match-expansion
+   (use-package example
+     :custom-face
+     (example-1-face ((t (:foreground "LightPink"))))
+     (example-2-face ((t (:foreground "LightGreen")))))
+   `(progn
+      (apply #'face-spec-set
+             (backquote (example-1-face ((t (:foreground "LightPink"))))))
+      (apply #'face-spec-set
+             (backquote (example-2-face ((t (:foreground "LightGreen"))))))
+      (require 'example nil nil))))
+
+(ert-deftest use-package-test/:custom-face-3 ()
+  (match-expansion
+   (use-package foo :custom-face (foo ((t (:background "#e4edfc"))) face-defspec-spec))
+   `(progn
+      (apply #'face-spec-set (backquote (foo ((t (:background "#e4edfc"))) face-defspec-spec)))
       (require 'foo nil nil))))
 
 (ert-deftest use-package-test/:init-1 ()
@@ -1818,7 +1827,7 @@
    `(bind-key "C-c C-r" #'org-ref-helm-insert-cite-link override-global-map nil)))
 
 (ert-deftest use-package-test/560 ()
-  (flet ((executable-find (name)))
+  (cl-letf (((symbol-function #'executable-find) #'ignore))
     (let (notmuch-command)
       (match-expansion
        (use-package notmuch
@@ -1929,7 +1938,8 @@
         (use-package-expand-minimally t)
         debug-on-error
         warnings)
-    (flet ((display-warning (_ msg _) (push msg warnings)))
+    (cl-letf (((symbol-function #'display-warning)
+               (lambda (_ msg _) (push msg warnings))))
       (progn
         (macroexpand-1
          '(use-package ediff :defer t (setq my-var t)))
@@ -1945,9 +1955,9 @@
      (use-package nonexistent
        :hook lisp-mode)
      `(when (locate-library nonexistent)
-        (unless (fboundp 'nonexistent)
-          (autoload #'nonexistent "nonexistent" nil t))
-        (add-hook 'lisp-mode-hook #'nonexistent)))))
+        (unless (fboundp 'nonexistent-mode)
+          (autoload #'nonexistent-mode "nonexistent" nil t))
+        (add-hook 'lisp-mode-hook #'nonexistent-mode)))))
 
 (ert-deftest bind-key/:prefix-map ()
   (match-expansion
@@ -1971,7 +1981,6 @@
     (should (eq (nth 2 binding) nil))))
 
 ;; Local Variables:
-;; indent-tabs-mode: nil
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
 ;; End:

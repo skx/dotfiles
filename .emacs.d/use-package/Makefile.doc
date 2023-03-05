@@ -5,7 +5,7 @@ include default.mk
 
 ## ###################################################################
 
-.PHONY: texi install clean AUTHORS.md stats
+.PHONY: install clean AUTHORS.md stats
 
 all: info
 
@@ -54,20 +54,6 @@ clean:
 	@$(RMDIR) dir $(INFOPAGES) $(HTMLFILES) $(HTMLDIRS) $(PDFFILES)
 
 ## Release management ################################################
-
-# Because most users don't have the necessary tools we cannot
-# use "%.texi: %.org".  Instead we have to hardcode each file
-# using a shared target.
-
-DOC_ARGS  = --batch -Q $(DOC_LOAD_PATH)
-DOC_ARGS += -l ox-extra -l org-man -l ox-texinfo+.el
-DOC_EVAL  = --eval "(ox-extras-activate '(ignore-headlines))"
-DOC_EVAL += -f org-texinfo-export-to-texinfo
-
-texi:
-	@printf "Generating use-package.texi\n"
-	@$(EMACSBIN) $(DOC_ARGS) use-package.org $(DOC_EVAL)
-	@echo >> use-package.texi
 
 stats:
 	@printf "Generating statistics\n"
