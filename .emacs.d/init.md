@@ -810,22 +810,6 @@ We'll also improve the default list-management functionality:
   :hook (org-mode . org-autolist-mode))
 ```
 
-When following links `C-RETURN` moves backwards, after following links:
-
-```lisp
-(add-hook 'org-mode-hook (lambda ()
-  (local-set-key (kbd "<C-return>") 'org-mark-ring-goto)))
-```
-
-On the topic of links, sometimes org-mode things that things are links
-which are not, and kills exporting.  We want to ignore that behaviour:
-
-```lisp
-;; I just want an export.
-;; If I wanted a link check, I'd ask for one.
-(setq org-export-with-broken-links t)
-```
-
 `org-mode` is __all__ about lists!  So one thing that is nice is to visually update the display of the list-prefixes, via unicode characters.  We'll use `org-bullets` for that:
 
 ```lisp
@@ -914,9 +898,6 @@ Now we're done with the general setup so we'll handle the more specific things h
         ((org-agenda-skip-function 'skx/org-agenda-skip-complete)))))
 )
 
-;; RETURN will follow links in org-mode files
-(setq org-return-follows-link t)
-
 ;; When exporting code then we get highlighting
 (setq org-latex-listings t)
 
@@ -970,7 +951,7 @@ Since we're living in the future we can use `org-mouse` for checking boxes, etc:
 ```
 
 
-## Org-Mode Diary
+### Org-Mode Diary
 
 I keep a work-log where I write down tasks and notes about my working-life
 every day.
@@ -1000,7 +981,8 @@ This is handled by my [org-diary](https://github.com/skx/org-diary) package, and
     (org-diary-today))
 ```
 
-## Org-Mode Code Execution
+
+### Org-Mode Code Execution
 
 Another useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block when a file is loaded.
 
@@ -1033,6 +1015,46 @@ To use these facilities define blocks like so in your org-mode files:
 ```
 
 By default `org-mode` will prompt you to confirm that you want execution to happen, but we use `org-eval-prefix-list` to enable whitelisting particular prefix-directories, which means there is no need to answer `y` to the prompt.
+
+
+### Org-Mode Links
+
+The basic setting to use is the following one:
+
+```lisp
+;; RETURN will follow links in org-mode files
+(setq org-return-follows-link t)
+```
+
+However this does not work for following links inside tables, so we resolve that via the following custom function:
+
+```lisp
+(defun org-clicky()
+   "Allow following links, even inside tables"
+  (interactive)
+  (if (eq 'org-link (get-text-property (point) 'face))
+     (org-open-at-point)
+  (org-return)))
+
+(add-hook 'org-mode-hook
+          (lambda ()
+            (local-set-key (kbd "RET") 'org-clicky)))
+```
+
+When following links `C-RETURN` moves backwards, after following links:
+
+```lisp
+(add-hook 'org-mode-hook (lambda ()
+  (local-set-key (kbd "<C-return>") 'org-mark-ring-goto)))
+```
+
+On the topic of links, sometimes org-mode things that things are links which are not, and kills exporting.  We want to ignore that behaviour:
+
+```lisp
+;; I just want an export.
+;; If I wanted a link check, I'd ask for one.
+(setq org-export-with-broken-links t)
+```
 
 
 ### Org-Mode tag cloud
@@ -1098,24 +1120,6 @@ With a prefix argument ARG, jump backward ARG many tables."
             (goto-char (1+ (org-table-begin))))
         (goto-char pt)))))
 
-```
-
-
-### Org-Mode and Table Links
-
-If you press `RET` on a link inside a table it doesn't work as expected.
-
-```lisp
-(defun org-clicky()
-   "Allow following links, even inside tables"
-  (interactive)
-  (if (eq 'org-link (get-text-property (point) 'face))
-     (org-open-at-point)
-  (org-return)))
-
-(add-hook 'org-mode-hook
-          (lambda ()
-            (local-set-key (kbd "RET") 'org-clicky)))
 ```
 
 
