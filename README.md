@@ -21,7 +21,7 @@ The contents of the emacs directory are laid out in a logical collection of sub-
 * [Misc. stuff](.emacs.d/misc)
   * Show recent files, report when I should take a break, etc.
 * [User interface](.emacs.d/ui)
-  * [ui/hl-todo.el](.emacs.d/ui/hl-todo.el) - Highlight TODO-comments.
+  * [ui/my-todo.el](.emacs.d/ui/my-todo.el) - Highlight TODO-comments.
   * [ui/linkifier.el](.emacs.d/ui/linkifier.el) - Turn text matching regular expressions into links/buttons
 * [Unix stuff](.emacs.d/unix)
   * MPC (music player control)

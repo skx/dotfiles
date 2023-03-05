@@ -47,7 +47,6 @@ This is a bit terrible, but also a bit awesome.
 | ~/.emacs.d/org/org-tag-cloud.el       | https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el                   | 09cee384ac0e58ddb2abb67f59699dc3 |
 |---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
 | ~/.emacs.d/org/org-appear.el          | https://raw.githubusercontent.com/awth13/org-appear/master/org-appear.el                      | 250b5ec7679bfff73f81bd1e8a3e25fd |
-| ~/.emacs.d/ui/hl-todo.el              | https://raw.githubusercontent.com/tarsius/hl-todo/master/hl-todo.el                           | 2987b717df83a3638d9a0ac0bde27f0c |
 #+TBLFM: $3='(download $2 $1)
 
 

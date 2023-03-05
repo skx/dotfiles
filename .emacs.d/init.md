@@ -627,14 +627,12 @@ easily, this also includes other examples such as:
 
 
 ```lisp
-(use-package hl-todo
+(use-package my-todo
   :defer 2
   :config
-    (setq hl-todo-keyword-faces
-      '(("FIXME"   . "#ffff00")
-        ("TODO"   . "#ffff00")
-        ("XXX"   . "#ffff00")))
-    (global-hl-todo-mode t))
+    (add-hook 'text-mode-hook #'my/todo-fontify)
+    (add-hook 'prog-mode-hook #'my/todo-fontify))
+
 ```
 
 ### Language Mode Helpers - Utilities
