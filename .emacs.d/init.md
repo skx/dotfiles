@@ -1079,50 +1079,6 @@ To make it useful we'll ensure that we disable warnings about eval which would o
 ```
 
 
-### Org-Mode table navigation
-
-There are no built-in functions for jumping around tables, so these two functions add the ability to go to the next/previous ones:
-
-```lisp
-(defun org-next-table (&optional arg)
-  "Jump to the next table.
-
-With a prefix argument ARG, jump forward ARG many tables."
-  (interactive "p")
-  (dotimes (n arg)
-    (let ((pt (point)))
-      (when (org-at-table-p)
-        (goto-char (org-table-end)))
-      (if (re-search-forward org-table-line-regexp nil t)
-          (when (org-invisible-p)
-            (org-reveal t)
-            (org-show-entry)
-            (unless (org-at-table-p)
-              (org-next-table 1)))
-        (goto-char pt)))))
-
-(defun org-previous-table (&optional arg)
-  "Jump to the previous table.
-
-With a prefix argument ARG, jump backward ARG many tables."
-  (interactive "p")
-  (dotimes (n arg)
-    (let ((pt (point)))
-      (when (org-at-table-p)
-        (goto-char (org-table-begin)))
-      (if (re-search-backward org-table-line-regexp nil t)
-          (progn
-            (when (org-invisible-p)
-              (org-reveal t)
-              (org-show-entry)
-              (unless (org-at-table-p)
-                (org-previous-table 1)))
-            (goto-char (1+ (org-table-begin))))
-        (goto-char pt)))))
-
-```
-
-
 ### Org-Mode and Blank Lines
 
 Blank lines keep getting inserted in between headlines and I don't want to see them in collapsed (contents) views. When I use TAB to fold (cycle) tasks I don't want to see any blank lines between headings.
@@ -1151,23 +1107,20 @@ The following setting prevents accidentally editing hidden text when the point i
 
 ### Org-Mode Utility Functions
 
-The following function allows extracting the value of a global header from the current document:
+I've put together a simple collection of utility-functions for org-mode files:
+
+* org-utils-header-prop - Return a named property from an org-file header.
+* org-utils-random-headline - Jump to a random headline.
+* org-utils-table-next - Jump to the next table.
+* org-utils-table-prev - Jump to the previous table.
+
+These can be found within the `org-utils.el` package:
 
 ```lisp
-  (defun skx/org-global-prop( name )
-    "Get the value from the global property with the given name, e.g. 'AUTHOR', 'TITLE', etc."
-    (save-excursion
-      (org-save-outline-visibility t
-        (outline-show-all)
-        (goto-line 0)
-        (if (re-search-forward (concat "^#\\+" name ":") nil t)
-          (progn
-            (setq start (point))
-            (re-search-forward "$")
-            (setq end (point))
-            (string-trim (buffer-substring-no-properties start end)))))))
+(use-package org-utils
+  :after org
+  :defer 2)
 ```
-
 
 ### Org-Mode Viewing Exported Documents
 
@@ -1243,23 +1196,6 @@ One other problem is that code blocks don't export neatly.  To resolve that you 
 In addition to the block you'll need `apt-get install python-pygments`.
 
 
-### Org-Mode Random Headline
-
-This function will open a random headline in an indirect buffer:
-
-```lisp
-(defun org-random-heading (top-level)
-    "Open random top-level heading from current Org buffer in new indirect buffer.
-    When TOP-LEVEL is non-nil, only go to top-level headings."
-    (interactive "P")
-    (goto-char (+ (point-min) (random (- (point-max) (point-min)))))
-    (if (org-before-first-heading-p)
-        (outline-next-heading)
-      (org-back-to-heading)
-      (when top-level
-          (cl-loop while (org-up-heading-safe))))
-    (org-tree-to-indirect-buffer))
-```
 
 
 ### Org-Mode Secrets
@@ -1507,72 +1443,72 @@ and many other languages.  The following section highlights expressions
 inside parenthesis in a cute way:
 
 ```lisp
-    (setq show-paren-style 'expression)
-    (setq show-paren-when-point-in-periphery t)
-    (setq show-paren-when-point-inside-paren t)
-    (setq show-paren-ring-bell-on-mismatch t)
-    (setq show-paren-delay 0)
-    (show-paren-mode t)
+(setq show-paren-style 'expression)
+(setq show-paren-when-point-in-periphery t)
+(setq show-paren-when-point-inside-paren t)
+(setq show-paren-ring-bell-on-mismatch t)
+(setq show-paren-delay 0)
+(show-paren-mode t)
 ```
 
 The following section takes care of setting up other basic and
 global things the way that I prefer them.
 
 ```lisp
-    ;; Show the time on the status bar.
-    (setq display-time-24hr-format t)
-    (setq display-time-day-and-date t)
-    (display-time)
+;; Show the time on the status bar.
+(setq display-time-24hr-format t)
+(setq display-time-day-and-date t)
+(display-time)
 
-    ; Ignore case when completing file names, buffer names,
-    ; and completions generally.
-    (setq read-file-name-completion-ignore-case t)
-    (setq read-buffer-completion-ignore-case t)
-    (setq case-fold-search t)
-    (setq completion-ignore-case  t)
+; Ignore case when completing file names, buffer names,
+; and completions generally.
+(setq read-file-name-completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
+(setq case-fold-search t)
+(setq completion-ignore-case  t)
 
-    ;; Show column-numbers too
-    (column-number-mode)
+;; Show column-numbers too
+(column-number-mode)
 
-    ;; Avoid the annoying startup message.
-    (setq-default
+;; Avoid the annoying startup message.
+(setq-default
       inhibit-startup-screen t               ; Disable start-up screen
       inhibit-startup-message t              ; Disable startup message
       inhibit-startup-echo-area-message t    ; Disable initial echo message
-    )
+      )
 
-    ;; Uncompress files as they're loaded.
-    (auto-compression-mode t)
+;; Uncompress files as they're loaded.
+(auto-compression-mode t)
 
-    ;; Paste at point, not mouse position
-    (setq mouse-yank-at-point t)
+;; Paste at point, not mouse position
+(setq mouse-yank-at-point t)
 
-    ;; Make all "yes or no" prompts show "y or n" instead
-    (fset 'yes-or-no-p 'y-or-n-p)
+;; Make all "yes or no" prompts show "y or n" instead
+(fset 'yes-or-no-p 'y-or-n-p)
 
-    ;; Highlight the region between point and mark at all times.
-    (transient-mark-mode t)
+;; Highlight the region between point and mark at all times.
+(transient-mark-mode t)
 
-    ;; Moving cursor down at bottom scrolls only a single line, not half page
-    (setq scroll-step 1)
-    (setq scroll-conservatively 5)
+;; Moving cursor down at bottom scrolls only a single line, not half page
+(setq scroll-step 1)
+(setq scroll-conservatively 5)
 
-    ;; TAB characters are evil
-    (setq-default indent-tabs-mode nil)
+;; TAB characters are evil
+(setq-default indent-tabs-mode nil)
 
-    ;; Show the file we've got loaded in the frame title.
-    (setq frame-title-format  (concat invocation-name "@" system-name ": %b %+%+ %f"))
+;; Show the file we've got loaded in the frame title.
+(setq frame-title-format  (concat invocation-name "@" system-name ": %b %+%+ %f"))
 
-    (defun px-raise-frame-and-give-focus ()
-        (when window-system
-            (raise-frame)
-            (x-focus-frame (selected-frame))
-            (set-mouse-pixel-position (selected-frame) 40 40)
-            (message "raised-window")))
-    (add-hook 'server-switch-hook 'px-raise-frame-and-give-focus)
+(defun px-raise-frame-and-give-focus ()
+  (when window-system
+    (raise-frame)
+    (x-focus-frame (selected-frame))
+    (set-mouse-pixel-position (selected-frame) 40 40)
+    (message "raised-window")))
+(add-hook 'server-switch-hook 'px-raise-frame-and-give-focus)
 
-    ; Text-mode is default mode
-    (setq default-major-mode 'text-mode)
+; Text-mode is default mode
+(setq default-major-mode 'text-mode)
 ```
 
 

@@ -18,6 +18,7 @@ The contents of the emacs directory are laid out in a logical collection of sub-
   * cfengine, docker, go, hcl, etc, etc.
 * [Org-Mode Stuff](.emacs.d/org)
   * [org-eval.el](.emacs.d/org/org-eval.el) Execute the contents of named blocks on file-load or save
+  * [org-utils.el](.emacs.d/org/org-utils.el) A minimal collection of utility functions.
 * [Misc. stuff](.emacs.d/misc)
   * Show recent files, report when I should take a break, etc.
 * [User interface](.emacs.d/ui)
