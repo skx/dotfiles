@@ -18,6 +18,7 @@
   (define-key mpc-mode-map [?n] 'mpc-play-next)
   (define-key mpc-mode-map [?p] 'mpc-play-prev)
   (define-key mpc-mode-map [?r] 'mpc-refresh-display)
+  (define-key mpc-mode-map [?R] 'mpc-toggle-random)
   (define-key mpc-mode-map "\C-m" 'mpc-play-cur)
   (define-key mpc-mode-map [?\+] 'mpc-louder)
   (define-key mpc-mode-map [?\-] 'mpc-quieter)
@@ -44,8 +45,8 @@
   (kill-all-local-variables)
   (let ((buffer-read-only nil))
       (delete-region (point-min) (point-max))
-      (insert "mpc :")
-      (insert "n == next | p == prev | spc = pause\n\n")
+      (insert (mpc-get-overview))
+      (insert "\n\n")
       (save-excursion
         (insert (mpc-get-playlist)))
       (forward-line (mpc-currently-playing))
@@ -58,6 +59,12 @@
   (hl-line-mode t)
   (toggle-read-only t)
   )
+
+
+(defun mpc-get-overview ()
+  "Return the status of the server"
+  (interactive)
+  (nth 2 (split-string (shell-command-to-string (format "%s status" mpc-path)) "\n")))
 
 
 ;;
@@ -82,6 +89,12 @@
   (interactive)
   (mpc-insert))
 
+
+(defun mpc-toggle-random()
+  "Toggle the state of the random flag"
+  (interactive)
+  (shell-command-to-string(format "%s random" mpc-path))
+  (mpc-refresh-display))
 
 ;;
 ;;  Next
