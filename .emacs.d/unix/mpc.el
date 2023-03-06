@@ -23,6 +23,8 @@
   (define-key mpc-mode-map [?\+] 'mpc-louder)
   (define-key mpc-mode-map [?\-] 'mpc-quieter)
   (define-key mpc-mode-map [? ] 'mpc-pause)
+  (define-key mpc-mode-map [??] 'mpc-help)
+  (define-key mpc-mode-map [?h] 'mpc-help)
 )
 
 
@@ -35,6 +37,13 @@
   (mpc-insert)
 )
 
+
+(defun mpc-help()
+  "Show the keybindings in the current mode."
+  (interactive)
+  (describe-bindings)
+  (pop-to-buffer (get-buffer-create "*Help*"))
+  (search-forward "Major Mode Bindings"))
 
 ;;
 ;; Insert the menu + playlist.
@@ -62,7 +71,8 @@
 
 
 (defun mpc-get-overview ()
-  "Return the status of the server"
+  "Return the status of the server, this includes the current
+volume the status of repeat, random, etc."
   (interactive)
   (nth 2 (split-string (shell-command-to-string (format "%s status" mpc-path)) "\n")))
 
@@ -100,7 +110,7 @@
 ;;  Next
 ;;
 (defun mpc-play-next()
-  "Move to the next track in the playlist"
+  "Move to the next track in the current playlist."
   (interactive)
   (shell-command
    (format "%s next" mpc-path))
@@ -111,7 +121,7 @@
 ;;  Pause
 ;;
 (defun mpc-pause()
-  "Toggle the pause"
+  "Toggle the state of the play/pause flag."
   (interactive)
   (shell-command
    (format "%s toggle" mpc-path))
@@ -122,7 +132,7 @@
 ;; Prev
 ;;
 (defun mpc-play-prev()
-  "Move to the previous track in the playlist"
+  "Move to the previous track in the current playlist."
   (interactive)
   (shell-command
    (format "%s prev" mpc-path))
@@ -133,7 +143,7 @@
 ;; Play current
 ;;
 (defun mpc-play-cur()
-  "Move to the current position in the playlist"
+  "Move to the current position in the playlist."
   (interactive)
   (save-excursion
     (beginning-of-line)
@@ -149,7 +159,7 @@
 ;; Volume tweaking
 ;;
 (defun mpc-louder()
-  "Make the volume louder"
+  "Make the volume louder."
   (interactive)
   (shell-command
    (format "%s volume +5 >/dev/null" mpc-path))
