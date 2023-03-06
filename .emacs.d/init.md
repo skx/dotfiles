@@ -787,6 +787,7 @@ As noted above it is possible to evaluated blocks of script from within `org-mod
 ```lisp
 (use-package ob-shell
   :defer 2
+  :after org
   :commands
   org-babel-execute:sh
   org-babel-expand-body:sh
@@ -798,6 +799,7 @@ Ensure that we can export org-blocks.  This is necessary for the CSS & Javascrip
 
 ```lisp
 (use-package ob-org
+  :after org
   :defer 2)
 ```
 
@@ -938,6 +940,7 @@ Since we're hiding the emphasis markers it can be hard to edit text which is for
 ```lisp
 (use-package org-appear
   :after org
+  :defer 2
   :config
   (setq org-appear-autolinks t)
   :hook ((org-mode org-diary-mode) . org-appear-mode))
@@ -947,6 +950,7 @@ Since we're living in the future we can use `org-mouse` for checking boxes, etc:
 
 ```lisp
 (use-package org-mouse
+  :defer 2
   :after org)
 ```
 
@@ -1175,8 +1179,8 @@ When exporting `org-mode` files to PDF it is nicer if new sections start on a ne
 One other problem is that code blocks don't export neatly.  To resolve that you need this:
 
 ```lisp
-(require 'org)
-;(require 'ox-latex)
+; (require 'org)
+; (require 'ox-latex)
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq org-latex-listings 'minted)
 
@@ -1273,6 +1277,7 @@ Here we keep track of recent files that have been opened:
 ```lisp
 (use-package recentf
   :bind
+  :defer 2
   :config
   (recentf-mode 1)
   (setq recentf-max-menu-items 25)
@@ -1283,6 +1288,7 @@ Now we can view a list of recently-opened files via `C-c r`:
 
 ```lisp
 (use-package recentf-buffer
+  :defer 2
   :bind
     (("C-c r" . recentf-open-files-in-simply-buffer)))
 ```
