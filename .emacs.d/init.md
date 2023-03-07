@@ -1277,7 +1277,8 @@ On a related note having easy access to a new lisp buffer is also useful, so I'v
 
 ## Recent Files
 
-Here we keep track of recent files that have been opened:
+Here we keep track of recent files that have been opened, we prune the list every time we launch and we ensure that
+we remove the `ido.last` file which is populated by the ido completion-framework:
 
 ```lisp
 (use-package recentf
@@ -1286,7 +1287,9 @@ Here we keep track of recent files that have been opened:
   :config
   (recentf-mode 1)
   (setq recentf-max-menu-items 25)
-  (setq recentf-max-saved-items 10))
+  (setq recentf-max-saved-items 10)
+  (add-to-list 'recentf-exclude "ido.last")
+  (recentf-cleanup))
 ```
 
 Now we can view a list of recently-opened files via `C-c r`:
