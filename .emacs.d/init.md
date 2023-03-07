@@ -1286,10 +1286,10 @@ we remove the `ido.last` file which is populated by the ido completion-framework
   :defer 2
   :config
   (recentf-mode 1)
-  (setq recentf-max-menu-items 25)
-  (setq recentf-max-saved-items 10)
-  (add-to-list 'recentf-exclude "ido.last")
-  (recentf-cleanup))
+  (setq recentf-max-menu-items   25
+        recentf-max-saved-items 300
+        recentf-exclude         '("/auto-install/" ".recentf" "ido.last" "COMMIT_EDITMSG" ".gz" "~$" "/tmp/" "/ssh:" "/sudo:" "/scp:" "go.mod" "go.sum")
+        recentf-auto-cleanup 600))
 ```
 
 Now we can view a list of recently-opened files via `C-c r`:
