@@ -1039,9 +1039,10 @@ However this does not work for following links inside tables, so we resolve that
 
 ```lisp
 (defun org-clicky()
-   "Allow following links, even inside tables"
+   "Allow following links, even inside tables."
   (interactive)
-  (if (eq 'org-link (get-text-property (point) 'face))
+  (if (or (member 'org-link (get-text-property (point) 'face))
+       (eq 'org-link (get-text-property (point) 'face)))
      (org-open-at-point)
   (org-return)))
 
