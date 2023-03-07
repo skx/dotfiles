@@ -85,6 +85,20 @@ Here we load the package which we'll then use for further configuration:
 ```
 
 
+## Initial Path
+
+On Unix systems the emacs process inherits the shell environment which was used to start it up.
+
+On MacOS there are some niggles, so we resolve those here:
+
+```lisp
+(use-package exec-path-from-shell
+   :if (eq system-type 'darwin)
+   :config
+   (exec-path-from-shell-initialize))
+```
+
+
 ## Basic History
 
 I like to keep history of various tools beneath a transient directory, which I can remove whenever I like, rather than scattered around the filesystem.
@@ -232,9 +246,9 @@ I'm using `ido` - the only thing to note for myself is that when running `C-x C-
 When `ido-ignore-extensions` is set to a true value then files are ignored from the general purpose `completion-ignored-extensions` list.  This covers most things, but we can add to it:
 
 ```lisp
-(push ".pdf" completion-ignored-extensions)
-(push ".tex" completion-ignored-extensions)
-(push ".last" completion-ignored-extensions)
+(dolist (suffix
+  '(".pdf" ".txt" ".last")
+     (push completion-ignored-extensions suffix)))
 ```
 
 ## Custom Variables
@@ -338,7 +352,7 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
   :defer 2
   :mode ("\\.pp$" . puppet-mode))
 
-;; Puppet
+;; Ruby
 (use-package ruby-mode
   :defer 2
   :mode ("\\.rb" . ruby-mode))
@@ -393,20 +407,12 @@ In emacs-lisp-mode we can enable eldoc-mode to display information about a funct
 
 (Obviously my [dotfiles](https://github.com/skx/dotfiles/) contain a copy of the appropriate files.)
 
-Once installed we can now configure the basic setup, ensuring that the mode is loaded for the editing of `*.go` files:
+Once installed we can now ensure that the mode is loaded for the editing of `*.go` files:
 
 ```lisp
-(defun my-go-before-save ()
-  "Format buffer and organize imports in Go mode."
-  (when (eq major-mode 'go-mode)
-    (lsp-organize-imports)
-    (lsp-format-buffer)))
-
-
 (use-package go-mode
   :defer 2
-  :mode ("\\.go" . go-mode)
-  :hook (before-save . my-go-before-save))
+  :mode ("\\.go" . go-mode))
 ```
 
 Beyond the basic support for golang installed via that mode I've also configured LSP for this language, which provides smart completion & etc.
@@ -452,7 +458,7 @@ Once the dependencies are present the following configures LSP, including a help
 ;; If we have `gopls` on our $PATH AND we have `lsp-mode` available ..
 ;; Then setup LSP, and add the hooks for go-mode to use it.
 (use-package lsp-mode
-  :if (executable-find "gopls")
+  :if (and (executable-find "gopls") (not (eq system-type 'darwin)))
   :custom
    (skx/setup-lsp)
   :init
@@ -462,7 +468,6 @@ Once the dependencies are present the following configures LSP, including a help
 ```
 
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
-
 
 
 ### Language Modes - Perl
