@@ -1293,13 +1293,26 @@ we remove the `ido.last` file which is populated by the ido completion-framework
         recentf-auto-cleanup 600))
 ```
 
+Here's a function that allows opening a recent file, with completion:
+
+```lisp
+(defun recentf-open-with-completion ()
+  (interactive)
+    (let* ((tocpl (mapcar (lambda (x) (cons (file-name-nondirectory x) x))
+                            recentf-list))
+             (fname (completing-read "File name: " tocpl nil nil)))
+        (when fname
+          (find-file (cdr (assoc-string fname tocpl))))))
+```
+
 Now we can view a list of recently-opened files via `C-c r`:
 
 ```lisp
 (use-package recentf-buffer
   :defer 2
   :bind
-    (("C-c r" . recentf-open-files-in-simply-buffer)))
+    (("C-c r" . recentf-open-files-in-simply-buffer)
+     ("C-c C-r" . recentf-open-with-completion)))
 ```
 
 
