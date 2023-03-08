@@ -225,15 +225,15 @@ I'm using `ido` - the only thing to note for myself is that when running `C-x C-
 * `C-e` - Edit the whole prompt.
 * See the help for `ido-find-file` for a complete list.
 
-
 ```lisp
 ;; IDO
 (use-package ido
   :defer 2
   :config
   (setq ido-everywhere t
-    ido-use-filename-at-point t
+    ido-use-filename-at-point 'guess
     ido-virtual-buffers t
+    ido-flex-matching t
     ido-use-faces t
     ido-default-buffer-method 'selected-window
     ido-auto-merge-work-directories-length -1
