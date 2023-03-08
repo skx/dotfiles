@@ -1293,7 +1293,7 @@ we remove the `ido.last` file which is populated by the ido completion-framework
   :defer 2
   :config
   (recentf-mode 1)
-  (setq recentf-max-menu-items   25
+  (setq recentf-max-menu-items  100
         recentf-max-saved-items 300
         recentf-exclude         '("/auto-install/" ".recentf" "ido.last" "COMMIT_EDITMSG" ".gz" "~$" "/tmp/" "/ssh:" "/sudo:" "/scp:" "go.mod" "go.sum")
         recentf-auto-cleanup 600))
