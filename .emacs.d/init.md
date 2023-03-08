@@ -1036,15 +1036,21 @@ The basic setting to use is the following one:
 ```
 
 However this does not work for following links inside tables, so we resolve that via the following custom function:
-
+(get-text-property (point) 'face)
 ```lisp
+(defun org-is-link ()
+  "Is the point over a link?  We deteremine this via the text-properties,
+   but note that this might return a symbol or a list depending on version/system."
+  (let ((tprop (get-text-property (point) 'face)))
+    (if (or (eq tprop 'org-link) (and (listp tprop) (memq 'org-link tprop)))
+       t nil)))
+
 (defun org-clicky()
    "Allow following links, even inside tables."
   (interactive)
-  (if (or (member 'org-link (get-text-property (point) 'face))
-       (eq 'org-link (get-text-property (point) 'face)))
-     (org-open-at-point)
-  (org-return)))
+  (if (org-is-link)
+    (call-interactively 'org-open-at-point)
+      (org-return)))
 
 (add-hook 'org-mode-hook
           (lambda ()
