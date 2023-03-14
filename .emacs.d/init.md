@@ -1729,21 +1729,24 @@ some I've grown accustomed to:
         (interactive)
         (call-process-region (point) (if mark-active (mark) (point)) "pbpaste" t t)))
 
-; HOME will go to the start of the indent, the start of the line, and only
+;; HOME will go to the start of the indent or the start of the line.
+;; Ctrl-HOME for beginning of buffer
 ; then the start of the buffer.
 (define-key steve-mode-map (kbd "<home>")
     '(lambda ()
         (interactive)
-        (if (bolp) (beginning-of-buffer)
-          (skip-chars-backward " \t")
-         (unless (bolp) (back-to-indentation)))))
+        (if (bolp)
+           (skip-chars-forward " \t")
+           (beginning-of-line))))
 
-; END will move to the end of the line, or the end of the buffer
+;; END will move to the end of the line, or the last non-whitespace character
+;;
+;; Ctrl-END will go to end of the buffer
 (define-key steve-mode-map (kbd "<end>")
     '(lambda ()
         (interactive)
         (if (eolp)
-          (end-of-buffer)
+           (skip-chars-backward " \t")
          (end-of-line))))
 
 ; unset things
