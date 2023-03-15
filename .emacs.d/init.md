@@ -1550,35 +1550,20 @@ global things the way that I prefer them.
 
 There is a neat package `imenu-list` which allows you to view a sidebar in the current frame, containing index-entries.
 
-Here I configure it to be used for both `markdown-mode` and `org-mode`:
+Here I configure it to be used for both general programming modes, as well as `org-mode`:
 
 ```lisp
-(defun skx/imenu-setup ()
-  ; setup defaults
-  (setq imenu-list-focus-after-activation t
-        imenu-list-auto-resize t
-        imenu-list-position 'left)
-
-  ; markdown mode
-  (add-hook 'markdown-mode-hook
-     (lambda ()
-      (local-set-key (kbd "M-i") 'imenu-list)))
-
-  ; org-mode
-  (add-hook 'org-mode-hook
-     (lambda ()
-      (local-set-key (kbd "M-i") 'imenu-list)))
-
-  ; programming modes, generally
-  (add-hook 'prog-mode-hook
-     (lambda ()
-      (local-set-key (kbd "M-i") 'imenu-list)))
-)
-
 (use-package imenu-list
   :defer 2
   :init
-  (skx/imenu-setup))
+    (setq imenu-list-focus-after-activation t
+          imenu-list-auto-resize t
+          imenu-list-position 'left)
+;  :config
+;    (imenu-list-minor-mode)
+  :bind
+    (("M-i" . #'imenu-list-smart-toggle))
+)
 ```
 
 ## UTF-8
@@ -1701,9 +1686,6 @@ some I've grown accustomed to:
 
 ;; agenda
 (define-key steve-mode-map (kbd "C-c a") 'org-agenda)
-
-;; org-mode & markdown-mode sidebar
-(define-key steve-mode-map (kbd "M-'") 'imenu-list-smart-toggleq)
 
 ; Allow the backtick key to work as I expected.
 (define-key steve-mode-map [dead-grave] "`")
