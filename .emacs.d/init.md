@@ -487,30 +487,21 @@ Now we want to make sure that the code is formatted according to my tastes:
 (add-hook 'cperl-mode-hook 'my-cperl-mode-hook t)
 ```
 
-I also install a post-save hook which shows if the perl we're writing is well-formed.
+I've also created a simple utility package which contains a pair of helpers for Perl buffers:
+
+* Reformat buffers, with `perltidy`, before saving.
+  * This works with the [.perltidyrc](https://github.com/skx/dotfiles/blob/master/.perltidyrc) configuration file I have stored in my dotfiles.
+* Run a syntax-check after saving.
 
 **NOTE**: This can be abused as `perl -c ...` will evaluate code found in `BEGIN{ .. }` blocks.
 
 ```lisp
-(use-package perl-syntax-check
+(use-package perl-utilities
   :defer 2
   :if (executable-find "perl")
 )
 ```
 
-The last Perl-specific thing I have is `M-x perltidy` which will
-invoke the `perltidy` command on the contents of the current buffer.
-This works with the
-[.perltidyrc](https://github.com/skx/dotfiles/blob/master/.perltidyrc)
-configuration file I have stored in my dotfiles:
-
-
-```lisp
-(use-package perl-tidy-on-save
-  :defer 2
-  :if (executable-find "perltidy")
-  )
-```
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
 
 
