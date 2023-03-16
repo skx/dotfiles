@@ -160,19 +160,6 @@ We disable that behaviour here, in preference to a visual-flash:
 ```
 
 
-## Breaks
-
-Regular breaks are good, so we configure an alarm to go off every thirty
-minutes to suggest one to the user:
-
-```lisp
-(use-package break-time
-  :defer 2
-  :custom
-  (break-time-start))
-```
-
-
 ## Buffers
 
 If multiple buffers use the same filename we'll prefix with the parent directory:

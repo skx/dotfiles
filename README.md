@@ -20,7 +20,7 @@ The contents of the emacs directory are laid out in a logical collection of sub-
   * [org-eval.el](.emacs.d/org/org-eval.el) Execute the contents of named blocks on file-load or save
   * [org-utils.el](.emacs.d/org/org-utils.el) A minimal collection of utility functions.
 * [Misc. stuff](.emacs.d/misc)
-  * Show recent files, report when I should take a break, etc.
+  * Show recent files, etc.
 * [User interface](.emacs.d/ui)
   * [ui/my-todo.el](.emacs.d/ui/my-todo.el) - Highlight TODO-comments.
   * [ui/linkifier.el](.emacs.d/ui/linkifier.el) - Turn text matching regular expressions into links/buttons
