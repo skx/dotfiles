@@ -140,6 +140,9 @@ I'm annoyed by backups and similar.  So I disable them all:
 (setq backup-inhibited t)
 (setq make-backup-files nil)
 
+;; Prevent the creation of the auto-save-list directory
+(setq auto-save-list-file-prefix nil)
+
 ;; Disable auto-save
 (setq auto-save-default nil)
 (setq auto-save-interval (* 60 60 24))
