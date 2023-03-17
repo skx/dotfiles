@@ -216,17 +216,19 @@ I'm using `ido` - the only thing to note for myself is that when running `C-x C-
 ;; IDO
 (use-package ido
   :defer 2
-  :config
-  (setq ido-everywhere t
-    ido-use-filename-at-point 'guess
-    ido-virtual-buffers t
-    ido-flex-matching t
-    ido-use-faces t
-    ido-default-buffer-method 'selected-window
+  :init
+  (setq ido-everywhere                     t
+    ido-use-filename-at-point              'guess
+    ido-virtual-buffers                    t
+    ido-flex-matching                      t
+    ido-use-faces                          t
+    ido-default-buffer-method              'selected-window
     ido-auto-merge-work-directories-length -1
-    ido-file-extensions-order '(".org" ".md" ".txt" ".html" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf" ".py")
+    ido-save-directory-list-file           (expand-file-name "~/.trash.d/emacs.ido.history")
+    ido-file-extensions-order              '(".org" ".md" ".txt" ".html" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf" ".py")
     ido-ignore-extensions t
     )
+  :config
   (ido-mode))
 ```
 
@@ -1273,6 +1275,7 @@ we remove the `ido.last` file which is populated by the ido completion-framework
   (recentf-mode 1)
   (setq recentf-max-menu-items  100
         recentf-max-saved-items 300
+        recentf-save-file (expand-file-name "~/.trash.d/emacs.recent.files")
         recentf-exclude         '("/auto-install/" ".recentf" "ido.last" "COMMIT_EDITMSG" ".gz" "~$" "/tmp/" "/ssh:" "/sudo:" "/scp:" "go.mod" "go.sum")
         recentf-auto-cleanup 600))
 ```
