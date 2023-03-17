@@ -1279,7 +1279,7 @@ we remove the `ido.last` file which is populated by the ido completion-framework
   (setq recentf-max-menu-items  100
         recentf-max-saved-items 300
         recentf-save-file (expand-file-name "~/.trash.d/emacs.recent.files")
-        recentf-exclude         '("/auto-install/" ".recentf" "ido.last" "COMMIT_EDITMSG" ".gz" "~$" "/tmp/" "/ssh:" "/sudo:" "/scp:" "go.mod" "go.sum")
+        recentf-exclude         '("/auto-install/" "/.trash.d/" "COMMIT_EDITMSG" ".gz" "~$" "/tmp/" "/ssh:" "/sudo:" "/scp:" "go.mod" "go.sum")
         recentf-auto-cleanup 600))
 ```
 
