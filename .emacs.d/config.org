@@ -16,39 +16,38 @@ To resync all the files place the cursor on the bottom-row of the table and exec
 This is a bit terrible, but also a bit awesome.
 
 #+NAME: github-urls
-| Destination                           | Link                                                                                          | Result                           |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/cfengine.el           | https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el                    | 31406a9472c32a5911b4bd7b4e2c4ed5 |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/go-mode.el            | https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode.el                       | e2ac21c5599b8ea7da5ad52c86d1bad3 |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/groovy-mode.el        | https://raw.githubusercontent.com/Groovy-Emacs-Modes/groovy-emacs-modes/master/groovy-mode.el | 2d94d202bea33899baba81c481135312 |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/lua-mode.el           | https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el                         | c1ca87c7e6b252783b9446904832fb52 |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/markdown-mode.el      | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el              | 79dbeb169b929db2cb49571f24231c60 |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/monkey.el             | https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el                           | 75c08fc655bf16b8c7e9cc146eb1f13f |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/puppet-mode.el        | https://raw.githubusercontent.com/voxpupuli/puppet-mode/master/puppet-mode.el                 | 09dc53bc950151a0d233c613a7881234 |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/terraform-mode.el     | https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el        | a2c026eac68576e7b0e1eb10db548711 |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/lang/web-mode.el           | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                          | 2d655d7ef12663fd72bf301d01fea242 |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/misc/literate-calc-mode.el | https://raw.githubusercontent.com/sulami/literate-calc-mode.el/master/literate-calc-mode.el   | 2c8be2e08ea04a1e3dabb0e6cb87812c |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/org/org-autolist.el        | https://raw.githubusercontent.com/calvinwyoung/org-autolist/master/org-autolist.el            | e97c43c9bc9dc0ddb62e9b50eb32e10e |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/org/org-diary.el           | https://raw.githubusercontent.com/skx/org-diary/master/org-diary.el                           | 58f9ae89e7a3cf3091e9034d3c3f8065 |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/org/org-nested.el          | https://raw.githubusercontent.com/skx/org-nested/master/org-nested.el                         | 243542d5caccdcc05bcd8cd568557735 |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/org/org-tag-cloud.el       | https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el                   | 09cee384ac0e58ddb2abb67f59699dc3 |
-|---------------------------------------+-----------------------------------------------------------------------------------------------+----------------------------------|
-| ~/.emacs.d/org/org-appear.el          | https://raw.githubusercontent.com/awth13/org-appear/master/org-appear.el                      | 250b5ec7679bfff73f81bd1e8a3e25fd |
+| Destination                       | Link                                                                                          | Result |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/cfengine.el       | https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el                    |   1496 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/go-mode.el        | https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode.el                       |   3055 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/groovy-mode.el    | https://raw.githubusercontent.com/Groovy-Emacs-Modes/groovy-emacs-modes/master/groovy-mode.el |   1018 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/lua-mode.el       | https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el                         |   2293 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/markdown-mode.el  | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el              |   9996 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/monkey.el         | https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el                           |     96 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/puppet-mode.el    | https://raw.githubusercontent.com/voxpupuli/puppet-mode/master/puppet-mode.el                 |   1293 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/terraform-mode.el | https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el        |    346 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/web-mode.el       | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                          |  14897 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/org/org-autolist.el    | https://raw.githubusercontent.com/calvinwyoung/org-autolist/master/org-autolist.el            |    232 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/org/org-diary.el       | https://raw.githubusercontent.com/skx/org-diary/master/org-diary.el                           |    183 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/org/org-nested.el      | https://raw.githubusercontent.com/skx/org-nested/master/org-nested.el                         |     37 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/org/org-tag-cloud.el   | https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el                   |     61 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/org/org-appear.el      | https://raw.githubusercontent.com/awth13/org-appear/master/org-appear.el                      |    426 |
+|-----------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/ui/smex.el             | https://raw.githubusercontent.com/nonsequitur/smex/master/smex.el                             |    483 |
 #+TBLFM: $3='(download $2 $1)
-
 
 #+BEGIN_SRC emacs-lisp :results output silent
   (defun download (url dest)
@@ -56,6 +55,6 @@ This is a bit terrible, but also a bit awesome.
     (if (length url)
       (progn
         (shell-command-to-string (concat "wget -O " dest " " url))
-        (shell-command-to-string (concat "md5sum " (expand-file-name dest) " | awk '{print $1}' | tr -d \\\\n")))
+        (shell-command-to-string (concat "wc -l " (expand-file-name dest) " | awk '{print $1}' | tr -d \\\\n")))
     (message "%s empty" url)))
 #+END_SRC
