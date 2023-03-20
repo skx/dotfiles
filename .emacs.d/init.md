@@ -687,9 +687,6 @@ have all my repositories cloned beneath ~/Repos/github.com, for example:
 
 
 ```lisp
-
-(require 'subr-x) ; for string-remove-prefix
-
 (defvar github-prefix "~/Repos/github.com/" "Root of github projects.")
 
 (defun skx-github-project ()
@@ -703,7 +700,7 @@ have all my repositories cloned beneath ~/Repos/github.com, for example:
 
 (defun get-github-projects (prefix)
   (map 'list
-       (lambda (x) (string-remove-prefix prefix x))
+       (lambda (x) (substring x (length prefix)))
        (file-expand-wildcards (concat prefix "*/*"))))
 ```
 
@@ -962,11 +959,19 @@ Since we're living in the future we can use `org-mouse` for checking boxes, etc:
 I keep a work-log where I write down tasks and notes about my working-life
 every day.
 
-This is handled by my [org-diary](https://github.com/skx/org-diary) package, and here we load it and allow quick access to my journal:
+Within my diary I want quick access to Jira (ugh), so I have a package to turn references into links:
+
+```lisp
+(use-package linkifier
+  :defer 2)
+```
+
+The diary itself is handled by my [org-diary](https://github.com/skx/org-diary) package, and here we load it and allow quick access to my journal:
 
 ```lisp
 (use-package org-diary
   :defer 2
+  :after linkifier
   :config
   ;; Add a new tag to all entries, after creating them.
   (add-hook 'org-diary-after-new-entry-hook
@@ -974,16 +979,11 @@ This is handled by my [org-diary](https://github.com/skx/org-diary) package, and
                 (org-set-tags (format-time-string "%Y_week_%V")))))
 
 
-(require 'linkifier)
-
 ;; Create a helper to load the diary.
 (defun skx-load-diary()
   "Load my diary/work-log, and scroll to today's entry."
   (interactive)
     (find-file (expand-file-name "~/Private/Worklog/Diary.org"))
-    (make-variable-buffer-local 'linkifier-patterns)
-    (setq linkifier-patterns '(("\\\<INFRA-[0-9]+\\\>" "https://metacoregames.atlassian.net/browse/%s")))
-    (linkifier-mode t)
     (org-diary-today))
 ```
 
@@ -1188,8 +1188,6 @@ When exporting `org-mode` files to PDF it is nicer if new sections start on a ne
 One other problem is that code blocks don't export neatly.  To resolve that you need this:
 
 ```lisp
-; (require 'org)
-; (require 'ox-latex)
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq org-latex-listings 'minted)
 

@@ -40,15 +40,15 @@ This is a bit terrible, but also a bit awesome.
 |------------------------------------+-----------------------------------------------------------------------------------------------+--------|
 | ~/.emacs.d/org/org-autolist.el     | https://raw.githubusercontent.com/calvinwyoung/org-autolist/master/org-autolist.el            |    232 |
 |------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/org/org-diary.el        | https://raw.githubusercontent.com/skx/org-diary/master/org-diary.el                           |     18 |
+| ~/.emacs.d/org/org-diary.el        | https://raw.githubusercontent.com/skx/org-diary/master/org-diary.el                           |    183 |
 |------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/org/org-nested.el       | https://raw.githubusercontent.com/skx/org-nested/master/org-nested.el                         |      7 |
+| ~/.emacs.d/org/org-nested.el       | https://raw.githubusercontent.com/skx/org-nested/master/org-nested.el                         |     37 |
 |------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/org/org-tag-cloud.el    | https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el                   |      1 |
+| ~/.emacs.d/org/org-tag-cloud.el    | https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el                   |     61 |
 |------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/org/org-appear.el       | https://raw.githubusercontent.com/awth13/org-appear/master/org-appear.el                      |      6 |
+| ~/.emacs.d/org/org-appear.el       | https://raw.githubusercontent.com/awth13/org-appear/master/org-appear.el                      |    426 |
 |------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/ui/smex.el              | https://raw.githubusercontent.com/nonsequitur/smex/master/smex.el                             |      3 |
+| ~/.emacs.d/ui/smex.el              | https://raw.githubusercontent.com/nonsequitur/smex/master/smex.el                             |    483 |
 #+TBLFM: $3='(download $2 $1)
 
 #+BEGIN_SRC emacs-lisp :results output silent
