@@ -266,6 +266,13 @@ By default, Emacs stores any configuration you make through its UI by writing cu
 ```
 
 
+## Dired
+
+```lisp
+(when (string= system-type "darwin")
+  (setq dired-use-ls-dired nil))
+```
+
 ## Docker
 
 There is a handy [dockerfile-mode](https://github.com/spotify/dockerfile-mode) which allows highlighting docker-files.
