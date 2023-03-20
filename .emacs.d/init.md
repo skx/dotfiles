@@ -79,9 +79,11 @@ I'm using `use-package` to speedup emacs startup, because it allows deferring pa
 Here we load the package which we'll then use for further configuration:
 
 ```lisp
-(setq use-package-verbose t use-package-expand-minimally nil)
+(setq use-package-verbose t
+      use-package-expand-minimally nil
+      use-package-compute-statistics t
+      debug-on-error t)
 (require 'use-package)
-(setq use-package-compute-statistics t)
 ```
 
 
