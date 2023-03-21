@@ -20,7 +20,7 @@ This is a bit terrible, but also a bit awesome.
 |------------------------------------+-----------------------------------------------------------------------------------------------+--------|
 | ~/.emacs.d/lang/cfengine.el        | https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el                    |   1496 |
 |------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/dockerfile-mode.el | https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el                    |    293 |
+| ~/.emacs.d/lang/dockerfile-mode.el | https://raw.githubusercontent.com/spotify/dockerfile-mode/master/dockerfile-mode.el           |    293 |
 |------------------------------------+-----------------------------------------------------------------------------------------------+--------|
 | ~/.emacs.d/lang/go-mode.el         | https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode.el                       |   3055 |
 |------------------------------------+-----------------------------------------------------------------------------------------------+--------|
