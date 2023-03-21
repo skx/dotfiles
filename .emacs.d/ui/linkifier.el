@@ -3,7 +3,7 @@
 ;;
 ;; Copyright (C) 2023 Steve Kemp
 ;;
-;; Version: 0.2
+;; Version: 0.3
 ;; Keywords: links, web, utility, regexp
 ;; Author: Steve Kemp <steve@steve.fi>
 ;;
@@ -65,6 +65,16 @@
 ;; pages to return 404.
 ;;
 
+;;
+;; VERSION HISTORY
+;;
+;;  0.1 - Hacked up initial implementation.
+;;  0.2 - Added support for capture groups.
+;;  0.3 - Fixed warnings
+;;          .emacs.d/ui/linkifier.el: Warning: ‘loop’ is an obsolete alias (as of 27.1); use ‘cl-loop’ instead.
+;;          .emacs.d/ui/linkifier.el: Warning: Use keywords rather than deprecated positional arguments to `define-minor-mode'
+
+
 ;; The default is nil as the destinations and patterns are entirely
 ;; site & user-specific.
 (defvar linkifier-patterns nil)
@@ -79,7 +89,7 @@
   replace any text that matches the regular expression specified with a button, which
   will open the destination URL when selected."
   (remove-overlays beg end 'type 'linkifier)
-  (loop for (regexp . destination) in linkifier-patterns do
+  (cl-loop for (regexp . destination) in linkifier-patterns do
         (save-excursion
           (goto-char beg)
           (while (re-search-forward regexp end t)
@@ -101,13 +111,15 @@
                            'follow-link t
                            'text (match-string 0)))))))
 
-(define-minor-mode linkifier-mode nil nil nil nil
+(define-minor-mode linkifier-mode
   "`linkifier-mode` is a simple minor mode for turning text matching a
  series of regular expressions into buttons/hyperlinks with templated
  destinations.
 
-  It can be handy for converting MP-XXX into a hyperlink to a Jira
- installation, bugzilla instance, or similar."
+  It can be handy for converting text such as FOO-123 into a hyperlink
+ to a Jira installation, bugzilla instance, or similar."
+  :init-value nil
+  :lighter    " linkifier"
   (cond
    (linkifier-mode
     (jit-lock-register #'linkifier-insert-buttons)
