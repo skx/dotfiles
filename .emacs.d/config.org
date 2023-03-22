@@ -46,11 +46,11 @@ This is a bit terrible, but also a bit awesome.
 |-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
 | ~/.emacs.d/lang/z80-mode.el             | https://raw.githubusercontent.com/SuperDisk/z80-mode/master/z80-mode.el                       | t      |
 |-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/misc/dash.el                 | https://raw.githubusercontent.com/magnars/dash.el/master/dash.el                              | t      |
+| ~/.emacs.d/lib/dash.el              | https://raw.githubusercontent.com/magnars/dash.el/master/dash.el                              | t      |
 |-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
 | ~/.emacs.d/misc/recentf-buffer.el       | https://www.emacswiki.org/emacs/download/recentf-buffer.el                                    | t      |
 |-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/misc/s.el                    | https://raw.githubusercontent.com/magnars/s.el/master/s.el                                    | t      |
+| ~/.emacs.d/lib/s.el                 | https://raw.githubusercontent.com/magnars/s.el/master/s.el                                    | t      |
 |-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
 | ~/.emacs.d/org/org-appear.el            | https://raw.githubusercontent.com/awth13/org-appear/master/org-appear.el                      | t      |
 |-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
