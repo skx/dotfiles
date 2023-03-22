@@ -108,9 +108,8 @@
 (defun recentf-open-files-in-simply-buffer-action (widget &rest ignore)
   (kill-buffer (current-buffer))
   (set-window-configuration recentf-windows-configure)
-  (find-file (widget-value widget))
+  (recentf-find-file (widget-value widget))
   )
-
 
 (defun recentf-open-files-in-simply-buffer-cancel (&rest ignore)
   (interactive)

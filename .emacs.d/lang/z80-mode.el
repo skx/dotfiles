@@ -1,6 +1,16 @@
+;;; z80-mode.el --- a simple package
+
+;; Copyright (C) 2011 Tanner Hobson (_player1537)
+
+;; Author: Tanner Hobson
+;; Keywords: z80 assembly
+;; Version: 1.0.0
+
 (defvar z80-mode-hook nil)
 (defvar z80-mode-map
   (let ((map (make-keymap)))
+    (define-key map (kbd "C-j") 'newline-and-indent)
+    ;;(define-key map (kbd "RET") 'newline-and-indent)
     map)
   "Keymap for z80 major mode")
 ;;;###autoload
@@ -12,17 +22,18 @@
   "Minimal highlighting expressions for z80 mode")
 (defconst z80-font-lock-keywords-2
   (append z80-font-lock-keywords-1
-     (list
-      '("\\<\\(\\([0-9][0-9A-Fa-f]*[Hh]\\|\\(0[Xx]\\|[0-9]\\|\\$[0-9A-Fa-f]\\)[0-9A-Fa-f]*\\)\\|[01][01]*[Bb]\\|%[01][01]*\\|[0-9]*\\)\\>" . font-lock-constant-face)
-      '("\\(\\$\\)" . font-lock-function-name-face)))
+          (list
+           '("\\<\\(\\([0-9][0-9A-Fa-f]*[Hh]\\|\\(0[Xx]\\|[0-9]\\|\\$[0-9A-Fa-f]\\)[0-9A-Fa-f]*\\)\\|[01][01]*[Bb]\\|%[01][01]*\\|[0-9]*\\)\\>" . font-lock-constant-face)
+           '("\\(\\$\\)" . font-lock-function-name-face)))
   "Additional Keywords to highlight in z80 mode")
 (defconst z80-font-lock-keywords-3
   (append z80-font-lock-keywords-2
-     (list
-      '("\\(\\.\\w*\\|#\\w*\\)" . font-lock-preprocessor-face)))
+          (list
+           '("\\(\\.\\w*\\|#\\w*\\)" . font-lock-preprocessor-face)))
   "Balls-out highlighting in z80 mode")
 (defvar z80-font-lock-keywords z80-font-lock-keywords-3
   "Default highlighting expressions for z80 mode")
+
 (defvar z80-mode-syntax-table
   (let ((st (make-syntax-table)))
     (modify-syntax-entry ?_ "w" st)
@@ -43,4 +54,5 @@
   (setq major-mode 'z80-mode)
   (setq mode-name "Z80")
   (run-hooks 'z80-mode-hook))
+
 (provide 'z80-mode)

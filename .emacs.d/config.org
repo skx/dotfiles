@@ -16,47 +16,57 @@ To resync all the files place the cursor on the bottom-row of the table and exec
 This is a bit terrible, but also a bit awesome.
 
 #+NAME: github-urls
-| Destination                        | Link                                                                                          | Result |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/cfengine.el        | https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el                    |   1496 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/dockerfile-mode.el | https://raw.githubusercontent.com/spotify/dockerfile-mode/master/dockerfile-mode.el           |    293 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/go-mode.el         | https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode.el                       |   3055 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/groovy-mode.el     | https://raw.githubusercontent.com/Groovy-Emacs-Modes/groovy-emacs-modes/master/groovy-mode.el |   1018 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/lua-mode.el        | https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el                         |   2293 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/markdown-mode.el   | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el              |   9996 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/monkey.el          | https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el                           |     96 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/puppet-mode.el     | https://raw.githubusercontent.com/voxpupuli/puppet-mode/master/puppet-mode.el                 |   1293 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/terraform-mode.el  | https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el        |    346 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/lang/web-mode.el        | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                          |  14897 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/org/org-autolist.el     | https://raw.githubusercontent.com/calvinwyoung/org-autolist/master/org-autolist.el            |    232 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/org/org-diary.el        | https://raw.githubusercontent.com/skx/org-diary/master/org-diary.el                           |    183 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/org/org-nested.el       | https://raw.githubusercontent.com/skx/org-nested/master/org-nested.el                         |     37 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/org/org-tag-cloud.el    | https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el                   |     61 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/org/org-appear.el       | https://raw.githubusercontent.com/awth13/org-appear/master/org-appear.el                      |    426 |
-|------------------------------------+-----------------------------------------------------------------------------------------------+--------|
-| ~/.emacs.d/ui/smex.el              | https://raw.githubusercontent.com/nonsequitur/smex/master/smex.el                             |    483 |
-#+TBLFM: $3='(download $2 $1)
-
-#+BEGIN_SRC emacs-lisp :results output silent
-  (defun download (url dest)
-    "Download the given URL and save the contents to the specified destination-file."
-    (if (length url)
-      (progn
-        (shell-command-to-string (concat "wget -O " dest " " url))
-        (shell-command-to-string (concat "wc -l " (expand-file-name dest) " | awk '{print $1}' | tr -d \\\\n")))
-    (message "%s empty" url)))
-#+END_SRC
+| Destination                             | Link                                                                                          | OK     |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/cfengine.el             | https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el                    | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/dockerfile-mode.el      | https://raw.githubusercontent.com/spotify/dockerfile-mode/master/dockerfile-mode.el           | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/etags-table.el          | delete me                                                                                     | #ERROR |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/go-mode.el              | https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode.el                       | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/groovy-mode.el          | https://raw.githubusercontent.com/Groovy-Emacs-Modes/groovy-emacs-modes/master/groovy-mode.el | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/hcl-mode.el             | https://raw.githubusercontent.com/syohex/emacs-hcl-mode/master/hcl-mode.el                    | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/lua-mode.el             | https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el                         | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/markdown-mode.el        | https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el              | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/monkey.el               | https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el                           | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/puppet-mode.el          | https://raw.githubusercontent.com/voxpupuli/puppet-mode/master/puppet-mode.el                 | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/terraform-mode.el       | https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el        | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/web-mode.el             | https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el                          | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/yaml-mode.el            | https://raw.githubusercontent.com/yoshiki/yaml-mode/master/yaml-mode.el                       | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/lang/z80-mode.el             | https://raw.githubusercontent.com/SuperDisk/z80-mode/master/z80-mode.el                       | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/misc/dash.el                 | https://raw.githubusercontent.com/magnars/dash.el/master/dash.el                              | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/misc/recentf-buffer.el       | https://www.emacswiki.org/emacs/download/recentf-buffer.el                                    | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/misc/s.el                    | https://raw.githubusercontent.com/magnars/s.el/master/s.el                                    | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/org/org-appear.el            | https://raw.githubusercontent.com/awth13/org-appear/master/org-appear.el                      | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/org/org-autolist.el          | https://raw.githubusercontent.com/calvinwyoung/org-autolist/master/org-autolist.el            | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/org/org-bullets.el           | https://raw.githubusercontent.com/sabof/org-bullets/master/org-bullets.el                     | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/org/org-diary.el             | https://raw.githubusercontent.com/skx/org-diary/master/org-diary.el                           | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/org/org-nested.el            | https://raw.githubusercontent.com/skx/org-nested/master/org-nested.el                         | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/org/org-tag-cloud.el         | https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el                   | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/ui/imenu-list.el             | https://raw.githubusercontent.com/bmag/imenu-list/master/imenu-list.el                        | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/ui/smex.el                   | https://raw.githubusercontent.com/nonsequitur/smex/master/smex.el                             | t      |
+|-----------------------------------------+-----------------------------------------------------------------------------------------------+--------|
+| ~/.emacs.d/unix/exec-path-from-shell.el | https://raw.githubusercontent.com/purcell/exec-path-from-shell/master/exec-path-from-shell.el | t      |
+#+TBLFM: $3='(url-copy-file $2 $1 t)
