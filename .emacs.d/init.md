@@ -148,6 +148,16 @@ Now we can configure the history:
 (savehist-mode 1)
 ```
 
+A good example of history is the ability to go to the last change in a buffer:
+
+```lisp
+(use-package goto-last-change
+  :defer 2
+  :bind
+    (
+    ("M-m" . #'goto-last-change)
+    ))
+```
 
 ## Backup Files
 

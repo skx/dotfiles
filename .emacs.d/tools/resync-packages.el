@@ -35,6 +35,7 @@
         ("~/.emacs.d/org/org-diary.el"              . "https://raw.githubusercontent.com/skx/org-diary/master/org-diary.el")
         ("~/.emacs.d/org/org-nested.el"             . "https://raw.githubusercontent.com/skx/org-nested/master/org-nested.el")
         ("~/.emacs.d/org/org-tag-cloud.el"          . "https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el")
+        ("~/.emacs.d/tools/goto-last-change.el"    . "https://www.emacswiki.org/emacs/download/goto-last-change.el")
         ("~/.emacs.d/ui/imenu-list.el"              . "https://raw.githubusercontent.com/bmag/imenu-list/master/imenu-list.el")
         ("~/.emacs.d/ui/recentf-buffer.el"          . "https://www.emacswiki.org/emacs/download/recentf-buffer.el")
         ("~/.emacs.d/ui/smex.el"                    . "https://raw.githubusercontent.com/nonsequitur/smex/master/smex.el")
