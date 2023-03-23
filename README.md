@@ -28,6 +28,13 @@ The contents of the emacs directory are laid out in a logical collection of sub-
 * Use Package
   * A clone of the [use-package repository](https://github.com/jwiegley/use-package), to keep this repository self-contained.
 
+As you can see the repository contains a bunch of other packages from external sources, these are committed _here_ to make sure they continue to be available even if their upstream source disappears.
+
+To resync the remote packages from their latest versions please see the package updater here:
+
+* [.emacs.d/tools/resync-packages.el](.emacs.d/tools/resync-packages.el) - Update our bundled packages from their upstream locations
+
+
 
 ### Shell Setup
 

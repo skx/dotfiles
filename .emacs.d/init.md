@@ -16,6 +16,13 @@ files if they are present, which are written in a similar literate fashion.
 Hopefully this is neat, and allows my configuration to be self-documenting,
 and easily understood.
 
+Multiple packages are loaded from beneath the various subdirectorires of `~/.emacs`,
+the files are stored within _this_ repository to ensure they continue to
+be available if the upstream location vanishes, however there is a simple package
+here which will update them from their remote sources:
+
+* [tools/resync-packages.el](tools/resync-packages.el) - Fetch the remote packages we use within this repository, updating them appropriately.
+
 
 ## Startup Tweaks
 
@@ -85,6 +92,15 @@ Here we load the package which we'll then use for further configuration:
       debug-on-error t)
 (require 'use-package)
 ```
+
+To ensure we can update our packages the first thing we'll do is load our
+package-refresher.  This must be triggered manually.
+
+```lisp
+(use-package resync-packages
+ :defer 2)
+```
+
 
 
 ## Initial Path
