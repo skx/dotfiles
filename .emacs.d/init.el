@@ -4,19 +4,12 @@
 ;; This is the driver which attempts to load, parse, and evaluate the
 ;; content of my main Markdown init-file "init.md" from beneath ~/.emacs.d/
 ;;
-;; In addition to loading `init.md` there are a few org-mode files which
-;; are also evaluated, if they're present.
-;;
 
 
-
-;; We load `org-mode` files, sometimes.
-(require 'org)
-
-;; Helper function.
 (defun hostname()
   "Return the (unqualified) hostname for this system."
   (car (split-string (system-name) "\\." )))
+
 
 (defun load-markdown-init (path)
   "If the specified file exists then attempt to load it.
@@ -53,7 +46,4 @@ execute directly.
 
 
 ;; Load the global-file markdown file.
-;;
-;; We never supported any per-host, or local markdown files, so this is
-;; simple and unconditional.
 (load-markdown-init "~/.emacs.d/init.md")
