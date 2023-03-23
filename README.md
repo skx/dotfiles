@@ -6,31 +6,37 @@ This is my _dotfiles_ repository.
 
 Visitors to this repository seem to be primarily interested in my GNU/Emacs setup, which is handled in a somewhat "literate" fashion, by virtual of being written in Markdown format:
 
-* [.emacs.d/init.md](.emacs.d/init.md)
-  * This is a markdown file which contains most of my emacs setup.
 * [.emacs.d/init.el](.emacs.d/init.el)
-  * This file is read at startup-time by Emacs, and executes the content of the markdown file.
-  * It will also load some org-mode files, if they exist.
+  * This file is read at startup-time by Emacs, and parses then evaluates the content of the corresponding markdown file.
+* [.emacs.d/init.md](.emacs.d/init.md)
+  * This is a markdown file which contains the literate configuration which I use for emacs.
 
-The contents of the emacs directory are laid out in a logical collection of sub-directories.  Some specific files are highlighted here, but there might be others of interest located beneath the given directories.
+Beneath the [.emacs.d](.emacs.d) directory you'll find a number of sub-directories, which are used to group the packages I use in a logical fashion.
+
+Some specific files are highlighted in this summary, but it's worth taking a peak if you want to see everything:
 
 * [Language modes](.emacs.d/lang/)
   * cfengine, docker, go, hcl, etc, etc.
 * [Org-Mode Stuff](.emacs.d/org)
-  * [org-eval.el](.emacs.d/org/org-eval.el) Execute the contents of named blocks on file-load or save
+  * `org-diary.el` which allows maintaining a simple work-log, or diary.
+     * https://github.com/skx/org-diary
+  * [org-eval.el](.emacs.d/org/org-eval.el) Execute the contents of named blocks when `org-mode` files are loaded/saved.
+  * [org-nested.el](.emacs.d/org/org-nested.el) Allow linking to nested headers, by regexp.
+  * `org-tag-cloud.el` which automates keeping a tag-cloud for individual `org-mode` files.
+     * https://github.com/skx/org-tag-cloud
   * [org-utils.el](.emacs.d/org/org-utils.el) A minimal collection of utility functions.
 * [User interface](.emacs.d/ui)
   * [ui/my-todo.el](.emacs.d/ui/my-todo.el) - Highlight TODO-comments.
-  * [ui/linkifier.el](.emacs.d/ui/linkifier.el) - Turn text matching regular expressions into links/buttons
+  * [ui/linkifier.el](.emacs.d/ui/linkifier.el) - Turn text matching regular expressions into links/buttons.
 * [Unix stuff](.emacs.d/unix)
   * MPC (music player control)
   * Autoformat, and lint, perl files on-save.
 * Use Package
   * A clone of the [use-package repository](https://github.com/jwiegley/use-package), to keep this repository self-contained.
 
-As you can see the repository contains a bunch of other packages from external sources, these are committed _here_ to make sure they continue to be available even if their upstream source disappears.
+As you can see the repository contains a bunch of other packages from external sources, they are committed _here_ to make sure they continue to be available even if their upstream source disappears, and so that my repository is standalone.
 
-To resync the remote packages from their latest versions please see the package updater here:
+To resync the remote packages from their latest versions please see the `resync-packages.el` file:
 
 * [.emacs.d/tools/resync-packages.el](.emacs.d/tools/resync-packages.el) - Update our bundled packages from their upstream locations
 
