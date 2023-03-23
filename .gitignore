@@ -1,6 +1,8 @@
 # Ignore all by default
 /*
 
+*.elc
+
 # Don't ignore the bash files
 !.bash/
 !.bashrc

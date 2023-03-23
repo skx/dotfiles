@@ -59,4 +59,16 @@
             resync/package-list)
     (message "Fetched %d files in %.06f seconds" count (float-time (time-since time)))))
 
+(defun resync/compile()
+  "bytecompile the contents of ~/.emacs.d"
+  (interactive)
+  (byte-recompile-directory (expand-file-name "~/.emacs.d") 0))
+
+(defun resync/resync()
+  "Resync packages, and bytecompile everything"
+  (interactive)
+  (resync/packages)
+  (resync/compile))
+
+
 (provide 'resync-packages)
