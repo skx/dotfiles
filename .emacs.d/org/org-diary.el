@@ -24,6 +24,8 @@
 ;; can add a new entry for each new-day.
 ;;
 
+;; For string-trim
+(eval-when-compile (require 'subr-x))
 
 ;; List of things we expand within a new entry, as we create it.
 ;;
@@ -83,7 +85,7 @@ Currently supported placeholders include:
     (save-excursion
       (org-save-outline-visibility t
         (outline-show-all)
-        (goto-line 0)
+        (goto-char (point-min))
         (if (re-search-forward (format-time-string org-diary-date-format) nil t)
             (setq pos (point))
           (message "No entry for today found."))))
@@ -119,7 +121,7 @@ entry, and have its variables expanded."
         (end nil))
     (save-excursion
       (outline-show-all)
-      (goto-line 0)
+      (goto-char (point-min))
       (if (not (re-search-forward "^\* DD/MM/YYYY" (point-max) t))
           (error "This buffer does not contain a template-block to insert as a new entry."))
       (beginning-of-line)
@@ -127,7 +129,7 @@ entry, and have its variables expanded."
       (setq start (point))
       ;; point is at the line before "* DD/MM"
       ;; So we want to skip forward
-      (next-line 2)
+      (forward-line 2)
       (re-search-forward "END$")
       (beginning-of-line)
       (backward-char 1)
@@ -159,16 +161,17 @@ entry, and have its variables expanded."
 then don't show them on export.
 
 Empty here means either literally empty, or having the content 'None' or 'None.'."
-    (save-excursion
-      (outline-show-all)
-      (goto-line 0)
+  (save-excursion
+    (outline-show-all)
+    (goto-char (point-min))
 
-      (org-map-entries
-       '(lambda ()
-          (if (or (string-collate-equalp "None." (format "%s" (org-get-entry)))
-                  (string-collate-equalp "None" (format "%s" (org-get-entry)))
-                  (string-collate-equalp "" (format "%s" (org-get-entry))))
-              (org-diary-clear-subtree))))))
+    (org-map-entries
+     '(lambda ()
+        (let* ((entry (string-trim (substring-no-properties (format "%s" (org-get-entry))))))
+          (if (or (string-collate-equalp "None." entry)
+                  (string-collate-equalp "None" entry)
+                  (string-collate-equalp "" entry))
+                  (org-diary-clear-subtree)))))))
 
 
 ;; Add a pre-export hook to remove empty sections.
