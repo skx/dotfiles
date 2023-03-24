@@ -165,9 +165,9 @@ Empty here means either literally empty, or having the content 'None' or 'None.'
 
       (org-map-entries
        '(lambda ()
-          (if (or (equalp "None." (format "%s" (org-get-entry)))
-                  (equalp "None" (format "%s" (org-get-entry)))
-                  (equalp "" (format "%s" (org-get-entry))))
+          (if (or (string-collate-equalp "None." (format "%s" (org-get-entry)))
+                  (string-collate-equalp "None" (format "%s" (org-get-entry)))
+                  (string-collate-equalp "" (format "%s" (org-get-entry))))
               (org-diary-clear-subtree))))))
 
 

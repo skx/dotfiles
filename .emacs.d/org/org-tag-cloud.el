@@ -35,7 +35,7 @@ This will also be done automatically when the document is saved."
       (goto-char (point-min))
       (while (re-search-forward org-complex-heading-regexp nil t)
         (dolist (tag (org-get-tags))
-          (unless (equalp tag "")
+          (unless (string-collate-equalp tag "")
             (push tag tags))))
       (cl-loop with result
                for tag in tags
