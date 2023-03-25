@@ -292,12 +292,57 @@ By default, Emacs stores any configuration you make through its UI by writing cu
 ```
 
 
-## Dired
+## Dired / File & Directory Browsing
+
+Emacs has a built-in file/directory browser which is available via `M-x dired`, and which I use very often.
+
+On MacOS I see issues with the display of directory listing, which are resolved like so:
 
 ```lisp
 (when (string= system-type "darwin")
   (setq dired-use-ls-dired nil))
 ```
+
+We highlight the current line when we're using dired:
+
+```lisp
+(add-hook 'dired-after-readin-hook 'hl-line-mode)
+```
+
+Dired typically opens a new buffer when you navigate through directories, in the past I used to dislike this behaviour but I have become a convert.
+
+However to cleanup is a simple matter:
+
+```lisp
+(defun kill-dired-buffers ()
+  (interactive)
+   (mapc (lambda (buffer)
+             (when (eq 'dired-mode (buffer-local-value 'major-mode buffer))
+                (kill-buffer buffer)))
+           (buffer-list)))
+```
+
+My only other irritation with `dired` is that by default "dotfiles" are shown, I usually prefer these to be hidden by default.  The following section does a bunch of things:
+
+* Allows killing all dired buffers, via `q`.
+* Hides dotfiles by default.
+* Allows them to be toggled via `TAB` which is more memorable than the default binding
+  * `C-x M-o`.
+* Binds delete to navigating up to a parent directory.
+
+```lisp
+(use-package dired-x
+  :defer 2
+  :bind (:map dired-mode-map
+           ("q"   . kill-dired-buffers)   ; Kill all dired buffers.
+           ("TAB" . dired-omit-mode)      ; Toggle hiding dotfiles.
+           ("DEL" . dired-jump))          ; Go up a directory.
+  :hook ((dired-mode . dired-omit-mode))
+  :config
+    (setq dired-omit-verbose nil)
+    (setq dired-omit-files "^\\...+$"))
+```
+
 
 ## Docker
 
@@ -310,46 +355,6 @@ Here we load it, and we can use `C-x C-b` to build the Dockerfile in the current
   :defer 2
   :mode
   ("Dockerfile\\'" . dockerfile-mode))
-```
-
-
-## File Handling
-
-Emacs has a built-in file/directory browser which is available via `M-x dired`, and which I use very often.
-
-We highlight the current line when we're using dired:
-
-```lisp
-(add-hook 'dired-after-readin-hook 'hl-line-mode)
-```
-
-We also want to ensure that we have only a single dired-buffer, no matter how we navigate around within it.
-
-There are lots of online posts about this, for example:
-
-* https://www.emacswiki.org/emacs/DiredReuseDirectoryBufferg
-
-This seems to work for me:
-
-```lisp
-(setf dired-kill-when-opening-new-dired-buffer t)
-```
-One irritation is that by default "dotfiles" are shown, I usually prefer these to be hidden by default.  The following section does two things:
-
-* Hides dotfiles by default.
-* Allows them to be toggled via `TAB` which is more memorable than the default binding
-  * `C-x M-o`.
-
-```lisp
-(use-package dired-x
-  :defer 2
-  :bind (:map dired-mode-map
-           ("TAB" . dired-omit-mode)      ; Toggle hiding dotfiles.
-           ("DEL" . dired-jump))          ; Go up a directory.
-  :hook ((dired-mode . dired-omit-mode))
-  :config
-    (setq dired-omit-verbose nil)
-    (setq dired-omit-files "^\\...+$"))
 ```
 
 
@@ -857,6 +862,7 @@ Org examples are useful, here we define a function to wrap the selection with so
 Now we're done with the general setup so we'll handle the more specific things here:
 
 ```lisp
+(require 'org)
 
 ;; Store our org-files beneath ~/Private/Org.
 (custom-set-variables  '(org-directory "~/Private/Org"))
