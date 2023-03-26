@@ -764,17 +764,53 @@ On top of that I wanted to make sure that the default font-sizes are "big":
 
 `org-mode` is a wonderful thing which allows Emacs to hold tables, TODO-lists, and much much more.  For the moment I'm keeping document-specific lisp and configuration within the appropriate document, but there are some things that make working with `org-mode` nicer which will live _here_.
 
-One of the nice things about org-mode is that it lets you contain embedded snippets of various programming languages which can be evaluated, executed and otherwise processed.  The following snippets ensure that these blocks can be highlighted and indented as expected:
+First of all we load the mode, and make some basic setup happen:
 
 ```lisp
-(setq org-src-tab-acts-natively t)
-(setq org-src-fontify-natively t)
-```
+;; Notice here we don't delay.
+(use-package org
+  :config
+    ;; Don't track org-id-locations.
+    ;; We don't want to see ~/.emacs.d/.org-id-locations
+    (setq org-id-track-globally nil)
 
-When I'm opening a document all code/example blocks will be hidden by default:
+    ;; indention should match headers.
+    (setq org-adapt-indentation t)
 
-```lisp
-(add-hook 'org-mode-hook 'org-hide-block-all)
+    ;; When exporting code then we get highlighting
+    (setq org-latex-listings t)
+
+    ;; Don't hide leading stars
+    (setq org-hide-leading-stars nil)
+
+    ;; Log when we're completing things.
+    (setq org-log-done t)
+
+    ;; All sections collapsed by default
+    (setq org-startup-indented t)
+    (setq org-startup-folded t)
+
+    ;; This sets the indention-depth for child-entries
+    (setq org-indent-indentation-per-level 2)
+
+    ;; Ctrl-a & Ctrl-e (for start/end of line) behave "magically"
+    ;; inside headlines this is what I think most people would expect
+    (setq org-special-ctrl-a/e 't)
+
+    ;; This hides the "*bold*", "/italic/" and "=preformatted=" markers:
+    (setq org-hide-emphasis-markers t)
+
+    ;; Ensure source blocks work naturally:
+    (setq org-src-tab-acts-natively t)
+    (setq org-src-fontify-natively t)
+
+    ;; Instead of showing ".." after folded-areas show the symbol.
+    (setq org-ellipsis " ▼")
+
+  :hook
+    ;; When I'm opening a document all code/example blocks will be hidden
+    (org-mode . org-hide-block-all)
+)
 ```
 
 Lines will be wrapped to the width of the buffer too:
@@ -862,22 +898,6 @@ Org examples are useful, here we define a function to wrap the selection with so
 Now we're done with the general setup so we'll handle the more specific things here:
 
 ```lisp
-(require 'org)
-
-;; Store our org-files beneath ~/Private/Org.
-(custom-set-variables  '(org-directory "~/Private/Org"))
-
-;; Don't track org-id-locations globally, as this creates
-;; a ~/.emacs.d/.org-id-locations file which is annoying.
-(setq org-id-track-globally nil)
-
-;; Populate the agenda from ~/Private/Org + ~/Private/Worklog/
-(setq org-agenda-files (apply 'append
-	(mapcar
-		(lambda (directory)
-			(if (file-directory-p directory)
-			   (directory-files-recursively directory org-agenda-file-regexp)))
-			       '("~/Private/Org" "~/Private/Worklog"))))
 
 ;; Add a custom org-agenda command
 ;;
@@ -894,6 +914,18 @@ Now we're done with the general setup so we'll handle the more specific things h
   :after org
   :bind
   ("C-c a" . org-agenda)
+  :config
+    ;; Store our org-files beneath ~/Private/Org.
+	(custom-set-variables  '(org-directory "~/Private/Org"))
+
+	;; Populate the agenda from ~/Private/Org + ~/Private/Worklog/
+	(setq org-agenda-files (apply 'append
+      (mapcar
+	    (lambda (directory)
+          (if (file-directory-p directory)
+            (directory-files-recursively directory org-agenda-file-regexp)))
+			  '("~/Private/Org" "~/Private/Worklog"))))
+
   :custom
 
   ;; Our agenda-view will span two weeks by default.
@@ -922,14 +954,6 @@ Now we're done with the general setup so we'll handle the more specific things h
         ((org-agenda-skip-function 'skx/org-agenda-skip-complete)))))
 )
 
-;; When exporting code then we get highlighting
-(setq org-latex-listings t)
-
-;; Don't hide leading stars
-(setq org-hide-leading-stars nil)
-
-;; Log when we're completing things.
-(setq org-log-done t)
 
 ;; Setup TODO-workflow, and colouring.
 (setq org-todo-keywords '((sequence "TODO(!)" "INPROGRESS" "|" "DONE(!)" "CANCELED" "SPILLOVER")))
@@ -940,21 +964,6 @@ Now we're done with the general setup so we'll handle the more specific things h
     ("CANCELED"   . (:foreground "pink" :weight bold))))
 
 
-;; Indentation in org-buffers matches the header-level
-(setq org-startup-indented t)
-
-;; This sets the indention-depth for child-entries
-(setq org-indent-indentation-per-level 2)
-
-;; Ctrl-a & Ctrl-e (for start/end of line) behave "magically" inside headlines
-;; this is what I think most people would expect
-(setq org-special-ctrl-a/e 't)
-
-;; This hides the "*bold*", "/italic/" and "=preformatted=" markers:
-(setq org-hide-emphasis-markers t)
-
-;; Instead of showing ".." after folded-areas show the symbol.
-(setq org-ellipsis " ▼")
 ```
 
 Since we're hiding the emphasis markers it can be hard to edit text which is formatted.  To handle that we use [org-appear](https://github.com/awth13/org-appear):
@@ -965,7 +974,7 @@ Since we're hiding the emphasis markers it can be hard to edit text which is for
   :defer 2
   :config
   (setq org-appear-autolinks t)
-  :hook ((org-mode org-diary-mode) . org-appear-mode))
+  :hook ((org-mode . org-appear-mode)))
 ```
 
 Since we're living in the future we can use `org-mouse` for checking boxes, etc:
@@ -994,18 +1003,26 @@ The diary itself is handled by my [org-diary](https://github.com/skx/org-diary) 
 ```lisp
 (use-package org-diary
   :defer 2
-  :after linkifier
-  :config
-  ;; Add a new tag to all entries, after creating them.
-  (add-hook 'org-diary-after-new-entry-hook
-              (lambda()
-                (org-set-tags (format-time-string "%Y_week_%V")))))
+  :after (org linkifier)
+  :autoload org-diary-mode
+  :init
+    ;; ensure we're loaded
+    (add-to-list 'auto-mode-alist
+             '("[dD][iI][aA][rR][yY]\\.[oO][rR][gG]" . org-diary-mode))
+
+    ;; Add a new tag to all entries, after creating them.
+    (add-hook 'org-diary-after-new-entry-hook
+                (lambda()
+                  (org-set-tags (format-time-string "%Y_week_%V"))))
+    (add-hook 'org-diary-mode-hook (lambda () (interactive) (org-hide-block-all)))
+)
 
 
 ;; Create a helper to load the diary.
 (defun skx-load-diary()
   "Load my diary/work-log, and scroll to today's entry."
   (interactive)
+    (require 'org-diary)
     (find-file (expand-file-name "~/Private/Worklog/Diary.org"))
     (org-diary-today))
 ```
@@ -1019,8 +1036,8 @@ The following configuration enables the contents of a block named `skx-startbloc
 
 ```lisp
 (use-package org-eval
-  :after org
   :defer 2
+  :after org
   :init
   (setq org-eval-prefix-list (list (expand-file-name "~/Private/"))
         org-eval-loadblock-name "skx-startblock"
@@ -1210,7 +1227,11 @@ When exporting `org-mode` files to PDF it is nicer if new sections start on a ne
 
 One other problem is that code blocks don't export neatly.  To resolve that you need this:
 
-```lisp
+```txt
+
+#
+# NOTE: STEVE: TODO: This is broken for the moment
+#
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq org-latex-listings 'minted)
 
