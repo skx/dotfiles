@@ -769,6 +769,7 @@ First of all we load the mode, and make some basic setup happen:
 ```lisp
 ;; Notice here we don't delay.
 (use-package org
+  :defer 2
   :config
     ;; Don't track org-id-locations.
     ;; We don't want to see ~/.emacs.d/.org-id-locations
@@ -786,8 +787,10 @@ First of all we load the mode, and make some basic setup happen:
     ;; Log when we're completing things.
     (setq org-log-done t)
 
-    ;; All sections collapsed by default
+    ;; All sections indented by default
     (setq org-startup-indented t)
+
+    ;; All sections collapsed by default
     (setq org-startup-folded t)
 
     ;; This sets the indention-depth for child-entries
@@ -804,6 +807,12 @@ First of all we load the mode, and make some basic setup happen:
     (setq org-src-tab-acts-natively t)
     (setq org-src-fontify-natively t)
 
+    ;; Header searches can match on substrings.
+    (setq org-link-search-must-match-exact-headline nil)
+
+    ;; Tags on items should be sorted alphabetically:
+    (setq org-tags-sort-function 'org-string-collate-lessp)
+
     ;; Instead of showing ".." after folded-areas show the symbol.
     (setq org-ellipsis " ▼")
 
@@ -817,18 +826,6 @@ Lines will be wrapped to the width of the buffer too:
 
 ```lisp
 (add-hook 'text-mode-hook 'visual-line-mode)
-```
-
-The next thing that is globally useful is to allow searches for internal links to match sub-strings of headlines, rather than requiring complete matches:
-
-```lisp
-(setq org-link-search-must-match-exact-headline nil)
-```
-
-One of things that makes `org-mode` so useful is the tagging support, this next section ensures that tags are sorted alphabetically:
-
-```lisp
-(setq org-tags-sort-function 'org-string-collate-lessp)
 ```
 
 I put together the [org-nested](https://github.com/skx/org-nested) package to allow refining links easily.  Allowing links to be augmented by refinements.  This is now loaded:
@@ -895,19 +892,9 @@ Org examples are useful, here we define a function to wrap the selection with so
     (widen)))
 ```
 
-Now we're done with the general setup so we'll handle the more specific things here:
+Now we're done with the general setup so we'll handle the more specific agenda things here:
 
 ```lisp
-
-;; Add a custom org-agenda command
-;;
-;; Show TODOs, except those that are 100% complete, or which have
-;; `:noexport:` in their text.  Note that this isn't a tag-match,
-;; just a literal match as used in my worklog(s).
-;;
-(defun skx/org-agenda-skip-complete ()
-  (org-agenda-skip-entry-if 'regexp ":noexport:\\|100%"))
-
 (use-package org-agenda
   :defer 2
   :ensure nil
@@ -942,16 +929,18 @@ Now we're done with the general setup so we'll handle the more specific things h
   (org-agenda-prefix-format "%-12:c %b")
 
   (org-agenda-custom-commands
-     '(("wi" "List of items closed in the past week."
-        tags "+CLOSED>\"<-7d>\"/DONE")
-       ("wq" "Quick (log) view"
-        agenda ""
+     '(
+        ("wi" "List of items closed in the past week."
+          tags "+CLOSED>\"<-7d>\"/DONE")
+        ("wq" "Quick (log) view"
+          agenda ""
           ((org-agenda-start-with-log-mode t)))
-       ("wt" "Show today's stories"
-        search (format-time-string "%Y-%m-%d"))
-       ("wo" "Outstanding items."
+        ("wt" "Show today's stories"
+          search (format-time-string "%Y-%m-%d"))
+       ("wo" "Outstanding items - except those that are done, or unexported"
         todo ""
-        ((org-agenda-skip-function 'skx/org-agenda-skip-complete)))))
+        ((org-agenda-skip-function (lambda () (org-agenda-skip-entry-if 'regexp ":noexport:\\|100%"))))
+)))
 )
 
 
