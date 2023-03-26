@@ -1017,6 +1017,19 @@ The diary itself is handled by my [org-diary](https://github.com/skx/org-diary) 
     (add-hook 'org-diary-mode-hook (lambda () (interactive) (org-hide-block-all)))
 )
 
+(defun org-show-current-heading-tidily ()
+  "Show next entry, keeping other entries closed."
+  (if (save-excursion (end-of-line) (outline-invisible-p))
+      (progn (org-show-entry) (show-children))
+    (outline-back-to-heading)
+    (unless (and (bolp) (org-on-heading-p))
+      (org-up-heading-safe)
+      (hide-subtree)
+      (error "Boundary reached"))
+    (org-overview)
+    (org-reveal t)
+    (org-show-entry)
+    (org-show-subtree)))
 
 ;; Create a helper to load the diary.
 (defun skx-load-diary()
@@ -1024,7 +1037,8 @@ The diary itself is handled by my [org-diary](https://github.com/skx/org-diary) 
   (interactive)
     (require 'org-diary)
     (find-file (expand-file-name "~/Private/Worklog/Diary.org"))
-    (org-diary-today))
+    (if (org-diary-today)
+      (org-show-current-heading-tidily)))
 ```
 
 
