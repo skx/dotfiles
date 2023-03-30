@@ -449,7 +449,7 @@ In emacs-lisp-mode we can enable eldoc-mode to display information about a funct
 
 [golang](https://golang.org/) is a language I use a fair bit, but there isn't a mode for it included in the releases of Emacs as packaged for Debian GNU/Linux, so installation instead relies upon the code in [the official github repository](https://github.com/dominikh/go-mode.el).
 
-(Obviously my [dotfiles](https://github.com/skx/dotfiles/) contain a copy of the appropriate files.)
+(Obviously my [dotfiles](https://github.com/skx/dotfiles/) contain a copy of the appropriate files, see the [tools/resync-packages.el](tools/resync-packages.el) library which is what copies it from the upstream source into _this_ repository.)
 
 Once installed we can now ensure that the mode is loaded for the editing of `*.go` files:
 
@@ -518,10 +518,7 @@ Note that I also setup [code-folding](#language-mode-helpers---code-folding) lat
 
 I used to do a lot of my coding in Perl, and this is configured here.
 
-First of all we want to ensure that we use `cperl-mode`, rather than
-`perl-mode`, and we wish to ensure that `*.t` are formatted in this mode
-too - as these files almost always contain perl test-cases in my
-experience:
+First of all we want to ensure that we use `cperl-mode`, rather than `perl-mode`, and we wish to ensure that `*.t` are formatted in this mode too - as these files almost always contain perl test-cases in my experience:
 
 ```lisp
 ;;  We always prefer CPerl mode to Perl mode.
@@ -589,10 +586,7 @@ I'm having fun doing "retro" things with a [Z80 processor](https://en.wikipedia.
 
 ### Language Modes - Web Mode
 
-One of the annoyances with writing HTML is that often it contains
-extra things inline, such as Javascript and CSS.  To solve this
-problem - of wanting to mix HTML-mode along with Javascript-mode for example,
-I use [web-mode](http://web-mode.org/):
+One of the annoyances with writing HTML is that often it contains extra things inline, such as Javascript and CSS.  To solve this problem - of wanting to mix HTML-mode along with Javascript-mode for example, I use [web-mode](http://web-mode.org/):
 
 ```lisp
 (use-package web-mode
@@ -610,7 +604,7 @@ I use [web-mode](http://web-mode.org/):
 
 ### Language Modes - YAML Mode
 
-YAML is used in Gitlab CI, and similar places.
+YAML is used in Gitlab CI, Kubernetes, and other similar places.
 
 ```lisp
 (use-package yaml-mode
@@ -621,11 +615,9 @@ YAML is used in Gitlab CI, and similar places.
 
 ### Language Mode Helpers - Code Folding
 
-I define a hook which will setup the toggling of code-blocks via HideShow,
-this will be enabled for C, C++, Golang & Perl-modes.
+I define a hook which will setup the toggling of code-blocks via HideShow, this will be enabled for C, C++, Golang & Perl-modes.
 
-This also binds `Esc-TAB` to toggle the block under the point, and `Esc--`
-and `Esc-+` to hide/show all:
+This also binds `Esc-TAB` to toggle the block under the point, and `Esc--` and `Esc-+` to hide/show all:
 
 ```lisp
 (use-package hs-minor-mode
@@ -642,8 +634,7 @@ and `Esc-+` to hide/show all:
 
 ### Language Mode Helpers - TODO Highlighting
 
-The following snippet of code ensures that `TODO` comments/lines are shown
-easily, this also includes other examples such as:
+The following snippet of code ensures that `TODO` comments/lines are shown easily, this also includes other examples such as:
 
 * FIXME: blah, blah.
 * TODO: here's some more stuff.
@@ -661,8 +652,7 @@ easily, this also includes other examples such as:
 
 ### Language Mode Helpers - Utilities
 
-A lot of programming environments allow you to setup variables via something
-like this:
+A lot of programming environments allow you to setup variables via something like this:
 
 ```
      int i = 1;
@@ -676,8 +666,7 @@ Things look neater if they're aligned, thusly:
      int foo = 2;
 ```
 
-The following section of code lets us select a region and run `M-=` to
-align the section based upon the `=` sign:
+The following section of code lets us select a region and run `M-=` to align the section based upon the `=` sign:
 
 ```lisp
 (defun align-equals (begin end)
@@ -698,8 +687,7 @@ align the section based upon the `=` sign:
 
 ## Github
 
-Opening a github project is something I do often, and in my case I
-have all my repositories cloned beneath ~/Repos/github.com, for example:
+Opening a github project is something I do often, and in my case I have all my repositories cloned beneath ~/Repos/github.com, for example:
 
 * `~/Repos/github.com/skx/foo`
 * `~/Repos/github.com/skx/bar`
@@ -764,35 +752,67 @@ On top of that I wanted to make sure that the default font-sizes are "big":
 
 `org-mode` is a wonderful thing which allows Emacs to hold tables, TODO-lists, and much much more.  For the moment I'm keeping document-specific lisp and configuration within the appropriate document, but there are some things that make working with `org-mode` nicer which will live _here_.
 
-One of the nice things about org-mode is that it lets you contain embedded snippets of various programming languages which can be evaluated, executed and otherwise processed.  The following snippets ensure that these blocks can be highlighted and indented as expected:
+First of all we load the mode, and make some basic setup happen:
 
 ```lisp
-(setq org-src-tab-acts-natively t)
-(setq org-src-fontify-natively t)
-```
+(use-package org
+  :defer 2
+  :config
+    ;; Don't track org-id-locations.
+    ;; We don't want to see ~/.emacs.d/.org-id-locations
+    (setq org-id-track-globally nil)
 
-When I'm opening a document all code/example blocks will be hidden by default:
+    ;; indention should match headers.
+    (setq org-adapt-indentation t)
 
-```lisp
-(add-hook 'org-mode-hook 'org-hide-block-all)
+    ;; When exporting code then we get highlighting
+    (setq org-latex-listings t)
+
+    ;; Don't hide leading stars
+    (setq org-hide-leading-stars nil)
+
+    ;; Log when we're completing things.
+    (setq org-log-done t)
+
+    ;; All sections indented by default
+    (setq org-startup-indented t)
+
+    ;; All sections collapsed by default
+    (setq org-startup-folded t)
+
+    ;; This sets the indention-depth for child-entries
+    (setq org-indent-indentation-per-level 2)
+
+    ;; Ctrl-a & Ctrl-e (for start/end of line) behave "magically"
+    ;; inside headlines this is what I think most people would expect
+    (setq org-special-ctrl-a/e 't)
+
+    ;; This hides the "*bold*", "/italic/" and "=preformatted=" markers:
+    (setq org-hide-emphasis-markers t)
+
+    ;; Ensure source blocks work naturally:
+    (setq org-src-tab-acts-natively t)
+    (setq org-src-fontify-natively t)
+
+    ;; Header searches can match on substrings.
+    (setq org-link-search-must-match-exact-headline nil)
+
+    ;; Tags on items should be sorted alphabetically:
+    (setq org-tags-sort-function 'org-string-collate-lessp)
+
+    ;; Instead of showing ".." after folded-areas show the symbol.
+    (setq org-ellipsis " ▼")
+
+  :hook
+    ;; When I'm opening a document all code/example blocks will be hidden
+    (org-mode . org-hide-block-all)
+)
 ```
 
 Lines will be wrapped to the width of the buffer too:
 
 ```lisp
 (add-hook 'text-mode-hook 'visual-line-mode)
-```
-
-The next thing that is globally useful is to allow searches for internal links to match sub-strings of headlines, rather than requiring complete matches:
-
-```lisp
-(setq org-link-search-must-match-exact-headline nil)
-```
-
-One of things that makes `org-mode` so useful is the tagging support, this next section ensures that tags are sorted alphabetically:
-
-```lisp
-(setq org-tags-sort-function 'org-string-collate-lessp)
 ```
 
 I put together the [org-nested](https://github.com/skx/org-nested) package to allow refining links easily.  Allowing links to be augmented by refinements.  This is now loaded:
@@ -859,102 +879,62 @@ Org examples are useful, here we define a function to wrap the selection with so
     (widen)))
 ```
 
-Now we're done with the general setup so we'll handle the more specific things here:
+Now we're done with the general setup so we'll handle the more specific agenda things here:
 
 ```lisp
-(require 'org)
-
-;; Store our org-files beneath ~/Private/Org.
-(custom-set-variables  '(org-directory "~/Private/Org"))
-
-;; Don't track org-id-locations globally, as this creates
-;; a ~/.emacs.d/.org-id-locations file which is annoying.
-(setq org-id-track-globally nil)
-
-;; Populate the agenda from ~/Private/Org + ~/Private/Worklog/
-(setq org-agenda-files (apply 'append
-	(mapcar
-		(lambda (directory)
-			(if (file-directory-p directory)
-			   (directory-files-recursively directory org-agenda-file-regexp)))
-			       '("~/Private/Org" "~/Private/Worklog"))))
-
-;; Add a custom org-agenda command
-;;
-;; Show TODOs, except those that are 100% complete, or which have
-;; `:noexport:` in their text.  Note that this isn't a tag-match,
-;; just a literal match as used in my worklog(s).
-;;
-(defun skx/org-agenda-skip-complete ()
-  (org-agenda-skip-entry-if 'regexp ":noexport:\\|100%"))
-
 (use-package org-agenda
   :defer 2
-  :ensure nil
   :after org
   :bind
-  ("C-c a" . org-agenda)
+    ("C-c a" . org-agenda)
+  :config
+    ;; Store our org-files beneath ~/Private/Org.
+	(custom-set-variables  '(org-directory "~/Private/Org"))
+
+	;; Populate the agenda from ~/Private/Org + ~/Private/Worklog/
+	(setq org-agenda-files (apply 'append
+      (mapcar
+	    (lambda (directory)
+          (if (file-directory-p directory)
+            (directory-files-recursively directory org-agenda-file-regexp)))
+			  '("~/Private/Org" "~/Private/Worklog"))))
+
   :custom
+    ;; Our agenda-view will span two weeks by default.
+    (org-agenda-span 14)
 
-  ;; Our agenda-view will span two weeks by default.
-  (org-agenda-span 14)
+    ;; But the agenda will start on the current day.
+    (org-agenda-start-on-weekday nil)
 
-  ;; But the agenda will start on the current day.
-  (org-agenda-start-on-weekday nil)
+    ;; We don't show tasks that are complete
+    (org-agenda-skip-deadline-if-done t)
+    (org-agenda-skip-scheduled-if-done t)
 
-  ;; We don't show tasks that are complete
-  (org-agenda-skip-deadline-if-done t)
-  (org-agenda-skip-scheduled-if-done t)
+    ;; When showing TODO we show the headline from which the item came.
+    (org-agenda-prefix-format "%-12:c %b")
 
-  ;; When showing TODO we show the headline from which the item came.
-  (org-agenda-prefix-format "%-12:c %b")
-
-  (org-agenda-custom-commands
-     '(("wi" "List of items closed in the past week."
-        tags "+CLOSED>\"<-7d>\"/DONE")
-       ("wq" "Quick (log) view"
-        agenda ""
+    (org-agenda-custom-commands
+     '(
+        ("wi" "List of items closed in the past week."
+          tags "+CLOSED>\"<-7d>\"/DONE")
+        ("wq" "Quick (log) view"
+          agenda ""
           ((org-agenda-start-with-log-mode t)))
-       ("wt" "Show today's stories"
-        search (format-time-string "%Y-%m-%d"))
-       ("wo" "Outstanding items."
+        ("wt" "Show today's stories"
+          search (format-time-string "%Y-%m-%d"))
+       ("wo" "Outstanding items - except those that are done, or unexported"
         todo ""
-        ((org-agenda-skip-function 'skx/org-agenda-skip-complete)))))
-)
+        ((org-agenda-skip-function (lambda () (org-agenda-skip-entry-if 'regexp ":noexport:\\|100%"))))
+    ))))
 
-;; When exporting code then we get highlighting
-(setq org-latex-listings t)
-
-;; Don't hide leading stars
-(setq org-hide-leading-stars nil)
-
-;; Log when we're completing things.
-(setq org-log-done t)
 
 ;; Setup TODO-workflow, and colouring.
 (setq org-todo-keywords '((sequence "TODO(!)" "INPROGRESS" "|" "DONE(!)" "CANCELED" "SPILLOVER")))
 (setq org-todo-keyword-faces '(
-    ("TODO" . (:foreground "blue" :weight bold))
+    ("TODO"       . (:foreground "blue" :weight bold))
     ("INPROGRESS" . (:foreground "purple" :weight bold))
-    ("SPILLOVER" . (:foreground "red" :weight bold))
+    ("SPILLOVER"  . (:foreground "red" :weight bold))
     ("CANCELED"   . (:foreground "pink" :weight bold))))
-
-
-;; Indentation in org-buffers matches the header-level
-(setq org-startup-indented t)
-
-;; This sets the indention-depth for child-entries
-(setq org-indent-indentation-per-level 2)
-
-;; Ctrl-a & Ctrl-e (for start/end of line) behave "magically" inside headlines
-;; this is what I think most people would expect
-(setq org-special-ctrl-a/e 't)
-
-;; This hides the "*bold*", "/italic/" and "=preformatted=" markers:
-(setq org-hide-emphasis-markers t)
-
-;; Instead of showing ".." after folded-areas show the symbol.
-(setq org-ellipsis " ▼")
 ```
 
 Since we're hiding the emphasis markers it can be hard to edit text which is formatted.  To handle that we use [org-appear](https://github.com/awth13/org-appear):
@@ -964,8 +944,9 @@ Since we're hiding the emphasis markers it can be hard to edit text which is for
   :after org
   :defer 2
   :config
-  (setq org-appear-autolinks t)
-  :hook ((org-mode org-diary-mode) . org-appear-mode))
+    (setq org-appear-autolinks t)
+  :hook
+    ((org-mode . org-appear-mode)))
 ```
 
 Since we're living in the future we can use `org-mouse` for checking boxes, etc:
@@ -979,8 +960,7 @@ Since we're living in the future we can use `org-mouse` for checking boxes, etc:
 
 ### Org-Mode Diary
 
-I keep a work-log where I write down tasks and notes about my working-life
-every day.
+I keep a work-log where I write down tasks and notes about my working-life every day.
 
 Within my diary I want quick access to Jira (ugh), so I have a package to turn references into links:
 
@@ -994,20 +974,42 @@ The diary itself is handled by my [org-diary](https://github.com/skx/org-diary) 
 ```lisp
 (use-package org-diary
   :defer 2
-  :after linkifier
-  :config
-  ;; Add a new tag to all entries, after creating them.
-  (add-hook 'org-diary-after-new-entry-hook
-              (lambda()
-                (org-set-tags (format-time-string "%Y_week_%V")))))
+  :after (org linkifier)
+  :autoload org-diary-mode
+  :init
+    ;; ensure we're loaded
+    (add-to-list 'auto-mode-alist
+             '("[dD][iI][aA][rR][yY]\\.[oO][rR][gG]" . org-diary-mode))
 
+    ;; Add a new tag to all entries, after creating them.
+    (add-hook 'org-diary-after-new-entry-hook
+                (lambda()
+                  (org-set-tags (format-time-string "%Y_week_%V"))))
+    (add-hook 'org-diary-mode-hook (lambda () (interactive) (org-hide-block-all))))
 
-;; Create a helper to load the diary.
+;; Show the current section, with children expanded.
+(defun org-show-current-heading-tidily ()
+  "Show the current section, with children expanded."
+  (if (save-excursion (end-of-line) (outline-invisible-p))
+      (progn (org-show-entry) (show-children))
+    (outline-back-to-heading)
+    (unless (and (bolp) (org-on-heading-p))
+      (org-up-heading-safe)
+      (hide-subtree)
+      (error "Boundary reached"))
+    (org-overview)
+    (org-reveal t)
+    (org-show-entry)
+    (org-show-subtree)))
+
+;; Create a helper to load my diary, show today's entry, and unfold nicely.
 (defun skx-load-diary()
   "Load my diary/work-log, and scroll to today's entry."
   (interactive)
+    (require 'org-diary)
     (find-file (expand-file-name "~/Private/Worklog/Diary.org"))
-    (org-diary-today))
+    (if (org-diary-today)
+      (org-show-current-heading-tidily)))
 ```
 
 
@@ -1019,12 +1021,12 @@ The following configuration enables the contents of a block named `skx-startbloc
 
 ```lisp
 (use-package org-eval
-  :after org
   :defer 2
+  :after org
   :init
-  (setq org-eval-prefix-list (list (expand-file-name "~/Private/"))
-        org-eval-loadblock-name "skx-startblock"
-        org-eval-saveblock-name "skx-saveblock" ))
+    (setq org-eval-prefix-list     (list (expand-file-name "~/Private/"))
+          org-eval-loadblock-name "skx-startblock"
+          org-eval-saveblock-name "skx-saveblock" ))
 ```
 
 To use these facilities define blocks like so in your org-mode files:
@@ -1056,10 +1058,10 @@ The basic setting to use is the following one:
 ```
 
 However this does not work for following links inside tables, so we resolve that via the following custom function:
-(get-text-property (point) 'face)
+
 ```lisp
 (defun org-is-link ()
-  "Is the point over a link?  We deteremine this via the text-properties,
+  "Is the point over a link?  We determine this via the text-properties,
    but note that this might return a symbol or a list depending on version/system."
   (let ((tprop (get-text-property (point) 'face)))
     (if (or (eq tprop 'org-link) (and (listp tprop) (memq 'org-link tprop)))
@@ -1210,7 +1212,11 @@ When exporting `org-mode` files to PDF it is nicer if new sections start on a ne
 
 One other problem is that code blocks don't export neatly.  To resolve that you need this:
 
-```lisp
+```txt
+
+#
+# NOTE: STEVE: TODO: This is broken for the moment
+#
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq org-latex-listings 'minted)
 
@@ -1336,7 +1342,7 @@ Now we can view a list of recently-opened files via `C-c r`:
 (use-package recentf-buffer
   :defer 2
   :bind
-    (("C-c r" . recentf-open-files-in-simply-buffer)
+    (("C-c r"   . recentf-open-files-in-simply-buffer)
      ("C-c C-r" . recentf-open-with-completion)))
 ```
 
@@ -1387,23 +1393,20 @@ One of the tools I use most frequently for that is [Hashicorp](https://www.hashi
 (use-package terraform-mode
   :defer 2
   :config
-  (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode))
+    (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode))
 ```
 
 
 
 ## Unix Setup
 
-The following section helper ensures that files are given `+x` permissions
-when they're saved, if they contain a valid shebang line:
+The following section helper ensures that files are given `+x` permissions when they're saved, if they contain a valid shebang line:
 
 ```lisp
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 ```
 
-Finally we allow Emacs to control our music playback, which is supplied
-by [MPD](http://www.musicpd.org/).  There are several different MPD
-client-modes in Emacs, this is my own:
+Finally we allow Emacs to control our music playback, which is supplied by [MPD](http://www.musicpd.org/).  There are several different MPD client-modes available for Emacs, including one built into emacs, this is my own and has a more minimal / less confusing UI:
 
 ```lisp
 (use-package mpc
@@ -1430,7 +1433,7 @@ The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so
 (use-package avoid
   :defer 2
   :config
-  (mouse-avoidance-mode 'cat-and-mouse))
+    (mouse-avoidance-mode 'cat-and-mouse))
 ```
 
 Once the basics have been setup the next step is to configure some colours:
@@ -1454,10 +1457,7 @@ Now we've tweaked the GUI we can setup the clipboard integration:
 (setq mouse-drag-copy-region t)
 ```
 
-Once we've removed things that we don't like the next section is
-responsible for configuring the colours - first of all the global
-theme which is used for colours, and then secondly the colour of
-the cursor:
+Once we've removed things that we don't like the next section is responsible for configuring the colours - first of all the global theme which is used for colours, and then secondly the colour of the cursor:
 
 ```lisp
 (setq-default cursor-in-non-selected-windows nil ; Hide the cursor in inactive windows
@@ -1578,12 +1578,11 @@ Here I configure it to be used for both general programming modes, as well as `o
     (setq imenu-list-focus-after-activation t
           imenu-list-auto-resize t
           imenu-list-position 'left)
-;  :config
-;    (imenu-list-minor-mode)
   :bind
     (("M-i" . #'imenu-list-smart-toggle))
 )
 ```
+
 
 ## UTF-8
 
@@ -1601,13 +1600,9 @@ UTF-8 is the future, we should greet it with open-arms.
 
 ## Web Utilities
 
-I don't often writen plain HTML these days, instead I use markdown
-for most of my websites via the
-[templer](http://github.com/skx/templer/) static-site generator.
+I don't often writen plain HTML these days, instead I use markdown for most of my websites via the [templer](http://github.com/skx/templer/) static-site generator.
 
-There are times when I need to escape content though, and the
-following  allows that to be done neatly - select the region and run
-`M-x escape-html-region`:
+There are times when I need to escape content though, and the following  allows that to be done neatly - select the region and run `M-x escape-html-region`:
 
 ```lisp
 (defun escape-html-region (start end)
@@ -1646,16 +1641,12 @@ make it visible by default:
 
    ; but make sure we keep a final newline
    (setq require-final-newline t))
-
 ```
 
-When running Emacs upon a terminal, rather than graphically, lines that
-are too long have a "`\`" character added to them.  This makes copying
-and pasting to other terminal-applications annoying.  Disable that wrapping
-behaviour here:
+When running Emacs upon a terminal, rather than graphically, lines that are too long have a "`\`" character added to them.  This makes copying and pasting to other terminal-applications annoying.  Disable that wrapping behaviour here:
 
 ```lisp
-    (set-display-table-slot standard-display-table 'wrap ?\ )
+(set-display-table-slot standard-display-table 'wrap ?\ )
 ```
 
 
