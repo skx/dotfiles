@@ -18,6 +18,7 @@ Some specific files are highlighted in this summary, but it's worth taking a pea
 * [Language modes](.emacs.d/lang/)
   * cfengine, docker, go, hcl, etc, etc.
 * [Org-Mode Stuff](.emacs.d/org)
+  * [org-auto-tag.el](.emacs.d/org/org-auto-tag.el) add tags to tasks, automatically based on the title of the TODO-task and the list of previously used tags.
   * `org-diary.el` which allows maintaining a simple work-log, or diary.
      * https://github.com/skx/org-diary
   * [org-eval.el](.emacs.d/org/org-eval.el) Execute the contents of named blocks when `org-mode` files are loaded/saved.

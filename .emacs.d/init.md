@@ -1117,6 +1117,21 @@ To make it useful we'll ensure that we disable warnings about eval which would o
 ```
 
 
+### Org-Mode tagging
+
+I put together a simple helper to auto-tag TODO-tasks, using tags from
+within the current document:
+
+```lisp
+(use-package org-auto-tag
+  :after org
+  :defer 2
+  :config
+     (add-hook 'org-after-todo-state-change-hook 'org-auto-tag)
+)
+```
+
+
 ### Org-Mode and Blank Lines
 
 Blank lines keep getting inserted in between headlines and I don't want to see them in collapsed (contents) views. When I use TAB to fold (cycle) tasks I don't want to see any blank lines between headings.
