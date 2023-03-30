@@ -214,7 +214,7 @@ switch to the list immediately:
     (switch-to-buffer "*Buffer List*")))
 ```
 
-### Calendar setup
+## Calendar setup
 
 `M-x calendar` will show a calendar with Finnish names:
 
@@ -1762,14 +1762,7 @@ some I've grown accustomed to:
 ```
 
 
-## XXXX - TODO
-
-A small section of things that might be nice to explore in the future.
-
-* https://github.com/integral-dw/org-superstar-mode
-* A massive `.emacs` file with good commentary:
-  * https://svn.red-bean.com/repos/kfogel/trunk/.emacs
-
+## XXX - Fin.
 
 ```lisp
 (message "init.md loaded in %s" (emacs-init-time))
