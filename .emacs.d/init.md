@@ -703,15 +703,15 @@ Opening a github project is something I do often, and in my case I have all my r
   "Open a github project, with completion."
   (interactive)
   (let ((pr nil))
-    (setq pr (ido-completing-read "Select project: " (get-github-projects github-prefix)))
+    (setq pr (ido-completing-read "Select project: " (skx-github-projects-available github-prefix)))
     (if pr
         (dired (concat github-prefix pr))
       (message "Nothing selected"))))
 
-(defun get-github-projects (prefix)
-  (map 'list
-       (lambda (x) (substring x (length prefix)))
-       (file-expand-wildcards (concat prefix "*/*"))))
+(defun skx-github-projects-available (prefix)
+  (mapcar
+     (lambda (x) (substring x (length prefix)))
+     (file-expand-wildcards (concat prefix "*/*"))))
 ```
 
 
