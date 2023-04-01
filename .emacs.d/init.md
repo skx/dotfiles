@@ -521,24 +521,19 @@ I used to do a lot of my coding in Perl, and this is configured here.
 First of all we want to ensure that we use `cperl-mode`, rather than `perl-mode`, and we wish to ensure that `*.t` are formatted in this mode too - as these files almost always contain perl test-cases in my experience:
 
 ```lisp
-;;  We always prefer CPerl mode to Perl mode.
-(fset 'perl-mode 'cperl-mode)
+(use-package cperl-mode
+  :defer 2
+  :config
+    ;;  We always prefer CPerl mode to Perl mode.
+    (fset 'perl-mode 'cperl-mode)
 
-;; Load .t files as perl too - as these are usually test-cases
-(setq auto-mode-alist (append '(("\\.t$" . cperl-mode)) auto-mode-alist))
-```
+    ;; Load .t files as perl too - as these are usually test-cases
+    (setq auto-mode-alist (append '(("\\.t$" . cperl-mode)) auto-mode-alist))
 
-Now we want to make sure that the code is formatted according to my tastes:
-
-```lisp
-;;  BSD Style brace placement, with tab=4 spaces.
-(defun my-cperl-mode-hook ()
-  (setq cperl-indent-level 4)
-  (setq cperl-brace-offset -2)
-  (setq cperl-label-offset 0))
-
-;;  When starting load my hooks
-(add-hook 'cperl-mode-hook 'my-cperl-mode-hook t)
+    (setq cperl-indent-level 4)
+    (setq cperl-brace-offset -2)
+    (setq cperl-label-offset 0)
+)
 ```
 
 I've also created a simple utility package which contains a pair of helpers for Perl buffers:
@@ -985,6 +980,8 @@ The diary itself is handled by my [org-diary](https://github.com/skx/org-diary) 
     (add-hook 'org-diary-after-new-entry-hook
                 (lambda()
                   (org-set-tags (format-time-string "%Y_week_%V"))))
+
+    ;; Hide all diary-blocks
     (add-hook 'org-diary-mode-hook (lambda () (interactive) (org-hide-block-all))))
 
 ;; Show the current section, with children expanded.
@@ -1265,10 +1262,10 @@ You can run `M-x org-decrypt-entries` to make them visible, but re-encrypt any t
   :ensure nil  ;; included with org-mode
   :after org
   :config
-  (org-crypt-use-before-save-magic)
-  (setq org-tags-exclude-from-inheritance (quote ("crypt")))
+    (org-crypt-use-before-save-magic)
+    (setq org-tags-exclude-from-inheritance (quote ("crypt")))
   :custom
-  (org-crypt-key "root@localhost"))
+    (org-crypt-key "root@localhost"))
 ```
 
 The downside to encrypting contents is that you'll have a random GPG-message in your exported document.  There are two solutions here:
@@ -1511,12 +1508,15 @@ and many other languages.  The following section highlights expressions
 inside parenthesis in a cute way:
 
 ```lisp
-(setq show-paren-style 'expression)
-(setq show-paren-when-point-in-periphery t)
-(setq show-paren-when-point-inside-paren t)
-(setq show-paren-ring-bell-on-mismatch t)
-(setq show-paren-delay 0)
-(show-paren-mode t)
+(use-package paren
+  :defer 2
+  :config
+    (setq show-paren-style 'expression)
+    (setq show-paren-when-point-in-periphery t)
+    (setq show-paren-when-point-inside-paren t)
+    (setq show-paren-ring-bell-on-mismatch t)
+    (setq show-paren-delay 0)
+    (show-paren-mode t))
 ```
 
 The following section takes care of setting up other basic and
@@ -1564,8 +1564,8 @@ global things the way that I prefer them.
 ;; TAB characters are evil
 (setq-default indent-tabs-mode nil)
 
-;; Show the file we've got loaded in the frame title.
-(setq frame-title-format  (concat invocation-name "@" system-name ": %b %+%+ %f"))
+;; Show the file, and only the file, we've got loaded in the frame title.
+(setq frame-title-format "%f")
 
 (defun px-raise-frame-and-give-focus ()
   (when window-system
