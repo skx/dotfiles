@@ -1565,7 +1565,7 @@ global things the way that I prefer them.
 (setq-default indent-tabs-mode nil)
 
 ;; Show the file, and only the file, we've got loaded in the frame title.
-(setq frame-title-format "%f")
+(setq frame-title-format "%b")
 
 (defun px-raise-frame-and-give-focus ()
   (when window-system
