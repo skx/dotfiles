@@ -887,12 +887,7 @@ Now we're done with the general setup so we'll handle the more specific agenda t
 	(custom-set-variables  '(org-directory "~/Private/Org"))
 
 	;; Populate the agenda from ~/Private/Org + ~/Private/Worklog/
-	(setq org-agenda-files (apply 'append
-      (mapcar
-	    (lambda (directory)
-          (if (file-directory-p directory)
-            (directory-files-recursively directory org-agenda-file-regexp)))
-			  '("~/Private/Org" "~/Private/Worklog"))))
+    (setq org-agenda-files '("~/Private/Org" "~/Private/Worklog"))
 
   :custom
     ;; Our agenda-view will span two weeks by default.
