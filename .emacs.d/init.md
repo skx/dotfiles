@@ -1320,10 +1320,9 @@ we remove the `ido.last` file which is populated by the ido completion-framework
 
 ```lisp
 (use-package recentf
-  :bind
-  :defer 2
   :config
   (recentf-mode 1)
+  :init
   (setq recentf-max-menu-items  100
         recentf-max-saved-items 300
         recentf-save-file (expand-file-name "~/.trash.d/emacs.recent.files")
@@ -1723,7 +1722,7 @@ some I've grown accustomed to:
                       (progn
                         (if (fboundp 'emacs-uptime) (message "Emacs uptime %s" (emacs-uptime)))
                         (sleep-for 1)))
-                  (save-buffers-kill-emacs)))
+                  (save-buffers-kill-terminal)))
             (message "emacs quit aborted")))
 
 (define-key steve-mode-map (kbd "C-v")
