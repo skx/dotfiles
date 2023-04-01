@@ -861,6 +861,10 @@ Group 3 matches the text.")
   "[^ \n\t][ \t]*\\(  \\)\n"
   "Regular expression for matching line breaks.")
 
+(defconst markdown-regex-escape
+  "\\(\\\\\\)."
+  "Regular expression for matching escape sequences.")
+
 (defconst markdown-regex-wiki-link
   "\\(?:^\\|[^\\]\\)\\(?1:\\(?2:\\[\\[\\)\\(?3:[^]|]+\\)\\(?:\\(?4:|\\)\\(?5:[^]]+\\)\\)?\\(?6:\\]\\]\\)\\)"
   "Regular expression for matching wiki links.
@@ -2216,6 +2220,7 @@ Depending on your font, some reasonable choices are:
                                      (4 'markdown-highlighting-face)
                                      (5 markdown-markup-properties)))
     (,markdown-regex-line-break . (1 'markdown-line-break-face prepend))
+    (,markdown-regex-escape . ((1 markdown-markup-properties prepend)))
     (markdown-fontify-sub-superscripts)
     (markdown-match-inline-attributes . ((0 markdown-markup-properties prepend)))
     (markdown-match-leanpub-sections . ((0 markdown-markup-properties)))
@@ -3504,17 +3509,30 @@ SEQ may be an atom or a sequence."
                                    `(display ,display-string))))))))
     t))
 
+(defun markdown--fontify-hrs-view-mode (hr-char)
+  (if (and hr-char (display-supports-face-attributes-p '(:extend t)))
+      (add-text-properties
+       (match-beginning 0) (match-end 0)
+       `(face
+         (:inherit markdown-hr-face :underline t :extend t)
+         font-lock-multiline t
+         display "\n"))
+    (let ((hr-len (and hr-char (/ (1- (window-body-width)) (char-width hr-char)))))
+      (add-text-properties
+       (match-beginning 0) (match-end 0)
+       `(face
+         markdown-hr-face font-lock-multiline t
+         display ,(make-string hr-len hr-char))))))
+
 (defun markdown-fontify-hrs (last)
   "Add text properties to horizontal rules from point to LAST."
   (when (markdown-match-hr last)
-    (let* ((hr-char (markdown--first-displayable markdown-hr-display-char))
-           (hr-len (and hr-char (/ (window-max-chars-per-line) (char-width hr-char)))))
-      (add-text-properties
-       (match-beginning 0) (match-end 0)
-       `(face markdown-hr-face
-              font-lock-multiline t
-              ,@(when (and markdown-hide-markup hr-char)
-                  `(display ,(make-string hr-len hr-char)))))
+    (let ((hr-char (markdown--first-displayable markdown-hr-display-char)))
+      (if (and markdown-hide-markup hr-char)
+          (markdown--fontify-hrs-view-mode hr-char)
+        (add-text-properties
+         (match-beginning 0) (match-end 0)
+         `(face markdown-hr-face font-lock-multiline t)))
       t)))
 
 (defun markdown-fontify-sub-superscripts (last)
