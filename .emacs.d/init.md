@@ -763,6 +763,15 @@ First of all we load the mode, and make some basic setup happen:
     ;; When exporting code then we get highlighting
     (setq org-latex-listings t)
 
+    ;; Hides blank lines between headings
+    (setq org-cycle-separator-lines 0)
+
+    ;; Avoid creating blank lines before headings.
+    (setq org-blank-before-new-entry (quote ((heading) (plain-list-item . auto))))
+
+    ;; Editing invisible text, inside folded regions, is an error.
+    (setq org-catch-invisible-edits 'error)
+
     ;; Don't hide leading stars
     (setq org-hide-leading-stars nil)
 
@@ -1111,8 +1120,7 @@ To make it useful we'll ensure that we disable warnings about eval which would o
 
 ### Org-Mode tagging
 
-I put together a simple helper to auto-tag TODO-tasks, using tags from
-within the current document:
+I put together a simple helper to auto-tag TODO-tasks, using tags from within the current document:
 
 ```lisp
 (use-package org-auto-tag
@@ -1122,33 +1130,6 @@ within the current document:
      (add-hook 'org-after-todo-state-change-hook 'org-auto-tag)
 )
 ```
-
-
-### Org-Mode and Blank Lines
-
-Blank lines keep getting inserted in between headlines and I don't want to see them in collapsed (contents) views. When I use TAB to fold (cycle) tasks I don't want to see any blank lines between headings.
-
-The following setting hides blank lines between headings which keeps folded view nice and compact.
-
-```lisp
-(setq org-cycle-separator-lines 0)
-```
-
-I find extra blank lines in lists and headings a bit of a nuisance. To get a body after a list you need to include a blank line between the list entry and the body – and indent the body appropriately. Most of my lists have no body detail so I like the look of collapsed lists with no blank lines better.
-
-The following setting prevents creating blank lines before headings but allows list items to adapt to existing blank lines around the items:
-
-```lisp
-(setq org-blank-before-new-entry (quote ((heading)
-    (plain-list-item . auto))))
-```
-
-The following setting prevents accidentally editing hidden text when the point is inside a folded region. This can happen if you are in the body of a heading and globally fold the org-file with S-TAB
-
-```lisp
-(setq org-catch-invisible-edits 'error)
-```
-
 
 ### Org-Mode Utility Functions
 
@@ -1330,7 +1311,7 @@ we remove the `ido.last` file which is populated by the ido completion-framework
         recentf-auto-cleanup 600))
 ```
 
-Here's a function that allows opening a recent file, with completion:
+Here's a function that allows opening a recent file from the minibuffer, with completion:
 
 ```lisp
 (defun recentf-open-with-completion ()
@@ -1428,9 +1409,8 @@ The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so
 
 ```lisp
 ;; Disable the scroll-bars, and the tool-bar.
-(dolist (mode
-  '(scroll-bar-mode tool-bar-mode))
-      (funcall mode 0))
+(scroll-bar-mode 0)
+(tool-bar-mode 0)
 
 ;; Show the menubar only when running with graphics
 (menu-bar-mode (display-graphic-p))
@@ -1442,16 +1422,10 @@ The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so
     (mouse-avoidance-mode 'cat-and-mouse))
 ```
 
-Once the basics have been setup the next step is to configure some colours:
+Once the basics have been setup the next step is to configure our theme:
 
 ```lisp
 (load-theme 'wombat)
-(set-face-background 'default "#111")
-(set-face-background 'cursor "#c96")
-(set-face-background 'isearch "#c60")
-(set-face-foreground 'isearch "#eee")
-(set-face-background 'lazy-highlight "#960")
-(set-face-foreground 'lazy-highlight "#ccc")
 ```
 
 Now we've tweaked the GUI we can setup the clipboard integration:
@@ -1473,28 +1447,8 @@ Once we've removed things that we don't like the next section is responsible for
 
 (blink-cursor-mode 1)                            ; We want to blink
 
-    ;; Change cursor color according to mode.
-    ;;  read-only -> red
-    ;;  insert    -> blue
-    ;;  default   -> white
-    (defvar hcz-set-cursor-color-color "")
-    (defvar hcz-set-cursor-color-buffer "")
-
-    (defun hcz-set-cursor-color-according-to-mode ()
-        "change cursor color according to some minor modes."
-        ;; set-cursor-color is somewhat costly, so we only call it when needed:
-        (let ((color
-            (if buffer-read-only "red"
-            (if overwrite-mode "blue"
-             "white"))))
-         (unless (and
-             (string= color hcz-set-cursor-color-color)
-             (string= (buffer-name) hcz-set-cursor-color-buffer))
-         (set-cursor-color (setq hcz-set-cursor-color-color color))
-         (setq hcz-set-cursor-color-buffer (buffer-name)))))
-
-    ;; After a command update things, if required.
-    (add-hook 'post-command-hook 'hcz-set-cursor-color-according-to-mode)
+(use-package cursor-colour
+  :defer 2)
 ```
 
 Lisp famously uses a lot of parenthesis, but so does Python, Perl,
