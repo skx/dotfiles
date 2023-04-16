@@ -1066,22 +1066,34 @@ The basic setting to use is the following one:
 (setq org-return-follows-link t)
 ```
 
-However this does not work for following links inside tables, so we resolve that via the following custom function:
+However this does not work for following links inside tables, so we resolve that via a custom function.  As overriding the behaviour of RET we'll also add support for toggling the state of the checkbox under the point.
 
 ```lisp
-(defun org-is-link ()
-  "Is the point over a link?  We determine this via the text-properties,
-   but note that this might return a symbol or a list depending on version/system."
+(defun org-has-text-property (val)
+  "Return true if the point is over an item with the given text-property"
   (let ((tprop (get-text-property (point) 'face)))
-    (if (or (eq tprop 'org-link) (and (listp tprop) (memq 'org-link tprop)))
+    (if (or (eq tprop val) (and (listp tprop) (memq val tprop)))
        t nil)))
 
+(defun org-is-link ()
+  "Is the point over a link?
+
+  We determine this via the text-properties, but note that this might return a symbol or a list depending on version/system."
+  (org-has-text-property 'org-link))
+
+(defun org-is-checkbox()
+  "Is the point over a checkbox?
+
+  We determine this via the text-properties, but note that this might return a symbol or a list depending on version/system."
+  (org-has-text-property 'org-checkbox))
+
 (defun org-clicky()
-   "Allow following links, even inside tables."
+  "Allow following links, even inside tables, and toggling checkboxes via RET"
   (interactive)
-  (if (org-is-link)
-    (call-interactively 'org-open-at-point)
-      (org-return)))
+  (cond
+     ((org-is-checkbox) (org-toggle-checkbox))
+     ((org-is-link)     (call-interactively 'org-open-at-point))
+     (t (org-return))))
 
 (add-hook 'org-mode-hook
           (lambda ()
