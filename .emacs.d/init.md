@@ -883,6 +883,14 @@ Org examples are useful, here we define a function to wrap the selection with so
     (widen)))
 ```
 
+A similar thing can be carried out by entering three graves:
+
+```lisp
+(use-package dig-my-grave
+  :defer 2
+  :after org)
+```
+
 Now we're done with the general setup so we'll handle the more specific agenda things here:
 
 ```lisp
