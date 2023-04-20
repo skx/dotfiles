@@ -1,5 +1,6 @@
 ;;; markdown-cleanup.el - Cleanup Spacing Between Markdown headers
 
+
 ;; This package is designed to ensure that documents have a consistent number of
 ;; blank lines between markdown headers.
 ;;
@@ -7,45 +8,38 @@
 ;;
 ;;     TODO: Better name
 ;;
-;;     TODO: Use a derived mode to test for things.
-;;
 ;;     TODO: Make more configurable.
 ;;
 
-(defun count-chars (char str)
+(defun count-chars (sep str)
   "Helper function to count how many times the given character occurs in the specified string."
-  (let ((s (char-to-string char))
-        (count 0)
-        (start-pos -1))
-    (while (setq start-pos (string-search s str (+ 1 start-pos)))
-      (setq count (+ 1 count)))
-    count))
+   (let ((qsep (regexp-quote sep)))
+     (- (length (split-string str qsep)) 1)))
 
 (defun markdown-cleanup-header-regexp ()
   "Return the appropriate regexp for finding headers.
 
-This supports `markdown-mode', `org-diary-mode', and `org-mode'."
+This supports `markdown-mode', and `org-mode', along with anything derived from either."
   (interactive)
   (cond
-   ((eq 'markdown-mode (buffer-local-value 'major-mode (current-buffer))) "^\n*#+")
-   ((eq 'org-diary-mode (buffer-local-value 'major-mode (current-buffer))) "^\n*\\*+")
-   ((eq 'org-mode (buffer-local-value 'major-mode (current-buffer))) "^\n*\\*+")))
+   ((derived-mode-p 'markdown-mode) "^\n*#+")
+   ((derived-mode-p 'org-mode)      "^\n*\\*+")))
 
 (defun markdown-cleanup-get-header-level (header)
   "Return the header depth level.
 
-This supports `markdown-mode', `org-diary-mode', and `org-mode'."
+This supports `markdown-mode', and `org-mode', along with anything derived from either."
   (interactive)
   (cond
-   ((eq 'markdown-mode (buffer-local-value 'major-mode (current-buffer))) (count-chars ?# header))
-   ((eq 'org-mode (buffer-local-value 'major-mode (current-buffer))) (count-chars ?* header))
-   ((eq 'org-diary-mode (buffer-local-value 'major-mode (current-buffer))) (count-chars ?* header))))
+   ((derived-mode-p 'markdown-mode) (count-chars "#" header))
+   ((derived-mode-p 'org-mode)      (count-chars "*" header))))
+
 
 (defun markdown-cleanup-get-newlines (level)
   "Return the string of newlines for the given mode.
 
 org-mode and org-diary mode will always return zero.  markdown will return 4-1"
-  (if (eq 'markdown-mode (buffer-local-value 'major-mode (current-buffer)))
+  (if (derived-mode-p 'markdown-mode)
       ;; markdown
       (cond ((= level 1) (insert "\n\n\n\n"))
             ((= level 2) (insert "\n\n\n"))
@@ -70,8 +64,9 @@ the level of indentation."
 
     ;; For each header
     (while (re-search-forward (markdown-cleanup-header-regexp) nil t)
+      ;; get the header, and count the depth of it.
       (let* ((match (match-string 0))
-             (lines (count-chars ?\n match)))
+             (lines (count-chars "\n" match)))
         ;; move to start of line
         (beginning-of-line)
         ;; remove each newline
@@ -85,12 +80,14 @@ the level of indentation."
     (goto-char (point-min))
 
     ;; now add new lines
+    ;; for each header
     (while (re-search-forward (markdown-cleanup-header-regexp) nil t)
+      ;; count the depth of it
       (let* ((match (match-string 0))
              (level (markdown-cleanup-get-header-level match)))
         ;; move to start of line
         (beginning-of-line)
-        (message "Level: %d" level)
+
         ;; insert newlines, based on header level
         (markdown-cleanup-get-newlines level)
 
@@ -102,9 +99,11 @@ the level of indentation."
 (defun markdown-cleanup-kill-leading-whitespace ()
   "Remove whitespace at the start of the file"
   (save-excursion
+    (outline-show-all)
     (goto-char (point-min))
-    (delete-blank-lines)
-    (delete-forward-char 1)))
+    (delete-region (point)
+                   (+ (save-excursion (skip-chars-forward " \n"))
+                      (point)))))
 
 ;; Install this package automatically
 (add-hook 'markdown-mode-hook (lambda () (add-hook 'before-save-hook #'markdown-cleanup t t)))
