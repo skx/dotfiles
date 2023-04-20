@@ -214,6 +214,7 @@ switch to the list immediately:
     (switch-to-buffer "*Buffer List*")))
 ```
 
+
 ## Calendar setup
 
 `M-x calendar` will show a calendar with Finnish names:
@@ -232,6 +233,7 @@ switch to the list immediately:
           (lambda ()
             (calendar-set-date-style 'european)))
 ```
+
 
 ## Completion
 
@@ -680,35 +682,6 @@ The following section of code lets us select a region and run `M-=` to align the
 
 
 
-## Github
-
-Opening a github project is something I do often, and in my case I have all my repositories cloned beneath ~/Repos/github.com, for example:
-
-* `~/Repos/github.com/skx/foo`
-* `~/Repos/github.com/skx/bar`
-* `~/Repos/github.com/user/one`
-* `~/Repos/github.com/user/two`
-
-
-
-```lisp
-(defvar github-prefix "~/Repos/github.com/" "Root of github projects.")
-
-(defun skx-github-project ()
-  "Open a github project, with completion."
-  (interactive)
-  (let ((pr nil))
-    (setq pr (ido-completing-read "Select project: " (skx-github-projects-available github-prefix)))
-    (if pr
-        (dired (concat github-prefix pr))
-      (message "Nothing selected"))))
-
-(defun skx-github-projects-available (prefix)
-  (mapcar
-     (lambda (x) (substring x (length prefix)))
-     (file-expand-wildcards (concat prefix "*/*"))))
-```
-
 
 ## Mac OS
 
@@ -965,6 +938,41 @@ Since we're living in the future we can use `org-mouse` for checking boxes, etc:
 ```
 
 
+### Org-Mode Code Execution
+
+Another useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block when a file is loaded.
+
+The following configuration enables the contents of a block named `skx-startblock` to be executed automatically when the file is loaded, and the block `skx-saveblock` to be evaluated once _before_ a file is saved:
+
+```lisp
+(use-package org-eval
+  :defer 2
+  :after org
+  :init
+    (setq org-eval-prefix-list     (list (expand-file-name "~/Private/"))
+          org-eval-loadblock-name "skx-startblock"
+          org-eval-saveblock-name "skx-saveblock" ))
+```
+
+To use these facilities define blocks like so in your org-mode files:
+
+```
+#+NAME: skx-startblock
+#+BEGIN_SRC emacs-lisp :results output silent
+  (message "I like cakes - on document loads - do you?")
+#+END_SRC
+```
+
+```
+#+NAME: skx-saveblock
+#+BEGIN_SRC emacs-lisp :results output silent
+  (message "I like cakes - just before a save - do you?")
+#+END_SRC
+```
+
+By default `org-mode` will prompt you to confirm that you want execution to happen, but we use `org-eval-prefix-list` to enable whitelisting particular prefix-directories, which means there is no need to answer `y` to the prompt.
+
+
 ### Org-Mode Diary
 
 I keep a work-log where I write down tasks and notes about my working-life every day.
@@ -1022,42 +1030,8 @@ The diary itself is handled by my [org-diary](https://github.com/skx/org-diary) 
 ```
 
 
-### Org-Mode Code Execution
 
-Another useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block when a file is loaded.
-
-The following configuration enables the contents of a block named `skx-startblock` to be executed automatically when the file is loaded, and the block `skx-saveblock` to be evaluated once _before_ a file is saved:
-
-```lisp
-(use-package org-eval
-  :defer 2
-  :after org
-  :init
-    (setq org-eval-prefix-list     (list (expand-file-name "~/Private/"))
-          org-eval-loadblock-name "skx-startblock"
-          org-eval-saveblock-name "skx-saveblock" ))
-```
-
-To use these facilities define blocks like so in your org-mode files:
-
-```
-#+NAME: skx-startblock
-#+BEGIN_SRC emacs-lisp :results output silent
-  (message "I like cakes - on document loads - do you?")
-#+END_SRC
-```
-
-```
-#+NAME: skx-saveblock
-#+BEGIN_SRC emacs-lisp :results output silent
-  (message "I like cakes - just before a save - do you?")
-#+END_SRC
-```
-
-By default `org-mode` will prompt you to confirm that you want execution to happen, but we use `org-eval-prefix-list` to enable whitelisting particular prefix-directories, which means there is no need to answer `y` to the prompt.
-
-
-### Org-Mode Links
+### Org-Mode Link Following
 
 The basic setting to use is the following one:
 
@@ -1116,7 +1090,7 @@ On the topic of links, sometimes org-mode things that things are links which are
 ```
 
 
-### Org-Mode tag cloud
+### Org-Mode Tag Cloud
 
 I put together a simple tag-cloud helper package, which we'll now load:
 
@@ -1138,7 +1112,7 @@ To make it useful we'll ensure that we disable warnings about eval which would o
 ```
 
 
-### Org-Mode tagging
+### Org-Mode Tagging Tasks Easily
 
 I put together a simple helper to auto-tag TODO-tasks, using tags from within the current document:
 
@@ -1291,7 +1265,15 @@ Here we wrap all GPG_messages with "`#+BEGIN_EXAMPLE`" to format them neatly on 
 ```
 
 
+
 ## Quick File Access
+
+There are some files that are accessed more than others, so here I setup a couple of helpers for those.
+
+See also the recent-file setup though.
+
+
+### Quick File Access - Emacs Init File
 
 This is a handy function I use if I need to edit _this_ initialization file:
 
@@ -1302,7 +1284,40 @@ This is a handy function I use if I need to edit _this_ initialization file:
     (find-file (expand-file-name "~/.emacs.d/init.md")))
 ```
 
-On a related note having easy access to a new lisp buffer is also useful, so I've defined the following to give me a new "scratch" buffer:
+
+### Quick File Access - Github Projects
+
+Opening a github project is something I do often, and in my case I have all my repositories cloned beneath ~/Repos/github.com, for example:
+
+* `~/Repos/github.com/skx/foo`
+* `~/Repos/github.com/skx/bar`
+* `~/Repos/github.com/user/one`
+* `~/Repos/github.com/user/two`
+
+
+
+```lisp
+(defvar github-prefix "~/Repos/github.com/" "Root of github projects.")
+
+(defun skx-github-project ()
+  "Open a github project, with completion."
+  (interactive)
+  (let ((pr nil))
+    (setq pr (ido-completing-read "Select project: " (skx-github-projects-available github-prefix)))
+    (if pr
+        (dired (concat github-prefix pr))
+      (message "Nothing selected"))))
+
+(defun skx-github-projects-available (prefix)
+  (mapcar
+     (lambda (x) (substring x (length prefix)))
+     (file-expand-wildcards (concat prefix "*/*"))))
+```
+
+
+### Quick File Access - Lisp Scratch
+
+Having easy access to a new lisp buffer is useful, so I've defined the following to give me a new "scratch" buffer:
 
 ```lisp
 (defun skx-scratch-buffer()
@@ -1314,9 +1329,9 @@ On a related note having easy access to a new lisp buffer is also useful, so I'v
 ```
 
 
-## Recent Files
+### Quick File Access - Recent Files
 
-Here we keep track of recent files that have been opened, we prune the list every time we launch and we ensure that
+We keep track of recent files that have been opened, we prune the list every time we launch and we ensure that
 we remove the `ido.last` file which is populated by the ido completion-framework:
 
 ```lisp
