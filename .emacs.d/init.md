@@ -24,6 +24,7 @@ here which will update them from their remote sources:
 * [tools/resync-packages.el](tools/resync-packages.el) - Fetch the remote packages we use within this repository, updating them appropriately.
 
 
+
 ## Startup Tweaks
 
 Because I use emacs as a server I tend to start it once per day, but even so a faster startup is always appreciated.
@@ -49,6 +50,8 @@ To keep an eye on the startup-time we'll record how long it takes to complete:
 (add-hook 'after-init-hook
           #'(lambda () (setq gc-cons-threshold (* 8 1024 1024))))
 ```
+
+
 
 ## Initial Functions
 
@@ -117,6 +120,7 @@ On MacOS there are some niggles, so we resolve those here:
 ```
 
 
+
 ## Basic History
 
 I like to keep history of various tools beneath a transient directory, which I can remove whenever I like, rather than scattered around the filesystem.
@@ -159,6 +163,8 @@ A good example of history is the ability to go to the last change in a buffer:
     ))
 ```
 
+
+
 ## Backup Files
 
 I'm annoyed by backups and similar.  So I disable them all:
@@ -180,6 +186,7 @@ I'm annoyed by backups and similar.  So I disable them all:
 ```
 
 
+
 ## Bell: Disabled
 
 Emacs has an annoying habit of making a beep if you attempt to scroll beyond the bottom of a buffer, cancel an operation, or carry out other everyday tasks.
@@ -189,6 +196,7 @@ We disable that behaviour here, in preference to a visual-flash:
 ```lisp
 (setq visible-bell 1)
 ```
+
 
 
 ## Buffers
@@ -215,6 +223,7 @@ switch to the list immediately:
 ```
 
 
+
 ## Calendar setup
 
 `M-x calendar` will show a calendar with Finnish names:
@@ -233,6 +242,7 @@ switch to the list immediately:
           (lambda ()
             (calendar-set-date-style 'european)))
 ```
+
 
 
 ## Completion
@@ -285,6 +295,7 @@ In addition to the completion provided by `ido` above we can also help ourselves
 ```
 
 
+
 ## Custom Variables
 
 By default, Emacs stores any configuration you make through its UI by writing custom-set-variables invocations to your init file, or to the file specified by custom-file. Though this is convenient, it’s also an excellent way to cause aggravation when the variable you keep trying to modify is being set in some custom-set-variables invocation. We can’t disable this behavior, and the custom-file variable can’t be nil, but we can make it look in a different place every time.
@@ -292,6 +303,7 @@ By default, Emacs stores any configuration you make through its UI by writing cu
 ```lisp
 (setq custom-file (make-temp-file ""))
 ```
+
 
 
 ## Dired / File & Directory Browsing
@@ -346,6 +358,7 @@ My only other irritation with `dired` is that by default "dotfiles" are shown, I
 ```
 
 
+
 ## Docker
 
 There is a handy [dockerfile-mode](https://github.com/spotify/dockerfile-mode) which allows highlighting docker-files.
@@ -358,6 +371,7 @@ Here we load it, and we can use `C-x C-b` to build the Dockerfile in the current
   :mode
   ("Dockerfile\\'" . dockerfile-mode))
 ```
+
 
 
 ## Language Modes
@@ -392,6 +406,10 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
   :defer 2
   :mode (("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode)))
+
+;; Markdown header cleanup.
+(use-package markdown-cleanup
+  :defer 2)
 
 ;; Puppet
 (use-package puppet-mode
@@ -446,6 +464,7 @@ In emacs-lisp-mode we can enable eldoc-mode to display information about a funct
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
 ```
+
 
 ### Language Modes - golang
 
@@ -556,7 +575,6 @@ I've also created a simple utility package which contains a pair of helpers for 
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
 
 
-
 ### Language Modes - Z80 Assembly
 
 I'm having fun doing "retro" things with a [Z80 processor](https://en.wikipedia.org/wiki/Zilog_Z80), so this mode loads the appropriate mode for that.
@@ -581,6 +599,7 @@ I'm having fun doing "retro" things with a [Z80 processor](https://en.wikipedia.
 
 ```
 
+
 ### Language Modes - Web Mode
 
 One of the annoyances with writing HTML is that often it contains extra things inline, such as Javascript and CSS.  To solve this problem - of wanting to mix HTML-mode along with Javascript-mode for example, I use [web-mode](http://web-mode.org/):
@@ -599,6 +618,7 @@ One of the annoyances with writing HTML is that often it contains extra things i
  )
 ```
 
+
 ### Language Modes - YAML Mode
 
 YAML is used in Gitlab CI, Kubernetes, and other similar places.
@@ -609,6 +629,7 @@ YAML is used in Gitlab CI, Kubernetes, and other similar places.
   :mode (("\\.yml\\'"   . yaml-mode)
          ("\\.yaml\\'"  . yaml-mode)))
 ```
+
 
 ### Language Mode Helpers - Code Folding
 
@@ -647,6 +668,7 @@ The following snippet of code ensures that `TODO` comments/lines are shown easil
 
 ```
 
+
 ### Language Mode Helpers - Utilities
 
 A lot of programming environments allow you to setup variables via something like this:
@@ -672,6 +694,7 @@ The following section of code lets us select a region and run `M-=` to align the
 ```
 
 
+
 ## Git
 
 `git` setup is pretty much outside the scope of this document, but the least we can do is to configure a suitable mode for the `~/.gitconfig` file:
@@ -679,7 +702,6 @@ The following section of code lets us select a region and run `M-=` to align the
 ```lisp
 (add-to-list 'auto-mode-alist '("\\.gitconfig$" . conf-mode))
 ```
-
 
 
 
@@ -714,6 +736,7 @@ On top of that I wanted to make sure that the default font-sizes are "big":
 (add-hook 'emacs-startup-hook (lambda () (td/adapt-font-size)))
 (add-hook 'after-make-frame-functions (lambda (x) (td/adapt-font-size)))
 ```
+
 
 
 ## Org-Mode
@@ -957,16 +980,40 @@ The following configuration enables the contents of a block named `skx-startbloc
 To use these facilities define blocks like so in your org-mode files:
 
 ```
+
+
+
+
 #+NAME: skx-startblock
+
+
+
+
 #+BEGIN_SRC emacs-lisp :results output silent
   (message "I like cakes - on document loads - do you?")
+
+
+
+
 #+END_SRC
 ```
 
 ```
+
+
+
+
 #+NAME: skx-saveblock
+
+
+
+
 #+BEGIN_SRC emacs-lisp :results output silent
   (message "I like cakes - just before a save - do you?")
+
+
+
+
 #+END_SRC
 ```
 
@@ -1028,7 +1075,6 @@ The diary itself is handled by my [org-diary](https://github.com/skx/org-diary) 
     (if (org-diary-today)
       (org-show-current-heading-tidily)))
 ```
-
 
 
 ### Org-Mode Link Following
@@ -1125,6 +1171,7 @@ I put together a simple helper to auto-tag TODO-tasks, using tags from within th
 )
 ```
 
+
 ### Org-Mode Utility Functions
 
 I've put together a simple collection of utility-functions for org-mode files:
@@ -1141,6 +1188,7 @@ These can be found within the `org-utils.el` package:
   :after org
   :defer 2)
 ```
+
 
 ### Org-Mode Viewing Exported Documents
 
@@ -1196,8 +1244,19 @@ One other problem is that code blocks don't export neatly.  To resolve that you 
 
 ```txt
 
+
+
+
 #
+
+
+
+
 # NOTE: STEVE: TODO: This is broken for the moment
+
+
+
+
 #
 (add-to-list 'org-latex-packages-alist '("" "minted"))
 (setq org-latex-listings 'minted)
@@ -1216,8 +1275,6 @@ One other problem is that code blocks don't export neatly.  To resolve that you 
 ```
 
 In addition to the block you'll need `apt-get install python-pygments`.
-
-
 
 
 ### Org-Mode Secrets
@@ -1369,6 +1426,7 @@ Now we can view a list of recently-opened files via `C-c r`:
 ```
 
 
+
 ## Search
 
 I set "search-default-mode" to allow me to match `äiti` when searching for `aiti`, for example.
@@ -1376,6 +1434,7 @@ I set "search-default-mode" to allow me to match `äiti` when searching for `ait
 ```lisp
 (setq search-default-mode 'char-fold-to-regexp)
 ```
+
 
 
 ## Spell-Checking
@@ -1403,6 +1462,7 @@ Typos and errors will be underlined, and `M-TAB` or middle-click can be used to 
   )
 
 ```
+
 
 
 ## System Administration
@@ -1434,6 +1494,7 @@ Finally we allow Emacs to control our music playback, which is supplied by [MPD]
 (use-package mpc
   :defer 2)
 ```
+
 
 
 ## User Interface Setup
@@ -1563,6 +1624,7 @@ global things the way that I prefer them.
 ```
 
 
+
 ## User Interface Sidebar
 
 There is a neat package `imenu-list` which allows you to view a sidebar in the current frame, containing index-entries.
@@ -1582,6 +1644,7 @@ Here I configure it to be used for both general programming modes, as well as `o
 ```
 
 
+
 ## UTF-8
 
 UTF-8 is the future, we should greet it with open-arms.
@@ -1594,6 +1657,7 @@ UTF-8 is the future, we should greet it with open-arms.
 (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 (setq org-export-coding-system 'utf-8)
 ```
+
 
 
 ## Whitespace Handling
@@ -1718,6 +1782,7 @@ some I've grown accustomed to:
 (define-key steve-mode-map (kbd "C-z")     '(lambda () (interactive)))
 (define-key steve-mode-map (kbd "C-c C-z") '(lambda () (interactive)))
 ```
+
 
 
 ## XXX - Fin.
