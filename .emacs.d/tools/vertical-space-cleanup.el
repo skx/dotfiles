@@ -156,4 +156,4 @@ a level-one header, by default, and those typically occur at the start of the do
                       (point)))))
 
 ;; Provide the package
-(provide 'markdown-cleanup)
+(provide 'vertical-space-cleanup)

@@ -29,7 +29,7 @@ Some specific files are highlighted in this summary, but it's worth taking a pea
      * https://github.com/skx/org-tag-cloud
   * [org-utils.el](.emacs.d/org/org-utils.el) A minimal collection of utility functions.
 * [Tools](.emacs.d/tools)
-  * [tools/markdown-cleanup.el](.emacs.d/tools/markdown-cleanup.el) - Enforce consistent whitespace breaks before markdown headers.
+  * [tools/vertical-space-cleanup.el](.emacs.d/tools/vertical-space-cleanup.el) - Enforce consistent whitespace breaks before headers in markdown and org-mode files.
   * [tools/resync-packages.el](.emacs.d/tools/resync-packages.el) - Update our bundled packages from their upstream locations
 * [User interface](.emacs.d/ui)
   * [ui/my-todo.el](.emacs.d/ui/my-todo.el) - Highlight TODO-comments.

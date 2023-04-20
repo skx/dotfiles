@@ -408,7 +408,7 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
          ("\\.markdown\\'" . markdown-mode)))
 
 ;; Markdown header cleanup.
-(use-package markdown-cleanup
+(use-package vertical-space-cleanup
   :defer 2)
 
 ;; Puppet
