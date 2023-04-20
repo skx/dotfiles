@@ -719,9 +719,6 @@ Macs are weird, so I've had to make some changes so that keybindings work as exp
 On top of that I wanted to make sure that the default font-sizes are "big":
 
 ```lisp
-; We get the default size like so.
-; (face-attribute 'default :height (selected-frame))
-
 (defun td/adapt-font-size (&optional frame)
   "Attempt to make the font sizes bigger on larger displays."
   (let* ((attrs (frame-monitor-attributes frame))
@@ -1327,8 +1324,6 @@ Here we wrap all GPG_messages with "`#+BEGIN_EXAMPLE`" to format them neatly on 
 
 There are some files that are accessed more than others, so here I setup a couple of helpers for those.
 
-See also the recent-file setup though.
-
 
 ### Quick File Access - Emacs Init File
 
@@ -1372,7 +1367,7 @@ Opening a github project is something I do often, and in my case I have all my r
 ```
 
 
-### Quick File Access - Lisp Scratch
+### Quick File Access - Lisp Scratch Buffer
 
 Having easy access to a new lisp buffer is useful, so I've defined the following to give me a new "scratch" buffer:
 
@@ -1427,7 +1422,7 @@ Now we can view a list of recently-opened files via `C-c r`:
 
 
 
-## Search
+## Searching
 
 I set "search-default-mode" to allow me to match `äiti` when searching for `aiti`, for example.
 
