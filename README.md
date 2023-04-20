@@ -2,6 +2,8 @@
 
 This is my _dotfiles_ repository.
 
+
+
 ## Emacs Setup
 
 Visitors to this repository seem to be primarily interested in my GNU/Emacs setup, which is handled in a somewhat "literate" fashion, by virtual of being written in Markdown format:
@@ -26,6 +28,9 @@ Some specific files are highlighted in this summary, but it's worth taking a pea
   * `org-tag-cloud.el` which automates keeping a tag-cloud for individual `org-mode` files.
      * https://github.com/skx/org-tag-cloud
   * [org-utils.el](.emacs.d/org/org-utils.el) A minimal collection of utility functions.
+* [Tools](.emacs.d/tools)
+  * [tools/markdown-cleanup.el](.emacs.d/tools/markdown-cleanup.el) - Enforce consistent whitespace breaks before markdown headers.
+  * [tools/resync-packages.el](.emacs.d/tools/resync-packages.el) - Update our bundled packages from their upstream locations
 * [User interface](.emacs.d/ui)
   * [ui/my-todo.el](.emacs.d/ui/my-todo.el) - Highlight TODO-comments.
   * [ui/linkifier.el](.emacs.d/ui/linkifier.el) - Turn text matching regular expressions into links/buttons.
@@ -42,10 +47,12 @@ To resync the remote packages from their latest versions please see the `resync-
 * [.emacs.d/tools/resync-packages.el](.emacs.d/tools/resync-packages.el) - Update our bundled packages from their upstream locations
 
 
-
 ### Shell Setup
 
 The `bash` setup is pretty minimal, the startup files just source every file located beneath [~/.bash/](.bash/) (and `~/.bash.local` if it exists).  This allows me to group setup in a small number of files which is easier to organize.
+
+
+
 
 # Using The Repository
 
@@ -80,6 +87,9 @@ Step four:  If no files will be corrupted, or you're happy to replace them, do t
 Now you're done.
 
 It is perhaps more sane to merely use the github browser to cherry-pick the files and functions you want, but each to their own.
+
+
+
 
 # Removing README.md
 
