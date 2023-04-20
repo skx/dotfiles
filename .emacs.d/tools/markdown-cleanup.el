@@ -1,15 +1,70 @@
-;;; markdown-cleanup.el - Cleanup Spacing Between Markdown headers
+;;; markdown-cleanup.el - Cleanup Spacing Between Markdown/Org headers
 
 
 ;; This package is designed to ensure that documents have a consistent number of
-;; blank lines between markdown headers.
+;; blank lines between headers, for both markdown files and org-mode files.
 ;;
-;; This is updated to work with org-mode files too, but the naming is wrong.
+;; For example this might be a Markdown file:
 ;;
-;;     TODO: Better name
+;;  /
+;;  |  # Intro
+;;  |  This is my introduction
+;;  |  ## Authors
+;;  |  Steve
+;;  |
+;;  |  ## References
+;;  \
 ;;
-;;     TODO: Make more configurable.
+;; Here we see there is a difference in the vertical whitespace between the
+;; two second-level headers "## Authors" and "## References".  Using this
+;; package the `markdown-cleanup' command can be invoked and will reformat
+;; all headers to have an identical number of newlines between the header and
+;; any previous content.
 ;;
+;; The configuration of the spacing depends upon the header-level.  In my
+;; personal configuration:
+;;
+;;  # Level 1 heading - four newlines before it
+;;  ## Level 2 heading  - three newlines before it
+;;  ### Level 3 heading  - two newlines before it
+;;  ### Level 4 heading  - one newlines before it
+;;
+;; The choice is made by looking at the Nth element of the list with name
+;; `markdown-cleanup-indent-md' - similar list exists for org-mode - after
+;; removing one.
+;;
+;; BUGS:
+;;
+;; - None known, please report if you see something wrong.
+;;
+;;
+;; TODO:
+;;
+;;  - Better name, now we support org-mode too.
+;;
+
+
+
+;; There is only one configuration value supported, which is the mapping
+;; of the header-level to the number of newlines to add.
+;;
+;; The following two lists handle that.   We should probably use an alist
+;; to get the values.
+;;
+(defvar markdown-cleanup-indent-md
+  (list
+   "\n\n\n\n"  ;; level 1 - 4 newlines before it
+   "\n\n\n"    ;; level 2 - 3 newlines before it
+   "\n\n"      ;; level 3 - 2 newlines before it
+   "\n"        ;; level 4 - 1 newlines before it
+   ))          ;; other levels get zero.
+
+(defvar markdown-cleanup-indent-org
+  (list
+   "\n"    ;; level 1 - 1 newline
+   ))      ;; other levels get zero.
+
+
 
 (defun count-chars (sep str)
   "Helper function to count how many times the given character occurs in the specified string."
@@ -38,25 +93,23 @@ This supports `markdown-mode', and `org-mode', along with anything derived from 
 (defun markdown-cleanup-get-newlines (level)
   "Return the string of newlines for the given mode.
 
-org-mode and org-diary mode will always return zero.  markdown will return 4-1"
-  (if (derived-mode-p 'markdown-mode)
-      ;; markdown
-      (cond ((= level 1) (insert "\n\n\n\n"))
-            ((= level 2) (insert "\n\n\n"))
-            ((= level 3) (insert "\n\n"))
-            ((= level 4) (insert "\n"))
-            (t (insert "")))
-    ;; org
-    (cond ((= level 1) (insert "\n"))
-          (t (insert "")))))
+This is based upon the header level, and is configurable via the two lists
+`markdown-cleanup-indent-md' and `markdown-cleanup-indent-org'."
+  (cond
+   ((derived-mode-p 'markdown-mode) (nth (- level 1) markdown-cleanup-indent-md))
+   ((derived-mode-p 'org-mode)      (nth (- level 1) markdown-cleanup-indent-org))))
+
 
 
 (defun markdown-cleanup ()
   "Ensure there is consistent whitespace between headers and previous sections.
 
-We iterate over the buffer and start by removing all newlines between markdown headers,
-then we iterate again and add a specific number of newlines between headers - based on
-the level of indentation."
+We iterate over the buffer and start by removing all newlines between headers,
+then we iterate again and add a specific number of newlines between headers
+based on the level of indentation.
+
+This function will operate upon either `markdown-mode' or `org-mode', as well as
+any modes derived from either of those."
   (interactive)
   (save-excursion
     (outline-show-all)
@@ -89,7 +142,8 @@ the level of indentation."
         (beginning-of-line)
 
         ;; insert newlines, based on header level
-        (markdown-cleanup-get-newlines level)
+        (if (markdown-cleanup-get-newlines level)
+            (insert (markdown-cleanup-get-newlines level)))
 
         ;; forward to avoid infinite loops
         (end-of-line))))
@@ -97,7 +151,11 @@ the level of indentation."
 
 
 (defun markdown-cleanup-kill-leading-whitespace ()
-  "Remove whitespace at the start of the file"
+  "Remove whitespace at the start of the file.
+
+This is largely required because the markdown setup will add four newlines before
+a level-one header, by default, and those typically occur at the start of the documents.
+"
   (save-excursion
     (outline-show-all)
     (goto-char (point-min))
@@ -105,8 +163,11 @@ the level of indentation."
                    (+ (save-excursion (skip-chars-forward " \n"))
                       (point)))))
 
-;; Install this package automatically
-(add-hook 'markdown-mode-hook (lambda () (add-hook 'before-save-hook #'markdown-cleanup t t)))
+;; Install this package automatically to both markdown-mode and org-mode files.
+(add-hook 'markdown-mode-hook
+          (lambda () (add-hook 'before-save-hook #'markdown-cleanup t t)))
+(add-hook 'org-mode-hook
+          (lambda () (add-hook 'before-save-hook #'markdown-cleanup t t)))
 
 ;; Provide the package
 (provide 'markdown-cleanup)
