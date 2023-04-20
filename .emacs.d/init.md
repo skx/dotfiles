@@ -1581,31 +1581,6 @@ UTF-8 is the future, we should greet it with open-arms.
 ```
 
 
-## Web Utilities
-
-I don't often writen plain HTML these days, instead I use markdown for most of my websites via the [templer](http://github.com/skx/templer/) static-site generator.
-
-There are times when I need to escape content though, and the following  allows that to be done neatly - select the region and run `M-x escape-html-region`:
-
-```lisp
-(defun escape-html-region (start end)
-  (interactive "r")
-  (save-excursion
-    (save-restriction
-      (narrow-to-region start end)
-      (goto-char (point-min))
-      (replace-string "&" "&amp;")
-      (goto-char (point-min))
-      (replace-string "<" "&lt;")
-      (goto-char (point-min))
-      (replace-string ">" "&gt;")
-      (goto-char (point-min))
-      (replace-string "\"" "&quot;")
-      )))
-```
-
-
-
 ## Whitespace Handling
 
 We like to remove trailing whitespace when we save files, and we
