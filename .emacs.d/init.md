@@ -407,10 +407,6 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
   :mode (("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode)))
 
-;; Markdown header cleanup.
-(use-package vertical-space-cleanup
-  :defer 2)
-
 ;; Puppet
 (use-package puppet-mode
   :defer 2
@@ -1680,6 +1676,28 @@ When running Emacs upon a terminal, rather than graphically, lines that are too 
 ```lisp
 (set-display-table-slot standard-display-table 'wrap ?\ )
 ```
+
+
+
+## Whitespace Handling - Vertical Space Handling
+
+In addition to the general whitespace handling I also prefer to have consistent vertical spacing between headers/blocks in org-mode and markdown-mode files:
+
+```lisp
+(use-package vertical-space-cleanup
+  :defer 2
+  :config
+    (add-hook 'org-mode-hook
+                (lambda()
+                   (add-hook 'before-save-hook #'vertical-space-cleanup t t)))
+
+    (add-hook 'markdown-mode-hook
+                (lambda()
+                   (add-hook 'before-save-hook #'vertical-space-cleanup t t)))
+  )
+```
+
+This ensures that headings are seperated from any previous content by a consistent amount.
 
 
 
