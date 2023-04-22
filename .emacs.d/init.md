@@ -368,6 +368,22 @@ Here we load it, and we can use `C-x C-b` to build the Dockerfile in the current
 
 
 
+## Help
+
+When using help-functions we want to make their buffers active by default:
+
+```lisp
+(setq help-window-select t)
+```
+
+Currently Apropos does not honour this setting, however it will in the future.  For the moment we workaround the problem with this snippet:
+
+```lisp
+(add-hook 'apropos-mode-hook (lambda () (pop-to-buffer (current-buffer))))
+```
+
+
+
 ## Language Modes
 
 Most of the time I spend in Emacs is for developing, and writing code.
