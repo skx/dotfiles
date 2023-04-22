@@ -6,17 +6,11 @@
 ;;
 
 
-(defun hostname()
-  "Return the (unqualified) hostname for this system."
-  (car (split-string (system-name) "\\." )))
-
-
 (defun load-markdown-init (path)
   "If the specified file exists then attempt to load it.
 
 We treat the file as markdown, and we extract code-blocks from it which we
-execute directly.
-"
+execute directly."
   ;; if the file exists
   (if (file-exists-p (expand-file-name path))
       (with-temp-buffer
@@ -36,6 +30,7 @@ execute directly.
           (re-search-forward "^```lisp$" (point-max) t)
 
           (let ((l (match-end 0)))
+
             ;; Find the end of the code-block
             (re-search-forward "^```$" (point-max) t)
 
