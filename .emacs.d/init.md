@@ -10,18 +10,15 @@ each of the following files:
 
 I've created the file [~/.emacs.d/init.el](init.el) which parses and executes
 the contents of _this_ (markdown) file, allowing me to write my Emacs
-configuration in a somewhat literate form.  It will also load some org-mode
-files if they are present, which are written in a similar literate fashion.
+configuration in a somewhat literate form.
 
 Hopefully this is neat, and allows my configuration to be self-documenting,
 and easily understood.
 
-Multiple packages are loaded from beneath the various subdirectorires of `~/.emacs`,
-the files are stored within _this_ repository to ensure they continue to
-be available if the upstream location vanishes, however there is a simple package
-here which will update them from their remote sources:
+Multiple packages are loaded from beneath the various subdirectorires of `~/.emacs`, the files are stored within _this_ repository to ensure they continue to be available if the upstream location vanishes, however there is a simple package here which will update them from their remote sources:
 
-* [tools/resync-packages.el](tools/resync-packages.el) - Fetch the remote packages we use within this repository, updating them appropriately.
+* [tools/resync-packages.el](tools/resync-packages.el)
+  * Fetch the remote packages we use within this repository, updating them appropriately.
 
 
 
@@ -136,20 +133,17 @@ First of all we define a helper to make a directory, if it is missing:
 Now we can configure the history:
 
 ```lisp
-;; Ensure we have ~/.trash.d which is the directory I use for transient things
-;; As well as a subdirectory for emacs.
-(mapcar (lambda (directory)
-          (mkdir-if-missing directory))
-          '("~/.trash.d/" "~/.trash.d/emacs.history/"))
+;; Ensure we have ~/.trash.d which is the directory I use for transient things.
+(mkdir-if-missing "~/.trash.d/")
 
 ;; Save our history into this new directory
 (setq savehist-file
   (format "%s/emacs.history.%s"
-    (expand-file-name "~/.trash.d/emacs.history")
+    (expand-file-name "~/.trash.d")
     (getenv "USER")))
 
 ;; Enable history saving.
-(savehist-mode 1)
+(savehist-mode t)
 ```
 
 A good example of history is the ability to go to the last change in a buffer:
