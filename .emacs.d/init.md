@@ -1438,6 +1438,19 @@ Now we can view a list of recently-opened files via `C-c r`:
 
 
 
+## Save Place In Visited Files
+
+This ensures we're restored to where we were previously, if possible.
+
+```lisp
+(setq-default save-place-file
+    (expand-file-name "~/.trash.d/emacs.place.history"))
+(setq-default save-place t)
+(save-place-mode +1)
+```
+
+
+
 ## Searching
 
 I set "search-default-mode" to allow me to match `äiti` when searching for `aiti`, for example.
