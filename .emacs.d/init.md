@@ -300,6 +300,16 @@ By default, Emacs stores any configuration you make through its UI by writing cu
 
 
 
+## Dialog Boxes
+
+Dialog boxes are disabled, we'll answer all questions via the minibuffer:
+
+```lisp
+(setq use-dialog-box nil)
+```
+
+
+
 ## Dired / File & Directory Browsing
 
 Emacs has a built-in file/directory browser which is available via `M-x dired`, and which I use very often.
