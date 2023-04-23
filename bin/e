@@ -23,7 +23,7 @@ fi
 
 
 # alternate falls on emacs --daemon
-EMACS='emacsclient --alternate-editor=""'
+EMACS='emacsclient --alternate-editor="/usr/bin/emacs"'
 
 # count opened window frames
 XFRAMES=`emacsclient -e "(frame-list)" 2>/dev/null | grep -o '#<frame [^F][^>]*>' | wc -l`
@@ -56,7 +56,7 @@ fi
 # If there is no frame then start one.
 if [ $XFRAMES = 0 ]; then
     echo "Launching emacs - no files given on command-line."
-    emacsclient --alternate-editor="" -n -c "$@"
+    emacsclient --alternate-editor="/usr/bin/emacs" -n -c "$@"
 else
     echo "Raising existing emacs - no files given on command-line."
     wmctrl -R emacs@
