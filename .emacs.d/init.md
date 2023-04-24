@@ -828,6 +828,16 @@ Lines will be wrapped to the width of the buffer too:
 (add-hook 'text-mode-hook 'visual-line-mode)
 ```
 
+However when line-wrapping is used the `Ctrl-k` binding changes behaviour, to kill to the end of the visual line, not the real line.  We resolve this by undoing that:
+
+```lisp
+;; Ctrl-k for "kill-line" is remapped, unconditionally, in visual-line-mode.
+;;
+;; We want to restore the expected behaviour, so that C-k kills to the end of
+;; the REAL line, not the VISUAL line.
+(fset 'kill-visual-line 'kill-line)
+```
+
 I put together the [org-nested](https://github.com/skx/org-nested) package to allow refining links easily.  Allowing links to be augmented by refinements.  This is now loaded:
 
 ```lisp
