@@ -49,6 +49,9 @@ specified one.
     ; Call the original function.
     (funcall orig--org-link-search first avoid-pos stealth)
 
+    ; expand the item so that it is visible
+    (show-subtree)
+
     ; Now for each refinement, search for the corresponding sub-header.
     (mapc #'(lambda (thing)
               (re-search-forward thing nil)) rest)))
