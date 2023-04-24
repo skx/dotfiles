@@ -1453,10 +1453,12 @@ Now we can view a list of recently-opened files via `C-c r`:
 This ensures we're restored to where we were previously, if possible.
 
 ```lisp
-(setq-default save-place-file
+(setq save-place-file
     (expand-file-name "~/.trash.d/emacs.place.history"))
-(setq-default save-place t)
-(save-place-mode +1)
+
+(if (fboundp #'save-place-mode)
+  (save-place-mode +1)
+  (setq-default save-place t))
 ```
 
 
