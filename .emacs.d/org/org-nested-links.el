@@ -1,10 +1,31 @@
-;;; org-nested.el - Allow links to be refined by regular expression.
+;;; org-nested-links.el - Allow links to be refined by regular expression.
 ;;;
 ;;; This package allows you to link to child headers, easily, via
 ;;; regular expressions added to normal links.
 ;;;
 ;;; It is useful if you want to have a standard set of headers which
 ;;; are not unique per-day.
+;;;
+;;; A normal link would look like this:
+;;;
+;;;   [[21/04/2023]]
+;;;
+;;; If you wanted to search for the first occurence of the word "Cake" beneath
+;;; that entry you would refine your link like so:
+;;;
+;;;   [[21/04/2023#Cake]]
+;;;
+;;; What this does:
+;;;
+;;; - Search for the headline "21/04/2023"
+;;;
+;;; - Once that is found further search (forward) for "Cake"
+;;;
+;;; The point here is if you have a lot of Cake-related entries, and you wish
+;;; to find the correct one.  (Of course using persistent UUIDs for each
+;;; headline is an alternative solution which works too, more generally, but
+;;; at a cost of readability.)
+;;;
 ;;;
 
 ;; Save reference to the original function
@@ -30,8 +51,8 @@ specified one.
 
     ; Now for each refinement, search for the corresponding sub-header.
     (mapc #'(lambda (thing)
-              (re-search-forward (format "^\**\s*%s" thing) nil)) rest)))
+              (re-search-forward thing nil)) rest)))
 
 
 ; We're done here now.
-(provide 'org-nested)
+(provide 'org-nested-links)

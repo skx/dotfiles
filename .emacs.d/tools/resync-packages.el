@@ -33,7 +33,7 @@
         ("~/.emacs.d/org/org-autolist.el"           . "https://raw.githubusercontent.com/calvinwyoung/org-autolist/master/org-autolist.el")
         ("~/.emacs.d/org/org-bullets.el"            . "https://raw.githubusercontent.com/sabof/org-bullets/master/org-bullets.el")
         ("~/.emacs.d/org/org-diary.el"              . "https://raw.githubusercontent.com/skx/org-diary/master/org-diary.el")
-        ("~/.emacs.d/org/org-nested.el"             . "https://raw.githubusercontent.com/skx/org-nested/master/org-nested.el")
+        ("~/.emacs.d/org/org-nested-links.el"       . "https://raw.githubusercontent.com/skx/org-nested-links/master/org-nested-links.el")
         ("~/.emacs.d/org/org-tag-cloud.el"          . "https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el")
         ("~/.emacs.d/tools/goto-last-change.el"     . "https://www.emacswiki.org/emacs/download/goto-last-change.el")
         ("~/.emacs.d/ui/imenu-list.el"              . "https://raw.githubusercontent.com/bmag/imenu-list/master/imenu-list.el")

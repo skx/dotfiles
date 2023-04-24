@@ -838,10 +838,10 @@ However when line-wrapping is used the `Ctrl-k` binding changes behaviour, to ki
 (fset 'kill-visual-line 'kill-line)
 ```
 
-I put together the [org-nested](https://github.com/skx/org-nested) package to allow refining links easily.  Allowing links to be augmented by refinements.  This is now loaded:
+I put together the [org-nested-links](https://github.com/skx/org-nested-links) package to allow refining links easily.  Allowing links to be augmented by refinements.  This is now loaded:
 
 ```lisp
-(use-package org-nested
+(use-package org-nested-links
   :after org
   :defer 2)
 ```
