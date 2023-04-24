@@ -106,6 +106,7 @@
                            'dest destination   ; from the config
                            'match match        ; either literal button-text or first capture value
                            'type 'linkifier
+                           'face 'link         ; make this button stand out.
                            'action `(lambda (button)
                                       (browse-url (format (car (button-get button 'dest)) (button-get button 'match))))
                            'follow-link t
