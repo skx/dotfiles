@@ -13,6 +13,7 @@
 ;;  |  Steve
 ;;  |
 ;;  |  ## References
+;;  |  1...
 ;;  \
 ;;
 ;; Here we see there is a difference in the vertical whitespace between the
@@ -24,14 +25,14 @@
 ;; The configuration of the spacing depends upon the header-level.  In my
 ;; personal configuration:
 ;;
-;;  # Level 1 heading - four newlines before it
-;;  ## Level 2 heading  - three newlines before it
-;;  ### Level 3 heading  - two newlines before it
-;;  ### Level 4 heading  - one newlines before it
+;;  # Level 1 heading - four newlines before it.
+;;  ## Level 2 heading  - three newlines before it.
+;;  ### Level 3 heading  - two newlines before it.
+;;  #### Level 4 heading  - one newlines before it.
 ;;
 ;; The choice is made by looking at the Nth element of the list with name
-;; `vertical-space-cleanup-md' - similar list exists for org-mode - after
-;; removing one.
+;; `vertical-space-cleanup-md' - a similar list exists for org-mode - after
+;; removing any previous newlines.
 ;;
 ;; BUGS:
 ;;
@@ -40,30 +41,40 @@
 
 
 
+;;; Configuration
+
 ;; There is only one configuration value supported, which is the mapping
 ;; of the header-level to the number of newlines to add.
 ;;
-;; The following two lists handle that.   We should probably use an alist
-;; to get the values.
+;; The following two lists handle that.
+
+;; TODO: We should probably use an alist, keyed on the mode, to get
+;; the values as this would allow easier updates for additional modes.
 ;;
 (defvar vertical-space-cleanup-md
   (list
-   "\n\n\n\n"  ;; level 1 - 4 newlines before it
-   "\n\n\n"    ;; level 2 - 3 newlines before it
-   "\n\n"      ;; level 3 - 2 newlines before it
-   "\n"        ;; level 4 - 1 newlines before it
+   "\n\n\n\n"  ;; level 1 - 4 newlines before it.
+   "\n\n\n"    ;; level 2 - 3 newlines before it.
+   "\n\n"      ;; level 3 - 2 newlines before it.
+   "\n"        ;; level 4 - 1 newline before it.
    ))          ;; other levels get zero.
+
 
 (defvar vertical-space-cleanup-org
   (list
-   "\n"    ;; level 1 - 1 newline
+   "\n"    ;; level 1 - 1 newline before it.
    ))      ;; other levels get zero.
 
+
+
+
+;;; Implementation
 
 (defun count-chars (sep str)
   "Helper function to count how many times the given character occurs in the specified string."
    (let ((qsep (regexp-quote sep)))
      (- (length (split-string str qsep)) 1)))
+
 
 (defun vertical-space-cleanup-header-regexp ()
   "Return the appropriate regexp for finding headers.
@@ -72,6 +83,7 @@ This supports `markdown-mode', and `org-mode', along with anything derived from 
   (cond
    ((derived-mode-p 'markdown-mode) "^\n*#+")
    ((derived-mode-p 'org-mode)      "^\n*\\*+")))
+
 
 (defun vertical-space-cleanup-get-header-level (header)
   "Return the header depth level.
@@ -82,6 +94,7 @@ This supports `markdown-mode', and `org-mode', along with anything derived from 
    ((derived-mode-p 'markdown-mode)   (count-chars "#" header))
    ((derived-mode-p 'org-mode)        (count-chars "*" header))))
 
+
 (defun vertical-space-cleanup-get-newlines (level)
   "Return the string of newlines for the given mode.
 
@@ -90,7 +103,6 @@ This is based upon the header level, and is configurable via the two lists
   (cond
    ((derived-mode-p 'markdown-mode) (nth (- level 1)   vertical-space-cleanup-md))
    ((derived-mode-p 'org-mode)      (nth (- level 1)   vertical-space-cleanup-org))))
-
 
 
 (defun vertical-space-cleanup ()
