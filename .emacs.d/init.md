@@ -1102,45 +1102,18 @@ The diary itself is handled by my [org-diary](https://github.com/skx/org-diary) 
 
 ### Org-Mode Link Following
 
-The basic setting to use is the following one:
+There exists a setting for following links by pressing `RETURN`, `org-return-follows-link`, however this doesn't work inside table-cells.
+
+To resolve this, and add extra features I created `org-return` allows following links, even inside tables, and toggling the state of checkboxes:
 
 ```lisp
-;; RETURN will follow links in org-mode files
-(setq org-return-follows-link t)
-```
-
-However this does not work for following links inside tables, so we resolve that via a custom function.  As overriding the behaviour of RET we'll also add support for toggling the state of the checkbox under the point.
-
-```lisp
-(defun org-has-text-property (val)
-  "Return true if the point is over an item with the given text-property"
-  (let ((tprop (get-text-property (point) 'face)))
-    (if (or (eq tprop val) (and (listp tprop) (memq val tprop)))
-       t nil)))
-
-(defun org-is-link ()
-  "Is the point over a link?
-
-  We determine this via the text-properties, but note that this might return a symbol or a list depending on version/system."
-  (org-has-text-property 'org-link))
-
-(defun org-is-checkbox()
-  "Is the point over a checkbox?
-
-  We determine this via the text-properties, but note that this might return a symbol or a list depending on version/system."
-  (org-has-text-property 'org-checkbox))
-
-(defun org-clicky()
-  "Allow following links, even inside tables, and toggling checkboxes via RET"
-  (interactive)
-  (cond
-     ((org-is-checkbox) (org-toggle-checkbox))
-     ((org-is-link)     (call-interactively 'org-open-at-point))
-     (t (org-return))))
-
-(add-hook 'org-mode-hook
+(use-package org-return
+  :defer 2
+  :after org
+  :config
+       (add-hook 'org-mode-hook
           (lambda ()
-            (local-set-key (kbd "RET") 'org-clicky)))
+            (local-set-key (kbd "RET") 'org-return-handler))))
 ```
 
 When following links `C-RETURN` moves backwards, after following links:

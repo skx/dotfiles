@@ -24,6 +24,8 @@ Some specific files are highlighted in this summary, but it's worth taking a pea
   * `org-diary.el` which allows maintaining a simple work-log, or diary.
      * https://github.com/skx/org-diary
   * [org-eval.el](.emacs.d/org/org-eval.el) Execute the contents of named blocks when `org-mode` files are loaded/saved.
+  * [org-return.el](.emacs.d/org/org-return.el) Follow links via RETURN, even inside table cells.
+    * Also allows toggling checkboxes via RETURN.
   * [org-nested.el](.emacs.d/org/org-nested.el) Allow linking to nested headers, by regexp.
   * `org-tag-cloud.el` which automates keeping a tag-cloud for individual `org-mode` files.
      * https://github.com/skx/org-tag-cloud
