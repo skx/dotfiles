@@ -1553,9 +1553,7 @@ Once we've removed things that we don't like the next section is responsible for
   :defer 2)
 ```
 
-Lisp famously uses a lot of parenthesis, but so does Python, Perl,
-and many other languages.  The following section highlights expressions
-inside parenthesis in a cute way:
+Lisp famously uses a lot of parenthesis, but so does Python, Perl, and many other languages.  The following section highlights expressions inside parenthesis in a cute way:
 
 ```lisp
 (use-package paren
@@ -1569,8 +1567,7 @@ inside parenthesis in a cute way:
     (show-paren-mode t))
 ```
 
-The following section takes care of setting up other basic and
-global things the way that I prefer them.
+The following section takes care of setting up other basic and global things the way that I prefer them.
 
 ```lisp
 ;; Show the time on the status bar.
@@ -1668,8 +1665,7 @@ UTF-8 is the future, we should greet it with open-arms.
 
 ## Whitespace Handling
 
-We like to remove trailing whitespace when we save files, and we
-make it visible by default:
+We like to remove trailing whitespace when we save files, and we make it visible by default:
 
 ```lisp
 (use-package whitespace
@@ -1696,7 +1692,7 @@ When running Emacs upon a terminal, rather than graphically, lines that are too 
 
 ## Whitespace Handling - Vertical Space Handling
 
-In addition to the general whitespace handling I also prefer to have consistent vertical spacing between headers/blocks in org-mode and markdown-mode files:
+In addition to the general whitespace handling I also prefer to have consistent vertical spacing between headers/blocks in `org-mode` and `markdown-mode` files:
 
 ```lisp
 (use-package vertical-space-cleanup
