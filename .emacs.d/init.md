@@ -551,6 +551,18 @@ Once the dependencies are present the following configures LSP, including a help
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
 
 
+### Language Modes - HCL
+
+One of the tools I use most frequently for that is [Hashicorp](https://www.hashicorp.com/)'s [terraform](https://www.terraform.io/), and here we'll configure our buffers to be auto-formatted when we save them:
+
+```lisp
+(use-package terraform-mode
+  :defer 2
+  :config
+    (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode))
+```
+
+
 ### Language Modes - Perl
 
 I used to do a lot of my coding in Perl, and this is configured here.
@@ -591,31 +603,6 @@ I've also created a simple utility package which contains a pair of helpers for 
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
 
 
-### Language Modes - Z80 Assembly
-
-I'm having fun doing "retro" things with a [Z80 processor](https://en.wikipedia.org/wiki/Zilog_Z80), so this mode loads the appropriate mode for that.
-
-```lisp
-(defun skx/z80-mode()
-  (set (make-local-variable 'comment-start) "//")
-  (set (make-local-variable 'comment-end) "")
-  (set (make-local-variable 'hs-block-start-regexp) "^; ?{")
-  (set (make-local-variable 'hs-block-end-regexp) "^; ?}")
-  (hs-minor-mode t)
-  (set 'hs-block-start-regexp "^; ?{{")
-  (set 'hs-block-end-regexp "^; ?}}")
-  (local-set-key (kbd "M-C-i") 'hs-toggle-hiding)
-  (local-set-key (kbd "M--") 'hs-hide-all)
-  (local-set-key (kbd "M-+") 'hs-show-all))
-
-(use-package z80-mode
-  :defer 2
-  :mode ("\\.z80$" . z80-mode)
-  :hook ((z80-mode . skx/z80-mode)))
-
-```
-
-
 ### Language Modes - Web Mode
 
 One of the annoyances with writing HTML is that often it contains extra things inline, such as Javascript and CSS.  To solve this problem - of wanting to mix HTML-mode along with Javascript-mode for example, I use [web-mode](http://web-mode.org/):
@@ -644,6 +631,31 @@ YAML is used in Gitlab CI, Kubernetes, and other similar places.
   :defer 2
   :mode (("\\.yml\\'"   . yaml-mode)
          ("\\.yaml\\'"  . yaml-mode)))
+```
+
+
+### Language Modes - Z80 Assembly
+
+I'm having fun doing "retro" things with a [Z80 processor](https://en.wikipedia.org/wiki/Zilog_Z80), so this mode loads the appropriate mode for that.
+
+```lisp
+(defun skx/z80-mode()
+  (set (make-local-variable 'comment-start) "//")
+  (set (make-local-variable 'comment-end) "")
+  (set (make-local-variable 'hs-block-start-regexp) "^; ?{")
+  (set (make-local-variable 'hs-block-end-regexp) "^; ?}")
+  (hs-minor-mode t)
+  (set 'hs-block-start-regexp "^; ?{{")
+  (set 'hs-block-end-regexp "^; ?}}")
+  (local-set-key (kbd "M-C-i") 'hs-toggle-hiding)
+  (local-set-key (kbd "M--") 'hs-hide-all)
+  (local-set-key (kbd "M-+") 'hs-show-all))
+
+(use-package z80-mode
+  :defer 2
+  :mode ("\\.z80$" . z80-mode)
+  :hook ((z80-mode . skx/z80-mode)))
+
 ```
 
 
@@ -1470,21 +1482,6 @@ Typos and errors will be underlined, and `M-TAB` or middle-click can be used to 
   (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_EXAMPLE " . "#\\+END_EXAMPLE$"))
   )
 
-```
-
-
-
-## System Administration
-
-Since we're living in the future nowadays a lot of system-administration is moving towards a cloud-based setup.
-
-One of the tools I use most frequently for that is [Hashicorp](https://www.hashicorp.com/)'s [terraform](https://www.terraform.io/), and here we'll configure our buffers to be auto-formatted when we save them:
-
-```lisp
-(use-package terraform-mode
-  :defer 2
-  :config
-    (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode))
 ```
 
 
