@@ -548,16 +548,13 @@ Once installed we can now ensure that the mode is loaded for the editing of `*.g
 
 Beyond the basic support for golang installed via that mode I've also configured LSP for this language, which provides smart completion & etc.
 
-To complete this setup I have (manually) executed the following:
-
-```sh
-$ sudo apt-get install elpa-lsp-mode elpa-company-lsp elpa-lsp-ui
-$ go install golang.org/x/tools/gopls@latest
-```
 
 ```lisp
 ;; install company-mode, via straight
-(use-package-straight company)
+(use-package-straight company
+  :config
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 1))
 
 ;; Along with the LSP-modes
 (use-package-straight lsp-mode)
@@ -573,33 +570,18 @@ $ sudo apt-get install python3-pyls
 Once the dependencies are present the following configures LSP, including a helper to format code on save & etc:
 
 ```lisp
-;; Define a save-hook to format buffers on-save
-(defun skx/lsp-install-save-hooks ()
+(defun skx/lsp-setup ()
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+  (add-hook 'before-save-hook #'lsp-organize-imports t t)
+  (local-set-key (kbd "M-.") 'lsp-find-definition)
+  (local-set-key (kbd "M-RET")    'pop-tag-mark))
 
-;; Define local keymappings for lsp-using modes
-(defun skx/lsp-setup-bindings ()
-  ; go to definition
-  (local-set-key (kbd "M-SPC") 'lsp-find-definition)
-  ; go back
-  (local-set-key (kbd "M-b")    'pop-tag-mark))
-
-;; Define a function to setup the LSP configuration I want.
-(defun skx/setup-lsp ()
-    (setq company-idle-delay 0)
-    (setq company-minimum-prefix-length 1)
-    (setq lsp-auto-guess-root t)
-    (add-hook 'go-mode-hook #'skx/lsp-install-save-hooks)
-    (add-hook 'go-mode-hook #'skx/lsp-setup-bindings)
-    (add-hook 'python-mode-hook #'skx/lsp-install-save-hooks)
-    (add-hook 'python-mode-hook #'skx/lsp-setup-bindings))
-
-;; If we have `gopls` on our $PATH AND we have `lsp-mode` available ..
-;; Then setup LSP, and add the hooks for go-mode to use it.
+;; Use LSP, and add the hooks for go-mode and python-mode to use it.
 (use-package lsp-mode
-  :custom
-   (skx/setup-lsp)
+  :config
+    (setq lsp-auto-guess-root t)
+    (add-hook 'go-mode-hook     #'skx/lsp-setup)
+    (add-hook 'python-mode-hook #'skx/lsp-setup)
   :init
    (setq lsp-keymap-prefix "C-c l")
   :hook ((go-mode python-mode) . lsp-deferred)
