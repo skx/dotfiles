@@ -83,7 +83,39 @@ I'm using `use-package` to speedup emacs startup, because it allows deferring pa
         ..
         )
 
-Here we load the package which we'll then use for further configuration:
+We're going to also use [straight](https://github.com/radian-software/straight.el) as a package manager, so first of all we bootstrap it (if necessary):
+
+```lisp
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+```
+
+`straight.el` is a functional package-manager, and will be used to actually install packages.
+
+`use-package` will be used to configure them, and so they need to be integrated:
+
+```lisp
+(straight-use-package 'use-package)
+
+(use-package straight
+;  :custom
+;  (straight-use-package-by-default t))
+)
+```
+
+Now we actually load use-package, which will be installed by straight.el.  This might be confusing, but I found the following guide useful:
+
+* https://francopasut.netlify.app/post/emacs_portable_use-package_straight/
 
 ```lisp
 (setq use-package-verbose t
@@ -729,6 +761,14 @@ The following section of code lets us select a region and run `M-=` to align the
 
 ```lisp
 (add-to-list 'auto-mode-alist '("\\.gitconfig$" . conf-mode))
+```
+
+Of course we also wish to install/use magit which is the emacs git package:
+
+```lisp
+(use-package magit
+  :ensure t
+  :bind (("C-x g" . magit-status)))
 ```
 
 
