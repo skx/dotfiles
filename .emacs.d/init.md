@@ -20,6 +20,11 @@ Multiple packages are loaded from beneath the various subdirectorires of `~/.ema
 * [tools/resync-packages.el](tools/resync-packages.el)
   * Fetch the remote packages we use within this repository, updating them appropriately.
 
+We use `use-package` to load, and configure, packages where possible, and we've configured `straight` to install a bunch of things from external repositories:
+
+* magit - git-client
+* company/lsp-ui/lsp - We configure LSP for go-mode, and python-mode.
+
 
 
 ## Startup Tweaks
@@ -61,7 +66,7 @@ We want to operate as a server, so we'll make sure that we start that before we 
 
 Operating as a server means that we can reuse the single Emacs instance, without having to worry about restarting new copies (and the potential speed-hit that would cost).
 
-With the server-startup out of the way the first thing we need to do is make sure that the various subdirectories beneath the `~/.emacs/` directory are added to the load-path.  This will ensure that future use of `require` will find the files we're attempting to load:
+With the server-startup out of the way the first real we need to do is make sure that the various subdirectories beneath the `~/.emacs/` directory are added to the load-path.  This will ensure that future use of `require` will find the files we're attempting to load:
 
 ```lisp
 (defun add-to-load-path (dir)
@@ -75,13 +80,6 @@ With the server-startup out of the way the first thing we need to do is make sur
 The initial setup is now complete, so we can start loading packages, making configuration-changes & etc.
 
 [use-package](https://github.com/jwiegley/use-package) is a helpful library which allows you to keep all configuration related to a single package in a self-contained block, and do so much more.
-
-Another advantage of `use-package` is speeding up emacs startup, because it allows deferring package loads until emacs is idle.  For example the following would load the `uniquify` package, but only when emacs has been idle for two seconds:
-
-      (use-package uniquify
-        :defer 2
-        ..
-        )
 
 We're going to also use [straight](https://github.com/radian-software/straight.el) as a package manager, so first of all we bootstrap it (if necessary):
 
@@ -104,13 +102,12 @@ We're going to also use [straight](https://github.com/radian-software/straight.e
 TLDR:
 
 * `straight.el` is a functional package-manager, and will be used to actually install packages.
-  * Most of our packages are already inside this repository, so they don't need installation.
+  * Most of the packages we use are already included within this repository, so they don't need installation.
   * `:straight t` will cause a package to be installed, if missing.
 * `use-package` will be used to configure them, and so they need to be integrated:
 
 ```lisp
 (straight-use-package 'use-package)
-
 (use-package straight)
 ```
 
@@ -126,7 +123,7 @@ Now we actually load use-package, which will be installed by straight.el.  This 
 (require 'use-package)
 ```
 
-To ensure we can update the packages bundled within this repository, and not installed via `straight.el`, the first thing we'll do is load our package-refresher.  This must be triggered manually.
+To ensure we can update the packages bundled within this repository, not those installed via `straight.el`, we'll load our package-refresher.  This must be triggered manually.
 
 ```lisp
 (use-package resync-packages
@@ -150,6 +147,8 @@ NAME and ARGS are in `use-package'."
      :straight t
      ,@args))
 ```
+
+This allows finding the packages we load remotely via a grep for `use-package-straight`.
 
 
 
@@ -1479,6 +1478,14 @@ Now we can view a list of recently-opened files via `C-c r`:
   :bind
     (("C-c r"   . recentf-open-files-in-simply-buffer)
      ("C-c C-r" . recentf-open-with-completion)))
+```
+
+If we don't have recentf-find-file we'll fake it:
+
+```lisp
+(if (not (fboundp 'recentf-find-file))
+  (fset 'recentf-find-file 'find-file))
+
 ```
 
 
