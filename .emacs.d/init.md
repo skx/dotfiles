@@ -108,9 +108,9 @@ We're going to also use [straight](https://github.com/radian-software/straight.e
 (straight-use-package 'use-package)
 
 (use-package straight
-;  :custom
+  :custom
 ;  (straight-use-package-by-default t))
-)
+  )
 ```
 
 Now we actually load use-package, which will be installed by straight.el.  This might be confusing, but I found the following guide useful:
@@ -130,6 +130,7 @@ package-refresher.  This must be triggered manually.
 
 ```lisp
 (use-package resync-packages
+ :ensure nil
  :defer 2)
 ```
 
@@ -537,6 +538,21 @@ $ sudo apt-get install elpa-lsp-mode elpa-company-lsp elpa-lsp-ui
 $ go install golang.org/x/tools/gopls@latest
 ```
 
+;;(use-package lsp
+;;  :ensure t)
+```lisp
+(use-package company
+  :ensure t)
+
+(straight-use-package 'lsp-ui)
+(straight-use-package 'lsp-mode)
+
+;(use-package lsp-mode
+;  :ensure t)
+;(use-package lsp-ui
+;  :ensure t)
+```
+
 For python:
 
 ```sh
@@ -571,7 +587,6 @@ Once the dependencies are present the following configures LSP, including a help
 ;; If we have `gopls` on our $PATH AND we have `lsp-mode` available ..
 ;; Then setup LSP, and add the hooks for go-mode to use it.
 (use-package lsp-mode
-  :if (and (executable-find "gopls") (not (eq system-type 'darwin)))
   :custom
    (skx/setup-lsp)
   :init
