@@ -980,9 +980,9 @@ Now we're done with the general setup so we'll handle the more specific agenda t
     ("C-c a" . org-agenda)
   :config
     ;; Store our org-files beneath ~/Private/Org.
-	(custom-set-variables  '(org-directory "~/Private/Org"))
+    (custom-set-variables  '(org-directory "~/Private/Org"))
 
-	;; Populate the agenda from ~/Private/Org + ~/Private/Worklog/
+    ;; Populate the agenda from ~/Private/Org + ~/Private/Worklog/
     (setq org-agenda-files '("~/Private/Org" "~/Private/Worklog"))
 
   :custom
@@ -1063,41 +1063,17 @@ The following configuration enables the contents of a block named `skx-startbloc
 To use these facilities define blocks like so in your org-mode files:
 
 ```
-
-
-
-
-#+NAME: skx-startblock
-
-
-
-
-#+BEGIN_SRC emacs-lisp :results output silent
-  (message "I like cakes - on document loads - do you?")
-
-
-
-
-#+END_SRC
+  #+NAME: skx-startblock
+  #+BEGIN_SRC emacs-lisp :results output silent
+    (message "I like cakes - on document loads - do you?")
+  #+END_SRC
 ```
 
 ```
-
-
-
-
-#+NAME: skx-saveblock
-
-
-
-
-#+BEGIN_SRC emacs-lisp :results output silent
-  (message "I like cakes - just before a save - do you?")
-
-
-
-
-#+END_SRC
+  #+NAME: skx-saveblock
+  #+BEGIN_SRC emacs-lisp :results output silent
+    (message "I like cakes - just before a save - do you?")
+  #+END_SRC
 ```
 
 By default `org-mode` will prompt you to confirm that you want execution to happen, but we use `org-eval-prefix-list` to enable whitelisting particular prefix-directories, which means there is no need to answer `y` to the prompt.
