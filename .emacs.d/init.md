@@ -76,7 +76,7 @@ The initial setup is now complete, so we can start loading packages, making conf
 
 [use-package](https://github.com/jwiegley/use-package) is a helpful library which allows you to keep all configuration related to a single package in a self-contained block, and do so much more.
 
-I'm using `use-package` to speedup emacs startup, because it allows deferring package loads until emacs is idle.  For example the following would load the `uniquify` package, but only when emacs has been idle for two seconds:
+Another advantage of `use-package` is speeding up emacs startup, because it allows deferring package loads until emacs is idle.  For example the following would load the `uniquify` package, but only when emacs has been idle for two seconds:
 
       (use-package uniquify
         :defer 2
@@ -86,20 +86,8 @@ I'm using `use-package` to speedup emacs startup, because it allows deferring pa
 We're going to also use [straight](https://github.com/radian-software/straight.el) as a package manager, so first of all we bootstrap it (if necessary):
 
 ```lisp
-
-;; require package
-(require 'package)
-
-;; Setup archives.
-(setq package-archives '(
-    ("gnu"          . "https://elpa.gnu.org/packages/")
-    ("melpa"        . "https://melpa.org/packages/")
-    ("marmalade"    . "https://marmalade-repo.org/packages/")
-    ("melpa-stable" . "https://stable.melpa.org/packages/")
-    ("elpy"         . "https://jorgenschaefer.github.io/packages/")))
-
-(package-initialize)
 (defvar bootstrap-version)
+
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 5))
@@ -113,9 +101,12 @@ We're going to also use [straight](https://github.com/radian-software/straight.e
   (load bootstrap-file nil 'nomessage))
 ```
 
-`straight.el` is a functional package-manager, and will be used to actually install packages.
+TLDR:
 
-`use-package` will be used to configure them, and so they need to be integrated:
+* `straight.el` is a functional package-manager, and will be used to actually install packages.
+  * Most of our packages are already inside this repository, so they don't need installation.
+  * `:straight t` will cause a package to be installed, if missing.
+* `use-package` will be used to configure them, and so they need to be integrated:
 
 ```lisp
 (straight-use-package 'use-package)
@@ -135,8 +126,7 @@ Now we actually load use-package, which will be installed by straight.el.  This 
 (require 'use-package)
 ```
 
-To ensure we can update our packages the first thing we'll do is load our
-package-refresher.  This must be triggered manually.
+To ensure we can update the packages bundled within this repository, and not installed via `straight.el`, the first thing we'll do is load our package-refresher.  This must be triggered manually.
 
 ```lisp
 (use-package resync-packages
@@ -146,6 +136,10 @@ package-refresher.  This must be triggered manually.
 
 
 ## Initial Macros
+
+As noted if we want to cause a package to be installed via `straight.el` we need to add `:straight t` to the `(use-package ..)` invocation.
+
+To be more explicit we'll use a little macro here to do that for us:
 
 ```lisp
 (defmacro use-package-straight (name &rest args)
