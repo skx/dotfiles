@@ -20,6 +20,11 @@ Multiple packages are loaded from beneath the various subdirectorires of `~/.ema
 * [tools/resync-packages.el](tools/resync-packages.el)
   * Fetch the remote packages we use within this repository, updating them appropriately.
 
+We use `use-package` to load, and configure, packages where possible, and we've configured `straight` to install a bunch of things from external repositories:
+
+* magit - git-client
+* company/lsp-ui/lsp - We configure LSP for go-mode, and python-mode.
+
 
 
 ## Startup Tweaks
@@ -61,7 +66,7 @@ We want to operate as a server, so we'll make sure that we start that before we 
 
 Operating as a server means that we can reuse the single Emacs instance, without having to worry about restarting new copies (and the potential speed-hit that would cost).
 
-With the server-startup out of the way the first thing we need to do is make sure that the various subdirectories beneath the `~/.emacs/` directory are added to the load-path.  This will ensure that future use of `require` will find the files we're attempting to load:
+With the server-startup out of the way the first real we need to do is make sure that the various subdirectories beneath the `~/.emacs/` directory are added to the load-path.  This will ensure that future use of `require` will find the files we're attempting to load:
 
 ```lisp
 (defun add-to-load-path (dir)
@@ -76,14 +81,39 @@ The initial setup is now complete, so we can start loading packages, making conf
 
 [use-package](https://github.com/jwiegley/use-package) is a helpful library which allows you to keep all configuration related to a single package in a self-contained block, and do so much more.
 
-I'm using `use-package` to speedup emacs startup, because it allows deferring package loads until emacs is idle.  For example the following would load the `uniquify` package, but only when emacs has been idle for two seconds:
+We're going to also use [straight](https://github.com/radian-software/straight.el) as a package manager, so first of all we bootstrap it (if necessary):
 
-      (use-package uniquify
-        :defer 2
-        ..
-        )
+```lisp
+(defvar bootstrap-version)
 
-Here we load the package which we'll then use for further configuration:
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+```
+
+TLDR:
+
+* `straight.el` is a functional package-manager, and will be used to actually install packages.
+  * Most of the packages we use are already included within this repository, so they don't need installation.
+  * `:straight t` will cause a package to be installed, if missing.
+* `use-package` will be used to configure them, and so they need to be integrated:
+
+```lisp
+(straight-use-package 'use-package)
+(use-package straight)
+```
+
+Now we actually load use-package, which will be installed by straight.el.  This might be confusing, but I found the following guide useful:
+
+* https://francopasut.netlify.app/post/emacs_portable_use-package_straight/
 
 ```lisp
 (setq use-package-verbose t
@@ -93,13 +123,32 @@ Here we load the package which we'll then use for further configuration:
 (require 'use-package)
 ```
 
-To ensure we can update our packages the first thing we'll do is load our
-package-refresher.  This must be triggered manually.
+To ensure we can update the packages bundled within this repository, not those installed via `straight.el`, we'll load our package-refresher.  This must be triggered manually.
 
 ```lisp
 (use-package resync-packages
  :defer 2)
 ```
+
+
+
+## Initial Macros
+
+As noted if we want to cause a package to be installed via `straight.el` we need to add `:straight t` to the `(use-package ..)` invocation.
+
+To be more explicit we'll use a little macro here to do that for us:
+
+```lisp
+(defmacro use-package-straight (name &rest args)
+  "Like `use-package' but with `straight' enabled.
+NAME and ARGS are in `use-package'."
+  (declare (indent defun))
+  `(use-package ,name
+     :straight t
+     ,@args))
+```
+
+This allows finding the packages we load remotely via a grep for `use-package-straight`.
 
 
 
@@ -498,11 +547,17 @@ Once installed we can now ensure that the mode is loaded for the editing of `*.g
 
 Beyond the basic support for golang installed via that mode I've also configured LSP for this language, which provides smart completion & etc.
 
-To complete this setup I have (manually) executed the following:
 
-```sh
-$ sudo apt-get install elpa-lsp-mode elpa-company-lsp elpa-lsp-ui
-$ go install golang.org/x/tools/gopls@latest
+```lisp
+;; install company-mode, via straight
+(use-package-straight company
+  :config
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 1))
+
+;; Along with the LSP-modes
+(use-package-straight lsp-mode)
+(use-package-straight lsp-ui)
 ```
 
 For python:
@@ -514,34 +569,18 @@ $ sudo apt-get install python3-pyls
 Once the dependencies are present the following configures LSP, including a helper to format code on save & etc:
 
 ```lisp
-;; Define a save-hook to format buffers on-save
-(defun skx/lsp-install-save-hooks ()
+(defun skx/lsp-setup ()
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+  (add-hook 'before-save-hook #'lsp-organize-imports t t)
+  (local-set-key (kbd "M-.") 'lsp-find-definition)
+  (local-set-key (kbd "M-RET")    'pop-tag-mark))
 
-;; Define local keymappings for lsp-using modes
-(defun skx/lsp-setup-bindings ()
-  ; go to definition
-  (local-set-key (kbd "M-SPC") 'lsp-find-definition)
-  ; go back
-  (local-set-key (kbd "M-b")    'pop-tag-mark))
-
-;; Define a function to setup the LSP configuration I want.
-(defun skx/setup-lsp ()
-    (setq company-idle-delay 0)
-    (setq company-minimum-prefix-length 1)
-    (setq lsp-auto-guess-root t)
-    (add-hook 'go-mode-hook #'skx/lsp-install-save-hooks)
-    (add-hook 'go-mode-hook #'skx/lsp-setup-bindings)
-    (add-hook 'python-mode-hook #'skx/lsp-install-save-hooks)
-    (add-hook 'python-mode-hook #'skx/lsp-setup-bindings))
-
-;; If we have `gopls` on our $PATH AND we have `lsp-mode` available ..
-;; Then setup LSP, and add the hooks for go-mode to use it.
+;; Use LSP, and add the hooks for go-mode and python-mode to use it.
 (use-package lsp-mode
-  :if (and (executable-find "gopls") (not (eq system-type 'darwin)))
-  :custom
-   (skx/setup-lsp)
+  :config
+    (setq lsp-auto-guess-root t)
+    (add-hook 'go-mode-hook     #'skx/lsp-setup)
+    (add-hook 'python-mode-hook #'skx/lsp-setup)
   :init
    (setq lsp-keymap-prefix "C-c l")
   :hook ((go-mode python-mode) . lsp-deferred)
@@ -729,6 +768,15 @@ The following section of code lets us select a region and run `M-=` to align the
 
 ```lisp
 (add-to-list 'auto-mode-alist '("\\.gitconfig$" . conf-mode))
+```
+
+Of course we also wish to install/use magit which is the emacs git package:
+
+```lisp
+;; install magit via straight
+(use-package-straight magit
+  :defer 2
+  :bind (("C-x g" . magit-status)))
 ```
 
 
@@ -932,9 +980,9 @@ Now we're done with the general setup so we'll handle the more specific agenda t
     ("C-c a" . org-agenda)
   :config
     ;; Store our org-files beneath ~/Private/Org.
-	(custom-set-variables  '(org-directory "~/Private/Org"))
+    (custom-set-variables  '(org-directory "~/Private/Org"))
 
-	;; Populate the agenda from ~/Private/Org + ~/Private/Worklog/
+    ;; Populate the agenda from ~/Private/Org + ~/Private/Worklog/
     (setq org-agenda-files '("~/Private/Org" "~/Private/Worklog"))
 
   :custom
@@ -1015,41 +1063,17 @@ The following configuration enables the contents of a block named `skx-startbloc
 To use these facilities define blocks like so in your org-mode files:
 
 ```
-
-
-
-
-#+NAME: skx-startblock
-
-
-
-
-#+BEGIN_SRC emacs-lisp :results output silent
-  (message "I like cakes - on document loads - do you?")
-
-
-
-
-#+END_SRC
+  #+NAME: skx-startblock
+  #+BEGIN_SRC emacs-lisp :results output silent
+    (message "I like cakes - on document loads - do you?")
+  #+END_SRC
 ```
 
 ```
-
-
-
-
-#+NAME: skx-saveblock
-
-
-
-
-#+BEGIN_SRC emacs-lisp :results output silent
-  (message "I like cakes - just before a save - do you?")
-
-
-
-
-#+END_SRC
+  #+NAME: skx-saveblock
+  #+BEGIN_SRC emacs-lisp :results output silent
+    (message "I like cakes - just before a save - do you?")
+  #+END_SRC
 ```
 
 By default `org-mode` will prompt you to confirm that you want execution to happen, but we use `org-eval-prefix-list` to enable whitelisting particular prefix-directories, which means there is no need to answer `y` to the prompt.
@@ -1294,7 +1318,6 @@ You can run `M-x org-decrypt-entries` to make them visible, but re-encrypt any t
 ```lisp
 (use-package org-crypt
   :defer 2
-  :ensure nil  ;; included with org-mode
   :after org
   :config
     (org-crypt-use-before-save-magic)
@@ -1399,6 +1422,7 @@ we remove the `ido.last` file which is populated by the ido completion-framework
 
 ```lisp
 (use-package recentf
+  :ensure nil
   :config
   (recentf-mode 1)
   :init
@@ -1426,9 +1450,18 @@ Now we can view a list of recently-opened files via `C-c r`:
 ```lisp
 (use-package recentf-buffer
   :defer 2
+  :ensure nil
   :bind
     (("C-c r"   . recentf-open-files-in-simply-buffer)
      ("C-c C-r" . recentf-open-with-completion)))
+```
+
+If we don't have recentf-find-file we'll fake it:
+
+```lisp
+(if (not (fboundp 'recentf-find-file))
+  (fset 'recentf-find-file 'find-file))
+
 ```
 
 
@@ -1467,6 +1500,7 @@ Typos and errors will be underlined, and `M-TAB` or middle-click can be used to 
 ```lisp
 (use-package flyspell
   :if (executable-find "ispell")
+  :ensure nil
   :defer 2
   :init
   (progn
@@ -1498,6 +1532,7 @@ Finally we allow Emacs to control our music playback, which is supplied by [MPD]
 
 ```lisp
 (use-package mpc
+  :ensure nil
   :defer 2)
 ```
 
@@ -1520,6 +1555,7 @@ The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so
 ;; Make sure our cursor doesn't get in the way.
 (use-package avoid
   :defer 2
+  :ensure nil
   :config
     (mouse-avoidance-mode 'cat-and-mouse))
 ```
@@ -1558,6 +1594,7 @@ Lisp famously uses a lot of parenthesis, but so does Python, Perl, and many othe
 ```lisp
 (use-package paren
   :defer 2
+  :ensure nil
   :config
     (setq show-paren-style 'expression)
     (setq show-paren-when-point-in-periphery t)
@@ -1637,6 +1674,7 @@ Here I configure it to be used for both general programming modes, as well as `o
 ```lisp
 (use-package imenu-list
   :defer 2
+  :ensure nil
   :init
     (setq imenu-list-focus-after-activation t
           imenu-list-auto-resize t
@@ -1670,6 +1708,7 @@ We like to remove trailing whitespace when we save files, and we make it visible
 ```lisp
 (use-package whitespace
   :defer  2
+  :ensure nil
   :config
 
    ; show trailing whitespace
