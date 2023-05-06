@@ -20,7 +20,7 @@ Multiple packages are loaded from beneath the various subdirectorires of `~/.ema
 * [tools/resync-packages.el](tools/resync-packages.el)
   * Fetch the remote packages we use within this repository, updating them appropriately.
 
-We use `use-package` to load, and configure, packages where possible, and we've configured `straight` to install a bunch of things from external repositories:
+We use `use-package` to configure/load packages where possible, and we've configured `straight` to install a small number of packages from external repositories:
 
 * [magit](https://magit.vc/)
   * The `git` client and interface.
@@ -30,37 +30,9 @@ We use `use-package` to load, and configure, packages where possible, and we've 
 
 
 
-## Startup Tweaks
-
-Because I use emacs as a server I tend to start it once per day, but even so a faster startup is always appreciated.
-
-To keep an eye on the startup-time we'll record how long it takes to complete:
-
-```lisp
-;; Use a hook so the message doesn't get clobbered by other messages.
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (message "Emacs ready in %s with %d garbage collections."
-                     (format "%.2f seconds"
-                             (float-time
-                              (time-subtract after-init-time before-init-time)))
-                     gcs-done)))
-
-; Set the garbage-collection threshold to something high.
-;
-; This will ensure we don't stall as we're loading.
-(setq gc-cons-threshold most-positive-fixnum)
-
-;; Reset garbage collector limit after init process has ended (8Mb)
-(add-hook 'after-init-hook
-          #'(lambda () (setq gc-cons-threshold (* 8 1024 1024))))
-```
-
-
-
 ## Initial Functions
 
-We want to operate as a server, so we'll make sure that we start that before we go any further of course if it is already running then we skip it:
+We want to operate as a server, so we'll make sure that we start that before we go any further - of course if it is already running then we skip it:
 
 ```lisp
 (require 'server)
@@ -825,7 +797,6 @@ On top of that I wanted to make sure that the default font-sizes are "big":
          (size (alist-get 'mm-size attrs))
          (geometry (alist-get 'geometry attrs))
          (ppi (/ (caddr geometry) (/ (car size) 25.4))))
-         (message "PPI:%s Size:%s Geometry:%s" ppi size geometry)
     (if (> ppi 120)
         (set-face-attribute 'default frame :height 200)
       (set-face-attribute 'default frame :height 150))))
@@ -1868,12 +1839,4 @@ some I've grown accustomed to:
 ; unset things
 (define-key steve-mode-map (kbd "C-z")     '(lambda () (interactive)))
 (define-key steve-mode-map (kbd "C-c C-z") '(lambda () (interactive)))
-```
-
-
-
-## XXX - Fin.
-
-```lisp
-(message "init.md loaded in %s" (emacs-init-time))
 ```
