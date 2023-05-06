@@ -22,8 +22,11 @@ Multiple packages are loaded from beneath the various subdirectorires of `~/.ema
 
 We use `use-package` to load, and configure, packages where possible, and we've configured `straight` to install a bunch of things from external repositories:
 
-* magit - git-client
-* company/lsp-ui/lsp - We configure LSP for go-mode, and python-mode.
+* [magit](https://magit.vc/)
+  * The `git` client and interface.
+* company/lsp-ui/lsp
+  * Language Server Protocol magic, to get completion, help on hover, etc.
+  * Configured for golang and python.
 
 
 
@@ -81,7 +84,7 @@ The initial setup is now complete, so we can start loading packages, making conf
 
 [use-package](https://github.com/jwiegley/use-package) is a helpful library which allows you to keep all configuration related to a single package in a self-contained block, and do so much more.
 
-We're going to also use [straight](https://github.com/radian-software/straight.el) as a package manager, so first of all we bootstrap it (if necessary):
+We're going to also use [straight](https://github.com/radian-software/straight.el) as a package manager (i.e installer) so we need to bootstrap it:
 
 ```lisp
 (defvar bootstrap-version)
@@ -101,10 +104,11 @@ We're going to also use [straight](https://github.com/radian-software/straight.e
 
 TLDR:
 
-* `straight.el` is a functional package-manager, and will be used to actually install packages.
-  * Most of the packages we use are already included within this repository, so they don't need installation.
+* `straight.el` is a package-manager, and will be used to install packages.
+  * Most of the packages we use are already included within this repository.
+* `use-package` will be used to configure packages, and so they need to be integrated
   * `:straight t` will cause a package to be installed, if missing.
-* `use-package` will be used to configure them, and so they need to be integrated:
+
 
 ```lisp
 (straight-use-package 'use-package)
