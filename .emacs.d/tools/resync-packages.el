@@ -60,10 +60,15 @@
     (message "Fetched %d files in %.06f seconds" count (float-time (time-since time)))))
 
 (defun resync/resync()
-  "Resync packages, and bytecompile everything"
+  "Resync packages from their upstream locations.
+
+If `straight' is installed then rebuild its packages at the same time."
   (interactive)
   (resync/packages)
-  (straight-pull-all))
+  (if (fboundp 'straight-pull-all)
+      (progn
+        (straight-pull-all)
+        (straight-rebuild-all))))
 
 
 (provide 'resync-packages)
