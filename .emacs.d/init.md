@@ -83,21 +83,22 @@ TLDR:
 
 
 ```lisp
+;; configure error-handling
+(setq use-package-verbose t
+      use-package-expand-minimally nil
+      use-package-compute-statistics t
+      debug-on-error t)
+
+;; load use-package
 (straight-use-package 'use-package)
+
+;; And ensure that straight is loaded
 (use-package straight)
 ```
 
 Now we actually load use-package, which will be installed by straight.el.  This might be confusing, but I found the following guide useful:
 
 * https://francopasut.netlify.app/post/emacs_portable_use-package_straight/
-
-```lisp
-(setq use-package-verbose t
-      use-package-expand-minimally nil
-      use-package-compute-statistics t
-      debug-on-error t)
-(require 'use-package)
-```
 
 To ensure we can update the packages bundled within this repository, not those installed via `straight.el`, we'll load our package-refresher.  This must be triggered manually.
 
@@ -112,7 +113,10 @@ To ensure we can update the packages bundled within this repository, not those i
 
 As noted if we want to cause a package to be installed via `straight.el` we need to add `:straight t` to the `(use-package ..)` invocation.
 
-To be more explicit we'll use a little macro here to do that for us:
+* Most of the packages we use are already included within this repository.
+* However there are a couple that we load externally.
+
+To be explicit we'll use a little macro here to configure things for us:
 
 ```lisp
 (defmacro use-package-straight (name &rest args)
@@ -128,7 +132,7 @@ This allows finding the packages we load remotely via a grep for `use-package-st
 
 
 
-## Initial Path
+## Initial PATH (MacOS)
 
 On Unix systems the emacs process inherits the shell environment which was used to start it up.
 
@@ -171,7 +175,7 @@ Now we can configure the history:
 (savehist-mode t)
 ```
 
-A good example of history is the ability to go to the last change in a buffer:
+A good use of history is the ability to go to the last change in a buffer:
 
 ```lisp
 (use-package goto-last-change
