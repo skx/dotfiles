@@ -62,3 +62,10 @@ fi
 #
 autoload -U select-word-style
 select-word-style bash
+
+
+#
+# Ensure the comment-character works in interactive sessions.
+#
+setopt interactivecomments
+
