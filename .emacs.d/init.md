@@ -407,6 +407,45 @@ Here we load it, and we can use `C-x C-b` to build the Dockerfile in the current
 
 
 
+## Git
+
+`git` setup is pretty much outside the scope of this document, but the least we can do is to configure a suitable mode for the `~/.gitconfig` file:
+
+```lisp
+(add-to-list 'auto-mode-alist '("\\.gitconfig$" . conf-mode))
+```
+
+Of course we also wish to install/use magit which is the emacs git package:
+
+```lisp
+;; install magit via straight
+(use-package-straight magit
+  :defer 2
+  :bind (("C-x g" . magit-status)))
+```
+
+`magit` allows easily switching branches, committing, etc, but the final step will be to open the browser to create a pull-request.  The following snippet binds that to `v` which is a synonym for `(v)iew`.
+
+```lisp
+(defun skx/visit-pull-request-url ()
+  "Visit the current branch's PR on Github."
+  (interactive)
+  (browse-url
+   (format "https://github.com/%s/pull/new/%s"
+           (replace-regexp-in-string
+            "\\`.+github\\.com:\\(.+\\)\\.git\\'" "\\1"
+            (magit-get "remote"
+                       (magit-get-current-remote)
+                       "url"))
+           (magit-get-current-branch))))
+
+(eval-after-load 'magit
+  '(define-key magit-mode-map "v"
+     #'skx/visit-pull-request-url))
+```
+
+
+
 ## Help
 
 When using help-functions we want to make their buffers active by default:
@@ -738,45 +777,6 @@ The following section of code lets us select a region and run `M-=` to align the
 (defun align-equals (begin end)
   (interactive "r")
   (align-regexp begin end "\\(\\s-*\\)=" 1 1))
-```
-
-
-
-## Git
-
-`git` setup is pretty much outside the scope of this document, but the least we can do is to configure a suitable mode for the `~/.gitconfig` file:
-
-```lisp
-(add-to-list 'auto-mode-alist '("\\.gitconfig$" . conf-mode))
-```
-
-Of course we also wish to install/use magit which is the emacs git package:
-
-```lisp
-;; install magit via straight
-(use-package-straight magit
-  :defer 2
-  :bind (("C-x g" . magit-status)))
-```
-
-`magit` allows easily switching branches, committing, etc, but the final step will be to open the browser to create a pull-request.  The following snippet binds that to `v` which is a synonym for `(v)iew`.
-
-```lisp
-(defun skx/visit-pull-request-url ()
-  "Visit the current branch's PR on Github."
-  (interactive)
-  (browse-url
-   (format "https://github.com/%s/pull/new/%s"
-           (replace-regexp-in-string
-            "\\`.+github\\.com:\\(.+\\)\\.git\\'" "\\1"
-            (magit-get "remote"
-                       (magit-get-current-remote)
-                       "url"))
-           (magit-get-current-branch))))
-
-(eval-after-load 'magit
-  '(define-key magit-mode-map "v"
-     #'skx/visit-pull-request-url))
 ```
 
 
