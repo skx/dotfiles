@@ -578,17 +578,20 @@ Beyond the basic support for golang installed via that mode I've also configured
 (use-package-straight lsp-mode)
 (use-package-straight lsp-ui)
 
-
-
 (use-package-straight yasnippet
   :defer 2
   :config
+    (setq yas-prompt-functions '(yas-ido-prompt))
     (yas-global-mode 1)
-  :init
-    (yas-reload-all))
+    (yas-reload-all)
+)
+
 
 (use-package-straight yasnippet-snippets
-  :defer 2)
+  :defer 2
+  :after yas
+)
+
 ```
 
 
@@ -606,7 +609,6 @@ Once the dependencies are present the following configures LSP, including a help
   (add-hook 'before-save-hook #'lsp-organize-imports t t)
   (local-set-key (kbd "M-.") 'lsp-find-definition)
   (local-set-key (kbd "M-RET")    'pop-tag-mark)
-;  (yas-minor-mode)
 )
 
 ;; Use LSP, and add the hooks for go-mode and python-mode to use it.
