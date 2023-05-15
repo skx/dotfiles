@@ -570,9 +570,22 @@ Beyond the basic support for golang installed via that mode I've also configured
 ```lisp
 ;; install company-mode, via straight
 (use-package-straight company
+  :after yas
   :config
-    (setq company-idle-delay 0)
-    (setq company-minimum-prefix-length 1))
+    (setq
+       company-echo-delay 0
+       company-idle-delay 0.2
+       company-minimum-prefix-length 1
+       company-tooltip-align-annotations t
+       company-tooltip-limit 10
+       company-tooltip-flip-when-above t
+       company-dabbrev-downcase nil
+       company-require-match nil
+       company-begin-commands '(self-insert-command))
+    (global-company-mode 1)
+    (add-to-list 'company-backends 'company-yasnippet)
+   (setq company-backends '((company-capf :with company-yasnippet)))
+  )
 
 ;; Along with the LSP-modes
 (use-package-straight lsp-mode)
