@@ -1635,13 +1635,6 @@ Lisp famously uses a lot of parenthesis, but so does Python, Perl, and many othe
 The following section takes care of setting up other basic and global things the way that I prefer them.
 
 ```lisp
-; mode-line is red for the active buffer, and black for the inactive.
-(set-face-background 'mode-line           "red")
-(set-face-background 'mode-line-inactive  "black")
-
-;; Don't show the percentage (or "All"/"Top"/"Bot") on the mode-line
-(setq mode-line-percent-position nil)
-
 ; Ignore case when completing file names, buffer names,
 ; and completions generally.
 (setq read-file-name-completion-ignore-case t)
@@ -1688,6 +1681,59 @@ The following section takes care of setting up other basic and global things the
 
 ; Text-mode is default mode
 (setq default-major-mode 'text-mode)
+```
+
+
+### User Interface Setup - Mode Line
+
+We'll change the colours here to make things stand out:
+
+```lisp
+(set-face-background 'mode-line           "red")
+(set-face-background 'mode-line-inactive  "black")
+```
+
+We want to remove the percentage display on the mode-line:
+
+```lisp
+;; Don't show the percentage (or "All"/"Top"/"Bot") on the mode-line
+(setq mode-line-percent-position nil)
+```
+
+Finally we'll prevent some minor-modes from cluttering the mode-line, by
+removing their settings from it (by replacing the output with ""):
+
+```lisp
+(defvar clean-mode-line-mode-list
+  (list
+      'auto-revert-mode
+      'company-mode
+      'eldoc-mode
+      'flymake-mode
+      'flyspell-mode
+      'hs-minor-mode
+      'lsp-lens-mode
+      'lsp-mode
+      'visual-line-mode
+      'yas-minor-mode
+      )
+      "This is a list of modes who have their details hidden from the mode-line.")
+
+(defun clean-mode-line-distractions ()
+  "Remove distractions from the mode-line.
+
+  The list of (minor) modes maintained in `clean-mode-line-mode-list' will
+  have their values hidden from the mode-line."
+  (interactive)
+  (loop for cleaner in clean-mode-line-mode-list
+        do (let* ((mode  cleaner)
+                  (old-mode-str (cdr (assq mode minor-mode-alist))))
+             (when old-mode-str
+                 (setcar old-mode-str ""))
+             (when (eq mode major-mode)
+               (setq mode-name mode-str)))))
+
+(add-hook 'after-change-major-mode-hook 'clean-mode-line-distractions)
 ```
 
 
