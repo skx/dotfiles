@@ -1639,6 +1639,9 @@ The following section takes care of setting up other basic and global things the
 (set-face-background 'mode-line           "red")
 (set-face-background 'mode-line-inactive  "black")
 
+;; Don't show the percentage (or "All"/"Top"/"Bot") on the mode-line
+(setq mode-line-percent-position nil)
+
 ; Ignore case when completing file names, buffer names,
 ; and completions generally.
 (setq read-file-name-completion-ignore-case t)
