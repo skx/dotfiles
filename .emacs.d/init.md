@@ -1700,6 +1700,9 @@ We want to remove the percentage display on the mode-line:
 (setq mode-line-percent-position nil)
 ```
 
+
+### User Interface Setup - Mode Line Cleanup
+
 Finally we'll prevent some minor-modes from cluttering the mode-line, by
 removing their settings from it (by replacing the output with ""):
 
@@ -1712,6 +1715,7 @@ removing their settings from it (by replacing the output with ""):
       'flymake-mode
       'flyspell-mode
       'hs-minor-mode
+      'linkifier-mode
       'lsp-lens-mode
       'lsp-mode
       'org-autolist-mode
