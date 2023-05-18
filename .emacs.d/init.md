@@ -1635,10 +1635,9 @@ Lisp famously uses a lot of parenthesis, but so does Python, Perl, and many othe
 The following section takes care of setting up other basic and global things the way that I prefer them.
 
 ```lisp
-;; Show the time on the status bar.
-(setq display-time-24hr-format t)
-(setq display-time-day-and-date t)
-(display-time)
+; mode-line is red for the active buffer, and black for the inactive.
+(set-face-background 'mode-line           "red")
+(set-face-background 'mode-line-inactive  "black")
 
 ; Ignore case when completing file names, buffer names,
 ; and completions generally.
@@ -1646,9 +1645,6 @@ The following section takes care of setting up other basic and global things the
 (setq read-buffer-completion-ignore-case t)
 (setq case-fold-search t)
 (setq completion-ignore-case  t)
-
-;; Show column-numbers too
-(column-number-mode)
 
 ;; Avoid the annoying startup message.
 (setq-default
