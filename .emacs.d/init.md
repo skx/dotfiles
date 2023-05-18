@@ -1709,6 +1709,7 @@ removing their settings from it (by replacing the output with ""):
 ```lisp
 (defvar clean-mode-line-mode-list
   (list
+      'abbrev-mode
       'auto-revert-mode
       'company-mode
       'eldoc-mode
