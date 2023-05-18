@@ -1714,6 +1714,8 @@ removing their settings from it (by replacing the output with ""):
       'hs-minor-mode
       'lsp-lens-mode
       'lsp-mode
+      'org-autolist-mode
+      'org-indent-mode
       'visual-line-mode
       'yas-minor-mode
       )
@@ -1725,14 +1727,16 @@ removing their settings from it (by replacing the output with ""):
   The list of (minor) modes maintained in `clean-mode-line-mode-list' will
   have their values hidden from the mode-line."
   (interactive)
-  (loop for cleaner in clean-mode-line-mode-list
-        do (let* ((mode  cleaner)
-                  (old-mode-str (cdr (assq mode minor-mode-alist))))
-             (when old-mode-str
-                 (setcar old-mode-str ""))
-             (when (eq mode major-mode)
-               (setq mode-name mode-str)))))
+  (mapc
+    (lambda (mode)
+       (let* ((old-mode-str (cdr (assq mode minor-mode-alist))))
+           (when old-mode-str
+              (setcar old-mode-str ""))
+           (when (eq mode major-mode)
+              (setq mode-name mode-str))))
+   clean-mode-line-mode-list))
 
+; (clean-mode-line-distractions)
 (add-hook 'after-change-major-mode-hook 'clean-mode-line-distractions)
 ```
 
