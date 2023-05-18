@@ -136,11 +136,10 @@ This allows finding the packages we load remotely via a grep for `use-package-st
 
 On Unix systems the emacs process inherits the shell environment which was used to start it up.
 
-On MacOS there are some niggles, so we resolve those here:
+On MacOS there are some niggles, and a similar problem occurs upon GNU/Linux if you launch Emacs from the GNOME menu:
 
 ```lisp
 (use-package exec-path-from-shell
-   :if (eq system-type 'darwin)
    :config
    (exec-path-from-shell-initialize))
 ```
