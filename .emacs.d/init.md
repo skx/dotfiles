@@ -1704,7 +1704,14 @@ We want to remove the percentage display on the mode-line:
 ### User Interface Setup - Mode Line Cleanup
 
 Finally we'll prevent some minor-modes from cluttering the mode-line, by
-removing their settings from it (by replacing the output with ""):
+removing their settings from it (by replacing the output with "").
+
+There are two approaches here:
+
+* Remove only the minor-modes given in a list.
+* Remove **all** minor-mode decorations.
+
+We default to the second, but allow the first for reference:
 
 ```lisp
 (defvar clean-mode-line-mode-list
@@ -1726,11 +1733,28 @@ removing their settings from it (by replacing the output with ""):
       )
       "This is a list of modes who have their details hidden from the mode-line.")
 
+(defvar clean-mode-line-hide-all-minor
+   t
+   "If this value is set to true ALL minor-modes will be hidden from the mode-line, rather than only the modes listed in `clean-mode-line-mode-list'")
+
+(defun minor-modes-active ()
+  "Get a list of which minor modes are enabled in the current buffer."
+  (let ($list)
+    (mapc (lambda ($mode)
+            (condition-case nil
+                (if (and (symbolp $mode) (symbol-value $mode))
+                    (setq $list (cons $mode $list)))
+              (error nil)))
+          minor-mode-list)
+    (sort $list 'string<)))
+
 (defun clean-mode-line-distractions ()
   "Remove distractions from the mode-line.
 
-  The list of (minor) modes maintained in `clean-mode-line-mode-list' will
-  have their values hidden from the mode-line."
+Either all minor modes will be hidden, if `clean-mode-line-hid-all-minor' is
+set to a true value, or only those modes which are listed in  `clean-mode-line-mode-list' will removed.
+
+When we say 'removed' we mean that their mode string will be set to ''."
   (interactive)
   (mapc
     (lambda (mode)
@@ -1739,9 +1763,10 @@ removing their settings from it (by replacing the output with ""):
               (setcar old-mode-str ""))
            (when (eq mode major-mode)
               (setq mode-name mode-str))))
-   clean-mode-line-mode-list))
+              (if clean-mode-line-hide-all-minor
+                 (minor-modes-active)
+                 clean-mode-line-mode-list)))
 
-; (clean-mode-line-distractions)
 (add-hook 'after-change-major-mode-hook 'clean-mode-line-distractions)
 ```
 
