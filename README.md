@@ -34,6 +34,7 @@ Some specific files are highlighted in this summary, but it's worth taking a pea
   * [tools/vertical-space-cleanup.el](.emacs.d/tools/vertical-space-cleanup.el) - Enforce consistent whitespace breaks before headers in markdown and org-mode files.
   * [tools/resync-packages.el](.emacs.d/tools/resync-packages.el) - Update our bundled packages from their upstream locations
 * [User interface](.emacs.d/ui)
+  * [ui/mode-line-major.el](.emacs.d/ui/mode-line-major.el) - Hide all minor-modes from the mode-line.
   * [ui/my-todo.el](.emacs.d/ui/my-todo.el) - Highlight TODO-comments.
   * [ui/linkifier.el](.emacs.d/ui/linkifier.el) - Turn text matching regular expressions into links/buttons.
 * [Unix stuff](.emacs.d/unix)
