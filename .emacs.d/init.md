@@ -491,7 +491,9 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
 ;; Markdown
 (use-package markdown-mode
   :defer 2
-  :mode (("\\.md\\'" . markdown-mode)
+  :commands (markdown-mode gfm-mode)
+  :mode  (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode)))
 
 ;; Puppet
@@ -806,6 +808,23 @@ The following section of code lets us select a region and run `M-=` to align the
 (defun align-equals (begin end)
   (interactive "r")
   (align-regexp begin end "\\(\\s-*\\)=" 1 1))
+```
+
+
+
+## Link Following
+
+The following allows following links, via RET, in all text/programming modes.
+
+This is particularly useful for Markdown mode, and similar, where you'd otherwise want to use `C-c C-o`:
+
+```link
+(use-package goto-addr
+  :bind
+  (:map goto-address-highlight-keymap
+        ("RET" . goto-address-at-point))
+  :hook ((prog-mode . goto-address-prog-mode)
+         (text-mode . goto-address-mode)))
 ```
 
 
