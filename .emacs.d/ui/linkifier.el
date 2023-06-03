@@ -1,4 +1,4 @@
-;;; linkifier.el --- Convert text into clickable links, by regexp
+;;; linkifier.el --- Convert text into clickable links, via regexp
 
 ;;
 ;; Copyright (C) 2023 Steve Kemp
@@ -73,7 +73,25 @@
 ;;  0.3 - Fixed warnings
 ;;          .emacs.d/ui/linkifier.el: Warning: ‘loop’ is an obsolete alias (as of 27.1); use ‘cl-loop’ instead.
 ;;          .emacs.d/ui/linkifier.el: Warning: Use keywords rather than deprecated positional arguments to `define-minor-mode'
-
+;;
+;;
+;;
+;; UPDATE
+;;
+;;
+;; Alternatives - This whole package could be replaced by `bug-reference-mode':
+;;
+;;    ; How to find the bug reference in text
+;;    (setq bug-reference-bug-regexp "\\(Trac-\\([0-9]+\\)\\)")
+;;
+;;    ; How to build bug-tracker URL
+;;    (setq bug-reference-url-format "https://trac.edgewall.org/ticket/%s")
+;;
+;;    ; Enable bug-reference parsing in prog buffers
+;;    (add-hook 'prog-mode-hook #'bug-reference-prog-mode)
+;;
+;;
+;;
 
 ;; The default is nil as the destinations and patterns are entirely
 ;; site & user-specific.
