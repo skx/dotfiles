@@ -37,3 +37,6 @@ go install github.com/tomnomnom/gron@latest
 
 # Terraform linter
 go install github.com/terraform-linters/tflint@latest
+
+# AWS SSO helper
+go install github.com/theurichde/go-aws-sso/cmd/go-aws-sso@main
