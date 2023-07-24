@@ -6,6 +6,10 @@ export PATH=$HOME/Repos/github.com/skx/dotfiles/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
 export PATH=$HOME/bin:$PATH
 
+#
+# Avoid homebrew cleanup, so we keep old things around.
+#
+export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 #
 # Setup TAB-completion for ZSH
@@ -16,6 +20,15 @@ then
   autoload -Uz compinit
   compinit
 fi
+
+#
+# Also setup atuin for shell-history
+#
+if type atuin &>/dev/null
+then
+  eval "$(atuin init zsh --disable-up-arrow)"
+fi
+
 
 #
 # We need to configure the use of plugins for the pass password-manager.
@@ -66,4 +79,3 @@ select-word-style bash
 # Ensure the comment-character works in interactive sessions.
 #
 setopt interactivecomments
-
