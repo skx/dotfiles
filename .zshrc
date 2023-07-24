@@ -2,7 +2,6 @@
 # Ensure we find ~/bin and the homebrew utilities
 #
 export PATH=/opt/homebrew/bin:$PATH
-export PATH=/opt/homebrew/opt/mysql-client/bin:$PATH
 export PATH=$HOME/Repos/github.com/skx/dotfiles/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
 export PATH=$HOME/bin:$PATH
@@ -14,7 +13,6 @@ export PATH=$HOME/bin:$PATH
 if type brew &>/dev/null
 then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-
   autoload -Uz compinit
   compinit
 fi
