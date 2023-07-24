@@ -12,17 +12,22 @@ export PATH=$HOME/bin:$PATH
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 #
-# Setup TAB-completion for ZSH
+# If homebrew is installed ensure that it is used.
 #
 if type brew &>/dev/null
 then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-  autoload -Uz compinit
-  compinit
 fi
 
 #
-# Also setup atuin for shell-history
+# Load the completion for ZSH, along with the bash compatibility
+#
+autoload -U +X compinit     && compinit
+autoload -U +X bashcompinit && bashcompinit
+
+
+#
+# I use atuin for shell-history
 #
 if type atuin &>/dev/null
 then
