@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# Show the top-level of the repository.
+#
+
+git rev-parse --show-toplevel
