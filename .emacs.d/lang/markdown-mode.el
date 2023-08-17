@@ -7,7 +7,7 @@
 ;; Maintainer: Jason R. Blevins <jblevins@xbeta.org>
 ;; Created: May 24, 2007
 ;; Version: 2.6-alpha
-;; Package-Requires: ((emacs "26.1"))
+;; Package-Requires: ((emacs "27.1"))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: https://jblevins.org/projects/markdown-mode/
 
@@ -704,7 +704,7 @@ Group 7 matches the title (optional).
 Group 8 matches the closing parenthesis.")
 
 (defconst markdown-regex-link-reference
-  "\\(?1:!\\)?\\(?2:\\[\\)\\(?3:[^]^][^]]*\\|\\)\\(?4:\\]\\)[ ]?\\(?5:\\[\\)\\(?6:[^]]*?\\)\\(?7:\\]\\)"
+  "\\(?1:!\\)?\\(?2:\\[\\)\\(?3:[^]^][^]]*\\|\\)\\(?4:\\]\\)\\(?5:\\[\\)\\(?6:[^]]*?\\)\\(?7:\\]\\)"
   "Regular expression for a reference link [text][id].
 Group 1 matches the leading exclamation point (optional).
 Group 2 matches the opening square bracket for the link text.
@@ -732,7 +732,7 @@ Group 2 matches only the label, without the surrounding markup.
 Group 3 matches the closing square bracket.")
 
 (defconst markdown-regex-header
-  "^\\(?:\\(?1:[^\r\n\t -].*\\)\n\\(?:\\(?2:=+\\)\\|\\(?3:-+\\)\\)\\|\\(?4:#+[ \t]+\\)\\(?5:.*?\\)\\(?6:[ \t]*#*\\)\\)$"
+  "^\\(?:\\(?1:[^\r\n\t -].*\\)\n\\(?:\\(?2:=+\\)\\|\\(?3:-+\\)\\)\\|\\(?4:#+[ \t]+\\)\\(?5:.*?\\)\\(?6:[ \t]+#+\\)?\\)$"
   "Regexp identifying Markdown headings.
 Group 1 matches the text of a setext heading.
 Group 2 matches the underline of a level-1 setext heading.
@@ -3483,17 +3483,30 @@ SEQ may be an atom or a sequence."
                    (add-text-properties
                     (match-beginning 3) (match-end 3) rule-props)))
         ;; atx heading
-        (if markdown-fontify-whole-heading-line
-            (let ((header-end (min (point-max) (1+ (match-end 0)))))
-              (add-text-properties
-               (match-beginning 0) header-end heading-props))
+        (let ((header-end
+               (if markdown-fontify-whole-heading-line
+                   (min (point-max) (1+ (match-end 0)))
+                 (match-end 0))))
           (add-text-properties
            (match-beginning 4) (match-end 4) left-markup-props)
-          (add-text-properties
-           (match-beginning 5) (match-end 5) heading-props)
-          (when (match-end 6)
+
+          ;; If closing tag is present
+          (if (match-end 6)
+              (progn
+                (if markdown-hide-markup
+                    (progn
+                      (add-text-properties
+                       (match-beginning 5) header-end heading-props)
+                      (add-text-properties
+                       (match-beginning 6) (match-end 6) right-markup-props))
+                  (add-text-properties
+                   (match-beginning 5) (match-end 5) heading-props)
+                  (add-text-properties
+                   (match-beginning 6) header-end right-markup-props)))
+            ;; If closing tag is not present
             (add-text-properties
-             (match-beginning 6) (match-end 6) right-markup-props)))))
+             (match-beginning 5) header-end heading-props))
+          )))
     t))
 
 (defun markdown-fontify-tables (last)
@@ -4592,7 +4605,7 @@ at the beginning of the block."
 (defun markdown-insert-foldable-block ()
   "Insert details disclosure element to make content foldable.
 If a region is active, wrap this region with the disclosure
-element. More detais here https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details."
+element. More details here https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details."
   (interactive)
   (let ((details-open-tag "<details>")
         (details-close-tag "</details>")
@@ -5053,9 +5066,10 @@ list simply adds a blank line)."
                (setq bounds (markdown-cur-list-item-bounds)))
           (let ((beg (cl-first bounds))
                 (end (cl-second bounds))
-                (length (cl-fourth bounds)))
+                (nonlist-indent (cl-fourth bounds))
+                (checkbox (cl-sixth bounds)))
             ;; Point is in a list item
-            (if (= (- end beg) length)
+            (if (= (- end beg) (+ nonlist-indent (length checkbox)))
                 ;; Delete blank list
                 (progn
                   (delete-region beg end)
@@ -8829,10 +8843,16 @@ LANG is a string, and the returned major mode is a symbol."
 (defun markdown--lang-mode-predicate (mode)
   (and mode
        (fboundp mode)
-       ;; https://github.com/jrblevin/markdown-mode/issues/761
-       (cl-loop for pair in auto-mode-alist
-                for func = (cdr pair)
-                thereis (and (atom func) (eq mode func)))))
+       (or
+        ;; https://github.com/jrblevin/markdown-mode/issues/787
+        ;; major-mode-remap-alist was introduced at Emacs 29.1
+        (cl-loop for pair in (bound-and-true-p major-mode-remap-alist)
+                 for func = (cdr pair)
+                 thereis (and (atom func) (eq mode func)))
+        ;; https://github.com/jrblevin/markdown-mode/issues/761
+        (cl-loop for pair in auto-mode-alist
+                 for func = (cdr pair)
+                 thereis (and (atom func) (eq mode func))))))
 
 (defun markdown-fontify-code-blocks-generic (matcher last)
   "Add text properties to next code block from point to LAST.
@@ -9734,8 +9754,8 @@ spaces, or alternatively a TAB should be used as the separator."
 Optional arguments ROWS, COLUMNS, and ALIGN specify number of
 rows and columns and the column alignment."
   (interactive)
-  (let* ((rows (or rows (string-to-number (read-string "Row size: "))))
-         (columns (or columns (string-to-number (read-string "Column size: "))))
+  (let* ((rows (or rows (read-number "Number of Rows: ")))
+         (columns (or columns (read-number "Number of Columns: ")))
          (align (or align (read-string "Alignment ([l]eft, [r]ight, [c]enter, or RET for default): ")))
          (align (cond ((equal align "l") ":--")
                       ((equal align "r") "--:")
