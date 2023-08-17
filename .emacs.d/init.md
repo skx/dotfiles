@@ -301,8 +301,8 @@ When `ido-ignore-extensions` is set to a true value then files are ignored from 
 
 ```lisp
 (dolist (suffix
-  '(".pdf" ".txt" ".last")
-     (push completion-ignored-extensions suffix)))
+  '(".pdf" ".txt" ".last"))
+     (push suffix completion-ignored-extensions))
 ```
 
 In addition to the completion provided by `ido` above we can also help ourselves by making "M-x ..:" easier to use, via smex:
@@ -1036,6 +1036,9 @@ Now we're done with the general setup so we'll handle the more specific agenda t
     ;; Our agenda-view will span two weeks by default.
     (org-agenda-span 14)
 
+    ;; Don't split the window use the full frame
+    (org-agenda-window-setup 'only-window)
+
     ;; But the agenda will start on the current day.
     (org-agenda-start-on-weekday nil)
 
@@ -1089,6 +1092,13 @@ Since we're living in the future we can use `org-mouse` for checking boxes, etc:
   :defer 2
   :after org)
 ```
+
+
+### Org-Mode Contacts
+
+This is something I'm testing out:
+
+* https://github.com/someguynamedmatt/rolodex.org/blob/master/rolodex.el
 
 
 ### Org-Mode Code Execution
