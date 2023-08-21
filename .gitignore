@@ -11,7 +11,10 @@
 
 # Don't ignore emacs configuration
 !.emacs.d/
-.emacs.d/auto-save-list/
+.emacs.d/org-persist
+.emacs.d/straight/
+.emacs.d/transient/
+.emacs.d/.lsp-session-v1
 
 # Don't ignore the MySQL config file
 !.my.cnf
