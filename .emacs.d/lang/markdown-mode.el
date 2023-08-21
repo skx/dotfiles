@@ -1317,6 +1317,7 @@ giving the bounds of the current and parent list items."
                           (not (eobp)))
                 (forward-line))
               (skip-syntax-backward "-")
+              (forward-line)
               (setq close (point)))
              ;; If current line has a list marker, update levels, move to end of block
              ((looking-at markdown-regex-list)
@@ -4665,6 +4666,7 @@ element. More details here https://developer.mozilla.org/en-US/docs/Web/HTML/Ele
   (interactive)
   (let ((fn (markdown-footnote-counter-inc)))
     (insert (format "[^%d]" fn))
+    (push-mark (point) t)
     (markdown-footnote-text-find-new-location)
     (markdown-ensure-blank-line-before)
     (unless (markdown-cur-line-blank-p)
