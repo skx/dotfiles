@@ -253,12 +253,30 @@ switch to the list immediately:
 ```lisp
 (setq calendar-week-start-day 1
       calendar-day-name-array
-      ["sunnuntai" "maanantai" "tiistai" "keskiviikko"
-      "torstai" "perjantai" "lauantai"]
+      [
+          "Sunnuntai"
+          "Maanantai"
+          "Tiistai"
+          "Keskiviikko"
+          "Torstai"
+          "Perjantai"
+          "Lauantai"
+      ]
       calendar-month-name-array
-      ["tammikuu" "helmikuu" "maaliskuu" "huhtikuu" "toukokuu"
-      "kesäkuu" "heinäkuu" "elokuu" "syyskuu"
-      "lokakuu" "marraskuu" "joulukuu"])
+      [
+          "Tammikuu[JAN)"
+          "Helmikuu(FEB)"
+          "Maaliskuu(MAR)"
+          "Huhtikuu(APR)"
+          "Toukokuu(MAY)"
+          "Kesäkuu(JUN)"
+          "Heinäkuu(JUL)"
+          "Elokuu(AUG)"
+          "Syyskuu(SEP)"
+          "Lokakuu(OCT)"
+          "Marraskuu(NOV)"
+          "Joulukuu(DEC)"
+      ])
 
 (add-hook 'calendar-load-hook
           (lambda ()
