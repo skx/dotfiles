@@ -485,17 +485,10 @@ Most of the time I spend in Emacs is for developing, and writing code.
 
 Code I write tends to be in some combination of Lua, Ruby, Perl, Go, or C++.
 
-In addition to _real_ programming languages I also use [CFEngine](http://cfengine.com/) and [Puppet](https://puppetlabs.com/) for automation - so I load modes for those too.
-
 **Note** The updates to `auto-mode-alist` end with `\\'`, which matches the end of the string (i.e. filename).  You might expect to see that written as "`.txt$`", but that would not be exactly the same, for filenames that contain a newline.  (`$` would match the newline, but `'` would match the end of the filename itself).
 
 
 ```lisp
-;; CFEngine
-(use-package cfengine
-  :defer 2
-  :mode ("\\.cf\\'" . cfengine-automode))
-
 ;; Lua
 (use-package lua-mode
   :defer 2
@@ -508,11 +501,6 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
   :mode  (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode)))
-
-;; Puppet
-(use-package puppet-mode
-  :defer 2
-  :mode ("\\.pp$" . puppet-mode))
 
 ;; Ruby
 (use-package ruby-mode

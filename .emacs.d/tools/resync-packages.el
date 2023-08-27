@@ -14,14 +14,12 @@
 
 (setq resync/package-list
       '(
-        ("~/.emacs.d/lang/cfengine.el"              . "https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el")
         ("~/.emacs.d/lang/dockerfile-mode.el"       . "https://raw.githubusercontent.com/spotify/dockerfile-mode/master/dockerfile-mode.el")
         ("~/.emacs.d/lang/go-mode.el"               . "https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode.el")
         ("~/.emacs.d/lang/hcl-mode.el"              . "https://raw.githubusercontent.com/syohex/emacs-hcl-mode/master/hcl-mode.el")
         ("~/.emacs.d/lang/lua-mode.el"              . "https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el")
         ("~/.emacs.d/lang/markdown-mode.el"         . "https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el")
         ("~/.emacs.d/lang/monkey.el"                . "https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el")
-        ("~/.emacs.d/lang/puppet-mode.el"           . "https://raw.githubusercontent.com/voxpupuli/puppet-mode/master/puppet-mode.el")
         ("~/.emacs.d/lang/terraform-mode.el"        . "https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el")
         ("~/.emacs.d/lang/web-mode.el"              . "https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el")
         ("~/.emacs.d/lang/yaml-mode.el"             . "https://raw.githubusercontent.com/yoshiki/yaml-mode/master/yaml-mode.el")
