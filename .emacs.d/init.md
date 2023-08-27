@@ -496,11 +496,6 @@ In addition to _real_ programming languages I also use [CFEngine](http://cfengin
   :defer 2
   :mode ("\\.cf\\'" . cfengine-automode))
 
-;; Groovy
-(use-package groovy-mode
-  :defer 2
-  :mode ("\\.groovy\\'" . groovy-mode))
-
 ;; Lua
 (use-package lua-mode
   :defer 2

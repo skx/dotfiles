@@ -17,7 +17,6 @@
         ("~/.emacs.d/lang/cfengine.el"              . "https://raw.githubusercontent.com/cfengine/core/master/contrib/cfengine.el")
         ("~/.emacs.d/lang/dockerfile-mode.el"       . "https://raw.githubusercontent.com/spotify/dockerfile-mode/master/dockerfile-mode.el")
         ("~/.emacs.d/lang/go-mode.el"               . "https://raw.githubusercontent.com/dominikh/go-mode.el/master/go-mode.el")
-        ("~/.emacs.d/lang/groovy-mode.el"           . "https://raw.githubusercontent.com/Groovy-Emacs-Modes/groovy-emacs-modes/master/groovy-mode.el")
         ("~/.emacs.d/lang/hcl-mode.el"              . "https://raw.githubusercontent.com/syohex/emacs-hcl-mode/master/hcl-mode.el")
         ("~/.emacs.d/lang/lua-mode.el"              . "https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el")
         ("~/.emacs.d/lang/markdown-mode.el"         . "https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el")
