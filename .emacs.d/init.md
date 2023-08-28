@@ -677,21 +677,25 @@ Note that I also setup [code-folding](#language-mode-helpers---code-folding) lat
 
 ### Language Modes - Python
 
-Here we perform the very minimal Python & LSP setup - the only real facility supported is to fixup the imports on save:
+Here we perform the very minimal Python & LSP setup - however this is only configured if `pylsp` is present upon the system $PATH.
 
 ```lisp
 (use-package python-mode
   :defer 2
+  :if (locate-file "pylsp" exec-path)
   :mode ("\\.py" . python-mode)
   :hook ((python-mode) . lsp-deferred))
 
-
 (defun lsp-python-install-save-hooks ()
+  "When saving the buffer (re)format the imports, and also setup some keybindings"
   (add-hook 'before-save-hook #'lsp-organize-imports t t)
   (local-set-key (kbd "M-.") 'lsp-find-definition)
   (local-set-key (kbd "M-RET")    'pop-tag-mark))
 
-(add-hook 'python-mode-hook #'lsp-python-install-save-hooks)
+;; Only add the hook if pylsp exists.
+(if (locate-file "pylsp" exec-path)
+  (add-hook 'python-mode-hook #'lsp-python-install-save-hooks)
+  (message "pylsp not found, ignoring hook for LSP"))
 ```
 
 Jumping to definitions works at least, once you've installed the tooling:
