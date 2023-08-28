@@ -558,19 +558,9 @@ In emacs-lisp-mode we can enable eldoc-mode to display information about a funct
 
 (Obviously my [dotfiles](https://github.com/skx/dotfiles/) contain a copy of the appropriate files, see the [tools/resync-packages.el](tools/resync-packages.el) library which is what copies it from the upstream source into _this_ repository.)
 
-Once installed we can now ensure that the mode is loaded for the editing of `*.go` files:
+The golang setup here is a bit special, because I use the LSP stuff to get completion, etc.  First of all we load that:
 
 ```lisp
-(use-package go-mode
-  :defer 2
-  :mode ("\\.go" . go-mode))
-```
-
-Beyond the basic support for golang installed via that mode I've also configured LSP for this language, which provides smart completion & etc.
-
-
-```lisp
-;; install company-mode, via straight
 (use-package-straight company
   :after yas
   :config
@@ -593,49 +583,41 @@ Beyond the basic support for golang installed via that mode I've also configured
 (use-package-straight lsp-mode)
 (use-package-straight lsp-ui)
 
+(use-package lsp-mode
+  :config
+    (setq lsp-auto-guess-root t))
+
 (use-package-straight yasnippet
   :defer 2
   :config
     (setq yas-prompt-functions '(yas-ido-prompt))
     (yas-global-mode 1)
-    (yas-reload-all)
-)
-
+    (yas-reload-all))
 
 (use-package-straight yasnippet-snippets
   :defer 2
-  :after yas
-)
+  :after yas)
 
 ```
 
-
-For python:
-
-```sh
-$ sudo apt-get install python3-pyls
-```
-
-Once the dependencies are present the following configures LSP, including a helper to format code on save & etc:
+Once installed we can now ensure that the mode is loaded for the editing of `*.go` files, we also load company-mode and the LSP setup too:
 
 ```lisp
-(defun skx/lsp-setup ()
+(use-package go-mode
+  :defer 2
+  :mode ("\\.go" . go-mode)
+  :hook ((go-mode) . lsp-deferred))
+
+
+;; Set up before-save hooks to format buffer and add/delete imports.
+;; Make sure you don't have other gofmt/goimports hooks enabled.
+(defun lsp-go-install-save-hooks ()
   (add-hook 'before-save-hook #'lsp-format-buffer t t)
   (add-hook 'before-save-hook #'lsp-organize-imports t t)
   (local-set-key (kbd "M-.") 'lsp-find-definition)
-  (local-set-key (kbd "M-RET")    'pop-tag-mark)
-)
+  (local-set-key (kbd "M-RET")    'pop-tag-mark))
 
-;; Use LSP, and add the hooks for go-mode and python-mode to use it.
-(use-package lsp-mode
-  :config
-    (setq lsp-auto-guess-root t)
-    (add-hook 'go-mode-hook     #'skx/lsp-setup)
-    (add-hook 'python-mode-hook #'skx/lsp-setup)
-  :init
-   (setq lsp-keymap-prefix "C-c l")
-  :hook ((go-mode python-mode) . lsp-deferred)
-  )
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 ```
 
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
@@ -691,6 +673,32 @@ I've also created a simple utility package which contains a pair of helpers for 
 ```
 
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
+
+
+### Language Modes - Python
+
+Here we perform the very minimal Python & LSP setup - the only real facility supported is to fixup the imports on save:
+
+```lisp
+(use-package python-mode
+  :defer 2
+  :mode ("\\.py" . python-mode)
+  :hook ((python-mode) . lsp-deferred))
+
+
+(defun lsp-python-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-organize-imports t t)
+  (local-set-key (kbd "M-.") 'lsp-find-definition)
+  (local-set-key (kbd "M-RET")    'pop-tag-mark))
+
+(add-hook 'python-mode-hook #'lsp-python-install-save-hooks)
+```
+
+Jumping to definitions works at least, once you've installed the tooling:
+
+```sh
+% pip3 install python-lsp-server
+```
 
 
 ### Language Modes - Web Mode
@@ -1233,6 +1241,7 @@ I put together a simple tag-cloud helper package, which we'll now load:
 ```lisp
 (use-package org-tag-cloud
   :after org
+  :disabled
   :defer 2
   :config
    (add-hook 'org-mode-hook 'skx-org-mode-hook-eval-ok))
