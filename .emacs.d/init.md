@@ -30,6 +30,20 @@ We use `use-package` to configure/load packages where possible, and we've config
 
 
 
+## System Information
+
+The following section defines some constants relating to the local system, they might be useful in the future.
+
+```lisp
+(defconst EMACS29+   (> emacs-major-version 28))
+(defconst IS-MAC     (eq system-type 'darwin))
+(defconst IS-LINUX   (eq system-type 'gnu/linux))
+(defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
+(defconst IS-BSD     (or IS-MAC (eq system-type 'berkeley-unix)))
+```
+
+
+
 ## Initial Functions
 
 We want to operate as a server, so we'll make sure that we start that before we go any further - of course if it is already running then we skip it:
@@ -83,16 +97,20 @@ TLDR:
 
 
 ```lisp
-;; configure error-handling
+;; configure error-handling for use-package, before we load it.
 (setq use-package-verbose t
       use-package-expand-minimally nil
       use-package-compute-statistics t
       debug-on-error t)
 
-;; load use-package
-(straight-use-package 'use-package)
+;;
+;; load use-package - unless it is already available
+;; (Because Emacs 29.x includes it natively.)
+;;
+(unless (package-installed-p 'use-package)
+  (straight-use-package 'use-package))
 
-;; And ensure that straight is loaded
+;; And ensure that straight is loaded by the use-package library.
 (use-package straight)
 ```
 
@@ -363,7 +381,7 @@ Emacs has a built-in file/directory browser which is available via `M-x dired`, 
 On MacOS I see issues with the display of directory listing, which are resolved like so:
 
 ```lisp
-(when (string= system-type "darwin")
+(if IS-MAC
   (setq dired-use-ls-dired nil))
 ```
 
