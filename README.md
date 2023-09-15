@@ -110,3 +110,10 @@ If you're curious you can see other files that are being ignored:
 If you ever want to restore the file:
 
     $ .DOTFILES update-index --no-assume-unchanged README.md
+
+
+# Seeing Local Files
+
+Because this repository uses `.gitignore` to ignore all files that are not explicitly added it can be hard to spot files that you _do_ want to be tracked.
+
+Remember to use `.DOTFILES status --ignored` to see those :)
