@@ -107,7 +107,7 @@ TLDR:
 ;; load use-package - unless it is already available
 ;; (Because Emacs 29.x includes it natively.)
 ;;
-(unless (package-installed-p 'use-package)
+(unless (and (fboundp 'package-installed-p) (package-installed-p 'use-package))
   (straight-use-package 'use-package))
 
 ;; And ensure that straight is loaded by the use-package library.
