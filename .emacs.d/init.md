@@ -426,6 +426,29 @@ My only other irritation with `dired` is that by default "dotfiles" are shown, I
 ```
 
 
+### NeoTree
+
+[neotree]() presents a navigator for files/directories in a sidebar.
+
+I'm experimenting with it:
+
+```lisp
+(use-package-straight neotree
+  :defer 2
+  :config
+  (setq neo-smart-open t)
+)
+
+(defun skx-neotree()
+  "Open the `neotree' sidebar, showing the directory containing the current buffer."
+  (interactive)
+  (neotree-dir (if buffer-file-name
+    (file-name-directory buffer-file-name)
+  default-directory)))
+
+```
+
+
 
 ## Docker
 
@@ -1895,6 +1918,7 @@ some I've grown accustomed to:
 (define-key steve-mode-map (kbd "C-c i") 'skx-load-init)
 (define-key steve-mode-map (kbd "C-c s") 'skx-scratch-buffer)
 (define-key steve-mode-map (kbd "C-c w") 'skx-load-diary)
+(define-key steve-mode-map (kbd "C-c d") 'skx-neotree)
 
 ;; change sizes
 (define-key steve-mode-map (kbd "C-+") 'text-scale-increase)
