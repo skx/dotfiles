@@ -428,23 +428,28 @@ My only other irritation with `dired` is that by default "dotfiles" are shown, I
 
 ### NeoTree
 
-[neotree]() presents a navigator for files/directories in a sidebar.
+[neotree](https://github.com/jaypei/emacs-neotree) presents a navigator for files/directories in a sidebar.
 
 I'm experimenting with it:
 
 ```lisp
 (use-package-straight neotree
   :defer 2
-  :config
-  (setq neo-smart-open t)
+  :init
+  (setq-default neo-smart-open t)
 )
 
 (defun skx-neotree()
-  "Open the `neotree' sidebar, showing the directory containing the current buffer."
+  "Open the `neotree' sidebar, showing the directory containing the current buffer.
+
+  Since `neo-smart-open' seems to silently fail for me, we also attempt to find the
+  current file when we open the sidebar, and select it manually via `neotree-find'."
   (interactive)
-  (neotree-dir (if buffer-file-name
-    (file-name-directory buffer-file-name)
-  default-directory)))
+  (let* ((dir  (if buffer-file-name (file-name-directory buffer-file-name) default-directory))
+         (file (if buffer-file-name buffer-file-name)))
+      (neotree-dir dir)
+      (if file
+          (neotree-find file))))
 
 ```
 
