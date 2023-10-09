@@ -436,7 +436,8 @@ I'm experimenting with it:
 (use-package-straight neotree
   :defer 2
   :init
-  (setq-default neo-smart-open t)
+  (setq-default neo-smart-open  t
+                neo-autorefresh t)
 )
 
 (defun skx-neotree()
@@ -517,10 +518,11 @@ When using help-functions we want to make their buffers active by default:
 (setq help-window-select t)
 ```
 
-Currently Apropos does not honour this setting, however it will in the future.  For the moment we workaround the problem with this snippet:
+Currently Apropos does not honour this setting, nor does the result of compilation.  Hopefully in the future this will change, for the moment we workaround the issue by making these two functions switch buffer via a mode-hook:
 
 ```lisp
-(add-hook 'apropos-mode-hook (lambda () (pop-to-buffer (current-buffer))))
+(dolist (mode-hook '(apropos-mode-hook compilation-mode-hook))
+  (add-hook mode-hook (lambda ()  (pop-to-buffer (current-buffer)))))
 ```
 
 
