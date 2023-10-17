@@ -446,11 +446,15 @@ I'm experimenting with it:
   Since `neo-smart-open' seems to silently fail for me, we also attempt to find the
   current file when we open the sidebar, and select it manually via `neotree-find'."
   (interactive)
+
   (let* ((dir  (if buffer-file-name (file-name-directory buffer-file-name) default-directory))
          (file (if buffer-file-name buffer-file-name)))
-      (neotree-dir dir)
-      (if file
-          (neotree-find file))))
+     (if (neo-global--window-exists-p)
+      (neotree-hide)
+      (progn
+          (neotree-dir dir)
+          (if file
+              (neotree-find file))))))
 
 ```
 

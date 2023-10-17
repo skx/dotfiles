@@ -39,6 +39,15 @@ execute directly."
                 (eval-region l (match-beginning 0))))))
     (message "Skipping file that doesn't exist %s" path)))
 
+;; Record our start time
+(defconst skx/startup-begin (float-time))
 
 ;; Load the global-file markdown file.
 (load-markdown-init "~/.emacs.d/init.md")
+
+;; Record the end of our startup time
+(defconst skx/startup-end (float-time))
+
+;; Show the duration
+(defconst skx/startup-duration (- skx/startup-end skx/startup-begin))
+(message "[Emacs startup duration %.2f seconds]" skx/startup-duration)
