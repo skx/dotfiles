@@ -13,6 +13,9 @@ go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
 go install honnef.co/go/tools/cmd/staticcheck@latest
 go install golang.org/x/vuln/cmd/govulncheck@latest
 go install github.com/skx/alphavet/cmd/alphavet@latest
+go install github.com/quasilyte/go-consistent@latest
+go install github.com/timakin/bodyclose@latest
+go install github.com/ryanrolds/sqlclosecheck@latest
 
 # my tools
 go install github.com/skx/aws-utils@latest
