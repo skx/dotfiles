@@ -2,7 +2,7 @@
 
 ;; Copyright 2011-2023 François-Xavier Bois
 
-;; Version: 17.3.9
+;; Version: 17.3.15
 ;; Author: François-Xavier Bois
 ;; Maintainer: François-Xavier Bois <fxbois@gmail.com>
 ;; Package-Requires: ((emacs "23.1"))
@@ -23,7 +23,7 @@
 
 ;;---- CONSTS ------------------------------------------------------------------
 
-(defconst web-mode-version "17.3.9"
+(defconst web-mode-version "17.3.15"
   "Web Mode version.")
 
 ;;---- GROUPS ------------------------------------------------------------------
@@ -370,18 +370,20 @@ by a li open tag is valid)."
 
 ;; https://developer.mozilla.org/en-US/docs/Web/HTML/Element
 (defcustom web-mode-tag-list
-  '("html" "base" "head" "link" "meta" "style" "title" "body" "address"
-    "article" "aside" "footer" "header" "h1" "h2" "h3" "h4" "h5" "h6" "main"
-    "nav" "section" "blockquote" "dd" "div" "dl" "dt" "figcaption" "figure"
-    "hr" "li" "menu" "ol" "p" "pre" "ula" "a" "abbr" "b" "bdi" "bdo" "br"
-    "cite" "code" "data" "dfn" "em" "i" "kbdmark" "q" "rp" "rt" "ruby" "s"
-    "samp" "small" "span" "strong" "sub" "sup" "time" "u" "var" "wbr" "area"
-    "audio" "img" "map" "track" "video" "embed" "iframe" "object" "picture"
-    "portal" "source" "svg" "math" "canvas" "noscript" "script" "del" "ins"
-    "caption" "col" "colgroup" "table" "tbody" "td" "tfoot" "th" "thead" "tr"
-    "button" "datalist" "fieldset" "form" "input" "label" "legend" "meter"
-    "optgroup" "option" "output" "progress" "select" "textarea" "details"
-    "dialog" "summary" "slot" "template")
+  '("a" "abbr" "address" "area" "article" "aside" "audio" "b"
+    "base" "bdi" "bdo" "blockquote" "body" "br" "button" "canvas"
+    "caption" "cite" "code" "col" "colgroup" "data" "datalist"
+    "dd" "del" "details" "dfn" "dialog" "div" "dl" "dt" "em"
+    "embed" "fieldset" "figcaption" "figure" "footer" "form" "h1"
+    "h2" "h3" "h4" "h5" "h6" "head" "header" "hgroup" "hr" "html"
+    "i" "iframe" "img" "input" "ins" "kbd" "label" "legend" "li"
+    "link" "main" "map" "mark" "math" "menu" "meta" "meter" "nav"
+    "noscript" "object" "ol" "optgroup" "option" "output" "p"
+    "picture" "pre" "progress" "q" "rp" "rt" "ruby" "s" "samp"
+    "script" "search" "section" "select" "slot" "small" "source"
+    "span" "strong" "style" "sub" "summary" "sup" "svg" "table"
+    "tbody" "td" "template" "textarea" "tfoot" "th" "thead" "time"
+    "title" "tr" "track" "u" "ul" "var" "video" "wbr")
   "HTML tags used for completion."
   :type '(repeat string)
   :group 'web-mode)
@@ -1390,7 +1392,7 @@ For example,
   (list
    '("antlers"     . "\"\\|'")
    '("artanis"     . "\"\\|#|\\|;")
-   '("asp"         . "//\\|/\\*\\|\"\\|''")
+   '("asp"         . "//\\|/\\*\\|\"\\|'")
    '("ejs"         . "//\\|/\\*\\|\"\\|'")
    '("erb"         . "\"\\|'\\|#\\|<<[-]?['\"]?\\([[:alnum:]_]+\\)['\"]?")
    '("lsp"         . "\"\\|#|\\|;")
@@ -1594,7 +1596,7 @@ shouldn't be moved back.)")
       "STR_PAD_LEFT" "STR_PAD_RIGHT"
       "ENT_COMPAT" "ENT_QUOTES" "ENT_NOQUOTES" "ENT_IGNORE"
       "ENT_SUBSTITUTE" "ENT_DISALLOWED" "ENT_HTML401" "ENT_XML1"
-      "ENT_XHTML" "ENT_HTML5" "JSON_PRETTY_PRINT"
+      "ENT_XHTML" "ENT_HTML5" "JSON_PRETTY_PRINT" "JSON_UNESCAPED_SLASHES"
       "LIBXML_NOBLANKS"))))
 
 (defvar web-mode-php-keywords
@@ -3687,13 +3689,14 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
                     delim-close "}}"))
              ((looking-at-p "[[:alnum:]]+\\.[[:alpha:]]+")
               )
-             ((looking-at-p "[[:alnum:]]+(")
-              (setq closing-string ")"
-                    delim-open "@"))
              ((string= sub1 "@")
               (setq closing-string "EOB"
                     delim-open "@"))
+             ((looking-at-p "[[:alnum:]]+(")
+              (setq closing-string ")"
+                    delim-open "@"))
              )
+           ;;(message "closing-string=%S delim-open=%S delim-close=%S" closing-string delim-open delim-close)
            ) ;blade
 
           ((string= web-mode-engine "smarty")
@@ -4273,9 +4276,47 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
     pos))
 
 (defun web-mode-blade-skip (pos)
-  (goto-char pos)
-  (forward-char)
-  (skip-chars-forward "a-zA-Z0-9_-"))
+  (let (regexp char inc continue found (reg-beg pos) (reg-end (point-max)))
+    (goto-char pos)
+    (forward-char)
+    (skip-chars-forward "a-zA-Z0-9_-")
+    (when (eq (char-after) ?\()
+      (setq regexp "[\"'()]"
+            inc 0)
+      (while (and (not found) (re-search-forward regexp reg-end t))
+        (setq char (char-before))
+        ;;(message "pos=%S char=%c" (point) char)
+        (cond
+         ((eq char ?\()
+          (setq inc (1+ inc)))
+         ((eq char ?\))
+          (cond
+           ((and (not (eobp))
+                (eq (char-after) ?\))
+                (< inc 2))
+            (forward-char)
+            (setq found t)
+            )
+           ((> inc 0)
+            (setq inc (1- inc)))
+           )
+          )
+         ((eq char ?\')
+          (setq continue t)
+          (while (and continue (search-forward "'" reg-end t))
+            (setq continue (web-mode-string-continue-p reg-beg))
+            )
+          )
+         ((eq char ?\")
+          (setq continue t)
+          (while (and continue (search-forward "\"" reg-end t))
+            (setq continue (web-mode-string-continue-p reg-beg))
+            )
+          )
+         ) ;cond
+        ) ;while
+    ) ; when
+  ))
 
 (defun web-mode-velocity-skip (pos)
   (goto-char pos)
@@ -4605,7 +4646,7 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
 
       ((and (string= web-mode-engine "asp")
             (string= sub2 "<%"))
-       (setq regexp "//\\|/\\*\\|\"\\|''")
+       (setq regexp "//\\|/\\*\\|\"\\|'")
        ) ;asp
 
       ((string= web-mode-engine "aspx")
@@ -4756,7 +4797,7 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
               char (aref match 0))
         (cond
 
-          ((and (string= web-mode-engine "asp") (string= match "''"))
+          ((and (string= web-mode-engine "asp") (string= match "'"))
            (goto-char token-end))
 
           ((and (string= web-mode-engine "razor") (eq char ?\'))
@@ -5638,6 +5679,9 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
          (setq attrs (+ attrs (web-mode-attr-scan pos state char name-beg name-end val-beg attr-flags equal-offset tag-flags)))
          )
 
+        ((and (or (= state 0) (= state 1)) (get-text-property pos 'block-side))
+         )
+
         ((or (and (= state 8) (not (member char '(?\" ?\\))))
              (and (= state 7) (not (member char '(?\' ?\\))))
              (and (= state 9) (not (member char '(?} ?\\))))
@@ -5829,7 +5873,7 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
 
         ) ;cond
 
-      ;;(message "point(%S) end(%S) state(%S) c(%S) name-beg(%S) name-end(%S) val-beg(%S) attr-flags(%S) equal-offset(%S)" pos end state char name-beg name-end val-beg attr-flags equal-offset tag-flags)
+      ;;(message "point(%S) state(%S) c(%S) name-beg(%S) name-end(%S) val-beg(%S) attr-flags(%S) equal-offset(%S)" pos state char name-beg name-end val-beg attr-flags equal-offset tag-flags)
 
       (when (and quoted (>= quoted 2))
         (setq quoted nil))
@@ -7914,8 +7958,102 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
                    'font-lock-face
                    'web-mode-current-column-highlight-face))
 
+(defun web-mode-count-invisible-character-ranges (min max)
+  (interactive "r")
+  (let ((count 0) (current-pos min))
+    (save-excursion
+      (while (<= current-pos max)
+        (goto-char current-pos)
+        (if (get-text-property current-pos 'invisible)
+            (progn
+              (setq count (1+ count))
+              (setq current-pos (1+ current-pos))
+              (while (and (<= current-pos max)
+                          (get-text-property current-pos 'invisible))
+                (setq current-pos (1+ current-pos))))
+          (setq current-pos (1+ current-pos)))))
+    count))
+
 (defun web-mode-column-show ()
-  (let ((index 0) overlay diff column line-to line-from)
+  (let ((index 0) overlay diff column line-to line-from line-delta regions (overlay-skip nil) last-line-no)
+    (web-mode-column-hide)
+    (setq web-mode-enable-current-column-highlight t)
+    (save-mark-and-excursion
+      (back-to-indentation)
+      (setq column (current-column)
+            line-to (web-mode-line-number))
+      (when (and (get-text-property (point) 'tag-beg)
+                 (member (get-text-property (point) 'tag-type) '(start end))
+                 (web-mode-tag-match)
+                 (setq line-from (web-mode-line-number))
+                 (not (= line-from line-to)))
+        (when (> line-from line-to)
+          (let (tmp)
+            (setq tmp line-from)
+            (setq line-from line-to)
+            (setq line-to tmp))
+          ) ;when
+        ;;(message "column(%S) line-from(%S) line-to(%S)" column line-from line-to)
+        (goto-char (point-min))
+        (when (> line-from 1)
+          (forward-line (1- line-from)))
+        ;; Added by JMA
+        (save-mark-and-excursion
+          (let (start-point end-point)
+            (goto-line line-from)
+            (move-to-column column)
+            (setq start-point (point))
+            (goto-line line-to)
+            (move-to-column column)
+            (setq end-point (point))
+            (setq line-delta (count-lines start-point end-point t))
+            (setq line-delta (+ line-delta (web-mode-count-invisible-character-ranges start-point end-point))))
+          (setq line-to (+ line-from (1- line-delta))))
+        ;(message (format "Currently at line: %d" (line-number-at-pos)))
+        (setq last-line-no (line-number-at-pos))
+        ;; end JMA add
+        (while (<= line-from line-to)
+          (setq overlay (web-mode-column-overlay-factory index))
+          (setq diff (- (line-end-position) (point)))
+          (cond
+            ((or (and (= column 0) (= diff 0))
+                 (> column diff))
+             (end-of-line)
+             (move-overlay overlay (point) (point))
+             (overlay-put overlay
+                          'after-string
+                          (concat
+                           (if (> column diff) (make-string (- column diff) ?\s) "")
+                           (propertize " "
+                                       'font-lock-face
+                                       'web-mode-current-column-highlight-face)
+                           ) ;concat
+                          )
+             )
+            (t
+             (move-to-column column)
+             (overlay-put overlay 'after-string nil)
+             (move-overlay overlay (point) (1+ (point)))
+             )
+            ) ;cond
+          (setq line-from (1+ line-from))
+          (forward-line)
+          ;; JMA ADD
+          ;(message (format "Currently at line: %d" (line-number-at-pos)))
+          (if (not (= (1+ last-line-no) (line-number-at-pos)))
+              (delete-overlay overlay))
+          (setq last-line-no (line-number-at-pos))
+          ;; END JMA ADD
+          (setq index (1+ index))
+          ) ;while
+        ) ;when
+      ) ;save-mark-and-excursion
+    ) ;let
+  )
+
+(defun web-mode-column-show2 ()
+  (let ((index 0) overlay diff column line-to line-from
+        line-delta regions (overlay-skip nil) last-line-no)
     (web-mode-column-hide)
     (setq web-mode-enable-current-column-highlight t)
     (save-excursion
@@ -9695,13 +9833,15 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
     (setq indentation (plist-get open-ctx :indentation))
     (when (and initial-column (> initial-column indentation))
       (setq indentation initial-column))
-    (setq case-fold-search nil) ; #1006
+    (setq case-fold-search nil) ;#1006
     (when open-ctx
       (setq open-pos (plist-get open-ctx :pos)))
     (setq block-pos (web-mode-inside-block-control pos))
+    (when (and block-pos (> limit block-pos)) ;#1275
+      (setq block-pos nil))
     ;;(message "bracket-pos=%S block-pos=%S" open-pos block-pos)
     (cond
-      ((and block-pos (or (null open-pos) (> block-pos open-pos))) ;; #1230
+      ((and block-pos (or (null open-pos) (> block-pos open-pos))) ;#1230
        (setq offset (+ indentation language-offset)))
       ((null open-pos)
        (setq offset initial-column))
@@ -9864,7 +10004,7 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
       (setq prev-indentation (cdr h))
       ;;(message "line=%S" line)
       (cond
-        ((string-match-p "''" line)
+        ((string-match-p "'" line)
          (setq out prev-indentation))
         ;; ----------------------------------------------------------------------
         ;; unindent
@@ -11427,7 +11567,7 @@ Prompt user if TAG-NAME isn't provided."
           (setq content (replace-regexp-in-string "^[ ]*" "#" sel)))
 
          ((member language '("asp"))
-          (setq content (replace-regexp-in-string "^[ ]*" "''" sel)))
+          (setq content (replace-regexp-in-string "^[ ]*" "'" sel)))
 
          (t
           (setq content (concat "/* " sel " */")))

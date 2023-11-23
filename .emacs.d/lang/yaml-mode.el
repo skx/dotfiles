@@ -8,7 +8,7 @@
 ;; URL: https://github.com/yoshiki/yaml-mode
 ;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: data yaml
-;; Version: 0.0.15
+;; Version: 0.0.16
 
 ;; This file is not part of Emacs
 
@@ -225,6 +225,7 @@ that key is pressed to begin a block literal."
   (set (make-local-variable 'indent-line-function) 'yaml-indent-line)
   (set (make-local-variable 'indent-tabs-mode) nil)
   (set (make-local-variable 'fill-paragraph-function) 'yaml-fill-paragraph)
+  (set (make-local-variable 'page-delimiter) "^---\\([ \t].*\\)*\n")
 
   (set (make-local-variable 'syntax-propertize-function)
        'yaml-mode-syntax-propertize-function)
