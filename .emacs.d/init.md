@@ -1851,12 +1851,17 @@ Here I configure it to be used for both general programming modes, as well as `o
 UTF-8 is the future, we should greet it with open-arms.
 
 ```lisp
-(prefer-coding-system 'utf-8)
-(set-charset-priority 'unicode)
-(set-keyboard-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(setq default-process-coding-system '(utf-8-unix . utf-8-unix))
-(setq org-export-coding-system 'utf-8)
+(use-package emacs
+  :init
+  (set-charset-priority 'unicode)
+  (setq locale-coding-system 'utf-8
+        coding-system-for-read 'utf-8
+        coding-system-for-write 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
+  (setq default-process-coding-system '(utf-8-unix . utf-8-unix)))
 ```
 
 
