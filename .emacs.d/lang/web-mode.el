@@ -1,8 +1,8 @@
 ;;; web-mode.el --- major mode for editing web templates -*- coding: utf-8; lexical-binding: t; -*-
 
-;; Copyright 2011-2023 François-Xavier Bois
+;; Copyright 2011-2024 François-Xavier Bois
 
-;; Version: 17.3.15
+;; Version: 17.3.17
 ;; Author: François-Xavier Bois
 ;; Maintainer: François-Xavier Bois <fxbois@gmail.com>
 ;; Package-Requires: ((emacs "23.1"))
@@ -23,7 +23,7 @@
 
 ;;---- CONSTS ------------------------------------------------------------------
 
-(defconst web-mode-version "17.3.15"
+(defconst web-mode-version "17.3.17"
   "Web Mode version.")
 
 ;;---- GROUPS ------------------------------------------------------------------
@@ -419,6 +419,15 @@ by a li open tag is valid)."
     "width" "wrap")
   "HTML attributes used for completion."
   :type '(repeat string)
+  :group 'web-mode)
+
+(defcustom web-mode-engines-alist nil
+  "A list of filename patterns and corresponding `web-mode' engine.
+For example,
+\(setq web-mode-engines-alist
+       \\='((\"php\"    . \"\\\\.phtml\\\\\\='\")
+         (\"blade\"  . \"\\\\.blade\\\\.\")))"
+  :type '(alist :key-type string :value-type string)
   :group 'web-mode)
 
 ;;---- FACES -------------------------------------------------------------------
@@ -929,13 +938,13 @@ Must be used in conjunction with web-mode-enable-block-face."
         'syntax-table)
   "Text properties used for code regions/tokens and html nodes.")
 
-(defvar web-mode-start-tag-regexp "<\\([[:alpha:]][[:alnum:].:_-]*\\|>\\)"
+(defvar web-mode-start-tag-regexp "<\\([[:alnum:].:_-]+\\|>\\)"
   "Regular expression for HTML/XML start tag.")
 
-(defvar web-mode-tag-regexp "</?\\([[:alpha:]][[:alnum:].:_-]*\\)"
+(defvar web-mode-tag-regexp "</?\\([[:alnum:].:_-]+\\)"
   "Regular expression for HTML/XML tag.")
 
-(defvar web-mode-dom-regexp "<\\(/?>\\|/?[[:alpha:]][[:alnum:].:_-]*\\|!--\\|!\\[CDATA\\[\\|!doctype\\|!DOCTYPE\\|\?xml\\)")
+(defvar web-mode-dom-regexp "<\\(/?>\\|/?[[:alnum:].:_-]+\\|!--\\|!\\[CDATA\\[\\|!doctype\\|!DOCTYPE\\|\?xml\\)")
 
 (defvar web-mode-whitespaces-regexp
   "^[ \t]\\{2,\\}$\\| \t\\|\t \\|[ \t]+$\\|^[ \n\t]+\\'\\|^[ \t]?[\n]\\{2,\\}"
@@ -1099,13 +1108,6 @@ For example,
 (setq web-mode-content-types-alist
   \\='((\"json\" . \"/some/path/.*\\.api\\\\='\")
     (\"jsx\"  . \"/some/react/path/.*\\.js[x]?\\\\='\")))")
-
-(defvar web-mode-engines-alist nil
-  "A list of filename patterns and corresponding `web-mode' engine.
-For example,
-\(setq web-mode-engines-alist
-       \\='((\"php\"    . \"\\\\.phtml\\\\\\='\")
-         (\"blade\"  . \"\\\\.blade\\\\.\")))")
 
 (defvar web-mode-smart-quotes
   '("«" . "»")
@@ -2488,7 +2490,7 @@ shouldn't be moved back.)")
   (list
    (cons (concat "\\_<\\(" web-mode-php-keywords "\\)\\_>") '(0 'web-mode-keyword-face))
    (cons (concat "\\_<\\(" web-mode-php-types "\\)\\_>") '(1 'web-mode-type-face))
-   (cons (concat "\\_<\\(" web-mode-php-constants "\\)\\_>") '(0 'web-mode-constant-face))
+   (cons (concat "\\(" web-mode-php-constants "\\)") '(0 'web-mode-constant-face))
    '("function[ ]+\\([[:alnum:]_]+\\)" 1 'web-mode-function-name-face)
    '("\\_<\\([[:alnum:]_]+\\)[ ]?(" 1 'web-mode-function-call-face)
    '("[[:alnum:]_][ ]?::[ ]?\\([[:alnum:]_]+\\)" 1 'web-mode-constant-face)
@@ -2901,6 +2903,7 @@ another auto-completion with different ac-sources (e.g. ac-php)")
     (add-hook 'after-save-hook        #'web-mode-on-after-save t t)
     (add-hook 'change-major-mode-hook #'web-mode-on-exit nil t)
     (add-hook 'post-command-hook      #'web-mode-on-post-command nil t)
+    (add-hook 'hack-local-variables-hook #'web-mode-guess-engine-and-content-type t t)
 
     (cond
       ((boundp 'yas-after-exit-snippet-hook)
@@ -2919,7 +2922,6 @@ another auto-completion with different ac-sources (e.g. ac-php)")
     (when web-mode-enable-sexp-functions
       (setq-local forward-sexp-function #'web-mode-forward-sexp))
 
-    (web-mode-guess-engine-and-content-type)
     (setq web-mode-change-beg (point-min)
           web-mode-change-end (point-max))
     (when (> (point-max) 256000)
@@ -3429,13 +3431,15 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
              (setq closing-string '("<\\?". "\\?>")))
            (cond
              ((looking-at-p "<?php")
-              (setq delim-open "<?php"))
+              (setq delim-open "<?php")
+              (setq delim-close "?>"))
              ((eq (char-after) ?\=)
-              (setq delim-open "<?="))
+              (setq delim-open "<?=")
+              (setq delim-close "?>"))
              (t
-              (setq delim-open "<?"))
+              (setq delim-open "<?")
+              (setq delim-close "?>"))
              ) ;cond
-           (setq delim-close "?>")
            ) ;php
 
           ((string= web-mode-engine "erb")
@@ -5491,7 +5495,9 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
            (cond
              ((string-match-p "-" tname)
               (setq flags (logior flags 2)))
-             ((string-match-p ":" tname)
+             ;;((string-match-p ":" tname)
+             ;; (setq flags (logior flags 32)))
+             ((string-match-p "[._:]" tname)
               (setq flags (logior flags 32)))
              )
            (cond
@@ -7978,7 +7984,7 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
   (let ((index 0) overlay diff column line-to line-from line-delta regions (overlay-skip nil) last-line-no)
     (web-mode-column-hide)
     (setq web-mode-enable-current-column-highlight t)
-    (save-mark-and-excursion
+    (save-excursion ;;save-mark-and-excursion
       (back-to-indentation)
       (setq column (current-column)
             line-to (web-mode-line-number))
@@ -7998,7 +8004,7 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
         (when (> line-from 1)
           (forward-line (1- line-from)))
         ;; Added by JMA
-        (save-mark-and-excursion
+        (save-excursion ;;save-mark-and-excursion
           (let (start-point end-point)
             (goto-line line-from)
             (move-to-column column)
@@ -8047,7 +8053,7 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
           (setq index (1+ index))
           ) ;while
         ) ;when
-      ) ;save-mark-and-excursion
+      ) ;save-excursion
     ) ;let
   )
 
