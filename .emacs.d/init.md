@@ -1168,13 +1168,6 @@ Since we're living in the future we can use `org-mouse` for checking boxes, etc:
 ```
 
 
-### Org-Mode Contacts
-
-This is something I'm testing out:
-
-* https://github.com/someguynamedmatt/rolodex.org/blob/master/rolodex.el
-
-
 ### Org-Mode Code Execution
 
 Another useful change to org-mode is allowing the ability to execute the Emacs lisp contained within a particular block when a file is loaded.
