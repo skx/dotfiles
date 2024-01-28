@@ -956,6 +956,15 @@ First of all we load the mode, and make some basic setup happen:
     ;; We don't want to see ~/.emacs.d/.org-id-locations
     (setq org-id-track-globally nil)
 
+    ;;
+    ;; A new link-type "copy" to copy things to the clipboard.
+    ;; https://sachachua.com/blog/2024/01/org-mode-custom-link-copy-to-clipboard/
+    ;;
+    (org-link-set-parameters
+        "copy"
+            :follow (lambda (link) (kill-new link))
+            :export (lambda (_ desc &rest _) desc))
+
     ;; indention should match headers.
     (setq org-adapt-indentation t)
 
@@ -1109,7 +1118,7 @@ Now we're done with the general setup so we'll handle the more specific agenda t
   :bind
     ("C-c a" . org-agenda)
   :config
-    ;; Store our org-files beneath ~/Private/Org.
+    ;; We store our org-files beneath ~/Private/Org.
     (custom-set-variables  '(org-directory "~/Private/Org"))
 
     ;; Populate the agenda from ~/Private/Org + ~/Private/Worklog/
@@ -1175,13 +1184,6 @@ Since we're living in the future we can use `org-mouse` for checking boxes, etc:
   :defer 2
   :after org)
 ```
-
-
-### Org-Mode Contacts
-
-This is something I'm testing out:
-
-* https://github.com/someguynamedmatt/rolodex.org/blob/master/rolodex.el
 
 
 ### Org-Mode Code Execution
