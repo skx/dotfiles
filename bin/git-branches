@@ -1,0 +1,48 @@
+#!/bin/sh
+#
+# Show all branches, optinally delete them.
+#
+# This can be called either directly or indirectly:
+#
+#   git branches [delete]
+#
+#   git-branches [delete]
+#
+
+
+#
+# Default command to execute against the branch-list
+#
+cmd="echo"
+
+#
+# Should we delete?
+#
+case "$#" in
+    0)
+    # nop
+        :
+        ;;
+    1)
+        if [ "$1" = "delete" ] ; then
+            echo "Deleting branches"
+            cmd="git branch -D"
+        else
+            echo "Unknown argument, only 'delete' is supported"
+            exit 1
+        fi
+        ;;
+    *)
+        echo "Usage: git branches [delete]"
+        exit 1
+        ;;
+esac
+
+#
+# Do the magic; we only run the command with ONE argument
+# via the "-L1" argument to xargs, this ensures we show our
+# output cleanly.
+#
+for r in $(git branch -r --format='%(refname)'); do
+    git branch --merged "$r";
+done | sort -u | grep -v '^\*' | xargs -r -L1 $cmd
