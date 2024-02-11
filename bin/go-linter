@@ -5,6 +5,9 @@ for tool in bodyclose sqlclosecheck shadow nilness ; do
     go vet -vettool=$(which "${tool}") ./...
 done
 
+# Dead code detector
+deadcode -test ./...
+
 # Standard linter
 go vet ./...
 

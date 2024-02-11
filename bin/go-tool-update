@@ -16,6 +16,7 @@ go install github.com/skx/alphavet/cmd/alphavet@latest
 go install github.com/quasilyte/go-consistent@latest
 go install github.com/timakin/bodyclose@latest
 go install github.com/ryanrolds/sqlclosecheck@latest
+go install golang.org/x/tools/cmd/deadcode@latest
 
 # my tools
 go install github.com/skx/aws-utils@latest
