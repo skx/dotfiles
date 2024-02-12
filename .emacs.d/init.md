@@ -314,12 +314,13 @@ I'm using `ido` - the only thing to note for myself is that when running `C-x C-
 * See the help for `ido-find-file` for a complete list.
 
 ```lisp
-;; IDO
 (use-package ido
   :defer 2
   :init
-  (setq ido-everywhere                     t
+  (setq
+    ido-everywhere                         t
     ido-use-filename-at-point              'guess
+    ido-use-url-at-point                   nil
     ido-virtual-buffers                    t
     ido-flex-matching                      t
     ido-use-faces                          t
@@ -327,6 +328,9 @@ I'm using `ido` - the only thing to note for myself is that when running `C-x C-
     ido-auto-merge-work-directories-length -1
     ido-save-directory-list-file           (expand-file-name "~/.trash.d/emacs.ido.history")
     ido-file-extensions-order              '(".org" ".md" ".txt" ".html" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf" ".py")
+    ido-enable-flex-matching               t
+
+    ;;; Ignore files defined in variable completion-ignored-extensions
     ido-ignore-extensions t
     )
   :config
