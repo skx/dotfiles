@@ -551,24 +551,6 @@ Currently Apropos does not honour this setting, nor does the result of compilati
 
 
 
-## Help - Identifying Shortcuts
-
-`which-key` shows the keybindings, and their meanings, available when you pause.
-
-It can be useful if you're unsure about local functions:
-
-```lisp
-(use-package which-key
-  :ensure t
-  :config
-  (progn
-    (which-key-mode)
-    (which-key-setup-side-window-bottom))
-  )
-```
-
-
-
 ## Language Modes
 
 Most of the time I spend in Emacs is for developing, and writing code.
