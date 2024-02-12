@@ -357,8 +357,8 @@ When `ido-ignore-extensions` is set to a true value then files are ignored from 
 
 ```lisp
 (dolist (suffix
-  '(".pdf" ".txt" ".last"))
-     (push suffix completion-ignored-extensions))
+   '(".last" ".odt" ".pdf" ".tex" ".txt"))
+    (push suffix completion-ignored-extensions))
 ```
 
 In addition to the completion provided by `ido` above we can also help ourselves by making "M-x ..:" easier to use, via smex:
