@@ -264,6 +264,22 @@ switch to the list immediately:
 
 
 
+## Case Sensitivity
+
+Ignore case when completing file names, buffer names, and running searches.
+
+```lisp
+; completion
+(setq read-file-name-completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
+(setq completion-ignore-case  t)
+
+; searches
+(setq case-fold-search t)
+```
+
+
+
 ## Calendar setup
 
 `M-x calendar` will show a calendar with Finnish names:
@@ -1754,13 +1770,6 @@ Lisp famously uses a lot of parenthesis, but so does Python, Perl, and many othe
 The following section takes care of setting up other basic and global things the way that I prefer them.
 
 ```lisp
-; Ignore case when completing file names, buffer names,
-; and completions generally.
-(setq read-file-name-completion-ignore-case t)
-(setq read-buffer-completion-ignore-case t)
-(setq case-fold-search t)
-(setq completion-ignore-case  t)
-
 ;; Avoid the annoying startup message.
 (setq-default
       inhibit-startup-screen t               ; Disable start-up screen
