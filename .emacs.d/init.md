@@ -1017,6 +1017,9 @@ First of all we load the mode, and make some basic setup happen:
     ;; Instead of showing ".." after folded-areas show the symbol.
     (setq org-ellipsis " ▼")
 
+    ;; disable org-persist caching
+    (setq org-element-cache-persistent nil)
+
   :hook
     ;; When I'm opening a document all code/example blocks will be hidden
     (org-mode . org-hide-block-all)
