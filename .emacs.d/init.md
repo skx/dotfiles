@@ -1149,7 +1149,10 @@ Now we're done with the general setup so we'll handle the more specific agenda t
           tags "+CLOSED>\"<-7d>\"/DONE")
         ("wq" "Quick (log) view"
           agenda ""
-          ((org-agenda-start-with-log-mode t)))
+          ((org-agenda-span 14)
+           (org-agenda-start-day "-7d")
+           (org-agenda-start-with-log-mode t)
+          ))
         ("wt" "Show today's stories"
           search (format-time-string "%Y-%m-%d"))
        ("wo" "Outstanding items - except those that are done, or unexported"
