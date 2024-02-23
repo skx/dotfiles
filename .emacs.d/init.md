@@ -1165,12 +1165,14 @@ Now we're done with the general setup so we'll handle the more specific agenda t
 
 
 ;; Setup TODO-workflow, and colouring.
-(setq org-todo-keywords '((sequence "TODO(!)" "INPROGRESS" "|" "DONE(!)" "CANCELED" "SPILLOVER")))
+(setq org-todo-keywords '((sequence "TODO(!)" "INPROGRESS" "|" "DONE(!)" "BLOCKED" "CANCELED" "SPILLOVER")))
 (setq org-todo-keyword-faces '(
-    ("TODO"       . (:foreground "blue" :weight bold))
+    ("BLOCKED"    . (:foreground "violet" :weight bold))
+    ("CANCELED"   . (:foreground "pink" :weight bold))
     ("INPROGRESS" . (:foreground "purple" :weight bold))
     ("SPILLOVER"  . (:foreground "red" :weight bold))
-    ("CANCELED"   . (:foreground "pink" :weight bold))))
+    ("TODO"       . (:foreground "blue" :weight bold))
+    ))
 ```
 
 Since we're hiding the emphasis markers it can be hard to edit text which is formatted.  To handle that we use [org-appear](https://github.com/awth13/org-appear):
