@@ -5,8 +5,13 @@
 ;; The configuration we support
 (setq save-check-config
       '(
+
         (:mode json-mode
          :exec "sysbox validate-json %s"
+         :cond (executable-find "sysbox"))
+
+        (:mode nxml-mode
+         :exec "sysbox validate-xml %s"
          :cond (executable-find "sysbox"))
 
         ;; This avoids creating .pyc files, which would happen if we had
@@ -15,12 +20,12 @@
          :exec "python3 -c 'import ast; ast.parse(open(\"%s\").read())'"
          :cond (executable-find "python3"))
 
+        (:mode sh-mode
+         :exec "shellcheck %s"
+         :cond (executable-find "shellcheck"))
+
         (:mode yaml-mode
          :exec "sysbox validate-yaml %s"
-         :cond (executable-find "sysbox"))
-
-        (:mode nxml-mode
-         :exec "sysbox validate-xml %s"
          :cond (executable-find "sysbox"))
        ))
 
