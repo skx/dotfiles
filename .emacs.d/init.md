@@ -1686,7 +1686,7 @@ Typos and errors will be underlined, and `M-TAB` or middle-click can be used to 
 
 ## Syntax Checks
 
-The [save-check]() package allows simple syntax-checks to be made _after_ files have been saved, here we load it:
+The [save-check.el](https://github.com/skx/save-check.el/) package allows simple syntax-checks to be made _after_ files have been saved, here we load it:
 
 ```lisp
 (use-package save-check)
