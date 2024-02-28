@@ -1028,6 +1028,9 @@ First of all we load the mode, and make some basic setup happen:
     ;; Instead of showing ".." after folded-areas show the symbol.
     (setq org-ellipsis " ▼")
 
+    ;; disable org-persist caching
+    (setq org-element-cache-persistent nil)
+
   :hook
     ;; When I'm opening a document all code/example blocks will be hidden
     (org-mode . org-hide-block-all)
@@ -1160,7 +1163,10 @@ Now we're done with the general setup so we'll handle the more specific agenda t
           tags "+CLOSED>\"<-7d>\"/DONE")
         ("wq" "Quick (log) view"
           agenda ""
-          ((org-agenda-start-with-log-mode t)))
+          ((org-agenda-span 14)
+           (org-agenda-start-day "-7d")
+           (org-agenda-start-with-log-mode t)
+          ))
         ("wt" "Show today's stories"
           search (format-time-string "%Y-%m-%d"))
        ("wo" "Outstanding items - except those that are done, or unexported"
@@ -1170,12 +1176,14 @@ Now we're done with the general setup so we'll handle the more specific agenda t
 
 
 ;; Setup TODO-workflow, and colouring.
-(setq org-todo-keywords '((sequence "TODO(!)" "INPROGRESS" "|" "DONE(!)" "CANCELED" "SPILLOVER")))
+(setq org-todo-keywords '((sequence "TODO(!)" "INPROGRESS" "|" "DONE(!)" "BLOCKED" "CANCELED" "SPILLOVER")))
 (setq org-todo-keyword-faces '(
-    ("TODO"       . (:foreground "blue" :weight bold))
+    ("BLOCKED"    . (:foreground "violet" :weight bold))
+    ("CANCELED"   . (:foreground "pink" :weight bold))
     ("INPROGRESS" . (:foreground "purple" :weight bold))
     ("SPILLOVER"  . (:foreground "red" :weight bold))
-    ("CANCELED"   . (:foreground "pink" :weight bold))))
+    ("TODO"       . (:foreground "blue" :weight bold))
+    ))
 ```
 
 Since we're hiding the emphasis markers it can be hard to edit text which is formatted.  To handle that we use [org-appear](https://github.com/awth13/org-appear):
