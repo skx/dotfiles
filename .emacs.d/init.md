@@ -695,6 +695,17 @@ Once installed we can now ensure that the mode is loaded for the editing of `*.g
 Note that I also setup [code-folding](#language-mode-helpers---code-folding) later in this file.
 
 
+### Language Modes - JSON
+
+JSON is pretty common-place, so we have to load this, and configure it for `*.json` files:
+
+```lisp
+(use-package-straight json-mode
+   :defer 2
+   :mode ("\\.json\\'" . json-mode))
+```
+
+
 ### Language Modes - HCL
 
 One of the tools I use most frequently for that is [Hashicorp](https://www.hashicorp.com/)'s [terraform](https://www.terraform.io/), and here we'll configure our buffers to be auto-formatted when we save them:
