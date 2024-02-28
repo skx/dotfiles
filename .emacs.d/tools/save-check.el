@@ -19,7 +19,7 @@
          :exec "sysbox validate-yaml %s"
          :cond (executable-find "sysbox"))
 
-        (:mode xml-mode
+        (:mode nxml-mode
          :exec "sysbox validate-xml %s"
          :cond (executable-find "sysbox"))
        ))
@@ -55,6 +55,8 @@ commands will have '%s' replaced with the path to the saved file."
 
 If the command exists with a zero-return code then nothing happens, otherwise the output will be shown."
   (interactive)
+  (with-current-buffer (get-buffer-create "*save-check*")
+    (kill-buffer))
   (let ((buffer (get-buffer-create "*save-check*"))
         (ret nil))
 
@@ -66,7 +68,10 @@ If the command exists with a zero-return code then nothing happens, otherwise th
     (setq ret (call-process-shell-command (format cmd buffer-file-name) nil buffer nil))
   (if (= 0 ret)
       (kill-buffer buffer)
-    (pop-to-buffer buffer))))
+    (progn
+      (pop-to-buffer buffer)
+      (special-mode)
+      ))))
 
 
 ;; Add the hook
