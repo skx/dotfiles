@@ -1676,6 +1676,16 @@ Typos and errors will be underlined, and `M-TAB` or middle-click can be used to 
 
 
 
+## Syntax Checks
+
+The [save-check]() package allows simple syntax-checks to be made _after_ files have been saved, here we load it:
+
+```lisp
+(use-package save-check)
+```
+
+
+
 ## Unix Setup
 
 The following section helper ensures that files are given `+x` permissions when they're saved, if they contain a valid shebang line:
