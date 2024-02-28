@@ -5,10 +5,23 @@
 ;; The configuration we support
 (setq save-check-config
       '(
-        (yaml-mode  . "sysbox validate-yaml %s")
-        (xml-mode   . "sysbox validate-xml %s")
-        (json-mode  . "sysbox validate-json %s")
-        (cperl-mode . "perl -wc -I. %s")
+        (:mode json-mode
+         :exec "sysbox validate-json %s"
+         :cond (executable-find "sysbox"))
+
+        ;; This avoids creating .pyc files, which would happen if we had
+        ;; used the more natural/obvious "python3 -m py_compile %s" approach
+        (:mode python-mode
+         :exec "python3 -c 'import ast; ast.parse(open(\"%s\").read())'"
+         :cond (executable-find "python3"))
+
+        (:mode yaml-mode
+         :exec "sysbox validate-yaml %s"
+         :cond (executable-find "sysbox"))
+
+        (:mode xml-mode
+         :exec "sysbox validate-xml %s"
+         :cond (executable-find "sysbox"))
        ))
 
 
@@ -19,8 +32,20 @@ The commands are contained within the list `save-check-config', and those
 commands will have '%s' replaced with the path to the saved file."
   (interactive)
   (mapc #'(lambda (entry)
-            (if (or (derived-mode-p (car entry)) (eq major-mode (car entry)))
-                (save-check-run-command (cdr entry))))
+            (let ((exec (plist-get entry :exec))
+                  (cnd (plist-get entry :cond))
+                  (mode (plist-get entry :mode))
+                  (run nil))
+
+              ;; If there is a condition set
+              (if cnd
+                  (if (eval cnd)
+                      (setq run t))   ; we run only if that passed
+                (setq run t) ;; otherwise, no condition set, we run
+                )
+
+              (if (and run (or (derived-mode-p mode) (eq major-mode  mode)))
+                  (save-check-run-command exec))))
         save-check-config)
   )
 
