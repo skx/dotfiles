@@ -2,9 +2,13 @@
 
 
 
-;; The configuration we support
+;; The default linters that we ship with.
 (setq save-check-config
       '(
+
+        (:mode dockerfile-mode
+         :exec "hadolint --no-color %f"
+         :cond (executable-find "hadolint"))
 
         (:mode json-mode
          :exec "sysbox validate-json %f"
