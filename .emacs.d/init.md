@@ -1956,6 +1956,18 @@ This ensures that headings are seperated from any previous content by a consiste
 
 
 
+## XXX - BugFixes
+
+Weirdly I noticed that `rmail-after-save-hook` was always present in the `after-save-hook` list, and that feels wrong:
+
+```lisp
+;; Remove the hook, if it is present
+(if (member 'rmail-after-save-hook after-save-hook)
+    (remove-hook 'after-save-hook #'rmail-after-save-hook))
+```
+
+
+
 ## XXX - Keybindings
 
 **NOTE** This file is largely grouped into settings, ordered alphabetically.  The keybindings go "last" though, because that makes sense.
