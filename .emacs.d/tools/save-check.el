@@ -84,8 +84,10 @@ If either sanity-check fails then an error is raised."
   t)
 
 
-(defun save-check-run()
-  "The `save-check-run' function is added to the global `after-save-hook'.
+(defun save-check()
+  "The `save-check' function is added to the global `after-save-hook' when
+`global-save-check-mode' is enabled.
+
 If the current `major-mode' matches an entry in `save-check-config' then
 a check will be carried out.
 
@@ -195,9 +197,18 @@ If the command exits with a zero-return code then nothing happens, otherwise the
         ))))
 
 
-;; Add the hook
-(add-hook 'after-save-hook 'save-check-run)
+;; Define a new mode.
+(define-minor-mode global-save-check-mode
+  "This mode toggles the installation and usage of `save-check' when
+files are saved."
+  nil
+  :global t
+  :lighter " save-check"
 
-;;
+  (if global-save-check-mode
+      (add-hook 'after-save-hook #'save-check)
+    (remove-hook 'after-save-hook #'save-check)))
+
+
 ;; End
 (provide 'save-check)

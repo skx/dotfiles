@@ -1689,7 +1689,11 @@ Typos and errors will be underlined, and `M-TAB` or middle-click can be used to 
 The [save-check.el](https://github.com/skx/save-check.el/) package allows simple syntax-checks to be made _after_ files have been saved, here we load it:
 
 ```lisp
-(use-package save-check)
+(use-package save-check
+  :defer 2
+  :config
+    (global-save-check-mode t))
+
 ```
 
 
