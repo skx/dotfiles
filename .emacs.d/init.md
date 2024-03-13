@@ -1692,7 +1692,47 @@ The [save-check.el](https://github.com/skx/save-check.el/) package allows simple
 (use-package save-check
   :defer 2
   :config
+    ; Show lisp errors, if present
+    (setq  save-check-show-eval t)
     (global-save-check-mode t))
+```
+
+I've found that sometimes kubernetes doesn't like duplicated keys, more specifically kustomize.  To attempt to deal with that we'll define a function to alert on those:
+
+```lisp
+(defun save-check-custom-yaml ()
+  "Alert if there are duplicate top-level keys in the current buffer.
+
+This function is primarily written to be invoked by `save-check' on YAML buffers,
+but the code is actually not specific."
+  (interactive)
+  (let ((matches))
+    ;; get the matches - i.e. top-level keys
+    (save-match-data
+      (save-excursion
+        (save-restriction
+          (widen)
+          (goto-char 1)
+          (while (search-forward-regexp "^\\([a-zA-Z0-9]+\\):" nil t 1)
+            (push (match-string-no-properties 0) matches)))))
+    ;; now matches contains a list of all keys
+    ;; look for duplicates
+    (setq matches (delete-dups (seq-filter
+                                (lambda (el) (member el (cdr (member el matches))))
+                                matches)))
+    (if matches
+        (if (= 1 (length matches))
+            (format "There is a duplicate top-level key %s" matches)
+          (format  "There are %d duplicate top-level keys %s" (length matches) matches))
+      nil)))
+```
+
+Now we can add that function and configure it to be enabled for all YAML files:
+
+```lisp
+(add-to-list 'save-check-config
+      '(:mode yaml-mode
+        :eval (save-check-custom-yaml)))
 
 ```
 
