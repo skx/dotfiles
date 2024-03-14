@@ -1715,10 +1715,15 @@ but the code is actually not specific."
           (goto-char 1)
           (while (search-forward-regexp "^\\([a-zA-Z0-9]+\\):" nil t 1)
             (push (match-string-no-properties 0) matches)))))
-    ;; now matches contains a list of all keys - look for any duplicate entries
+    ;; now matches contains a list of all top-level keys - look for any duplicate entries
     (setq matches (delete-dups (seq-filter
                                 (lambda (el) (member el (cdr (member el matches))))
                                 matches)))
+
+    ;; remove false-positives which might occur more than once even without error.
+    (dolist (known '("apiVersion:" "kind:" "metadata:" "spec:"))
+      (setq matches (delete known matches)))
+
     ;; if we have duplicates - format the response based on one vs. multiple duplicates.
     (if matches
         (if (= 1 (length matches))
