@@ -751,7 +751,7 @@ I've also created a simple utility package which contains a pair of helpers for 
 ```lisp
 (use-package perl-utilities
   :defer 2
-  :if (executable-find "perl")
+  :if (and (executable-find "perl") (not IS-MAC))
 )
 ```
 
@@ -1690,7 +1690,6 @@ The [save-check.el](https://github.com/skx/save-check.el/) package allows simple
 
 ```lisp
 (use-package save-check
-  :defer 2
   :config
     ; Show lisp errors, if present
     (setq  save-check-show-eval t)
