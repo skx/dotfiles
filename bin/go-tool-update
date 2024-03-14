@@ -13,7 +13,7 @@ go install github.com/tomnomnom/gron@latest
 
 # kubernetes
 go install github.com/derailed/k9s@latest
-go install sigs.k8s.io/kustomize/kustomize@latest
+go install sigs.k8s.io/kustomize/kustomize/v5@latest
 
 # linters & etc
 go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
