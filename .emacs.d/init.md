@@ -310,7 +310,15 @@ Ignore case when completing file names, buffer names, and running searches.
           "Lokakuu(OCT)"
           "Marraskuu(NOV)"
           "Joulukuu(DEC)"
-      ])
+      ]
+
+      ;; M-x world-clock
+      world-clock-list
+      '(("Europe/Helsinki" "Helsinki")
+        ("CET" "Berlin")
+        ("Europe/London" "London")
+        ))
+
 
 (add-hook 'calendar-load-hook
           (lambda ()
@@ -443,6 +451,16 @@ My only other irritation with `dired` is that by default "dotfiles" are shown, I
   :config
     (setq dired-omit-verbose nil)
     (setq dired-omit-files "^\\...+$"))
+```
+
+
+### Navigation
+
+This is a neat thing to navigate easily, it is bound to `C-c j` later in the keybinding setup.
+
+```lisp
+(use-package-straight ace-jump-mode
+)
 ```
 
 
@@ -2049,6 +2067,10 @@ some I've grown accustomed to:
 (define-key steve-mode-map (kbd "C-c s") 'skx-scratch-buffer)
 (define-key steve-mode-map (kbd "C-c w") 'skx-load-diary)
 (define-key steve-mode-map (kbd "C-c d") 'skx-neotree)
+
+;; ace-jump-mode
+(define-key steve-mode-map (kbd "C-c j") 'ace-jump-mode)
+(define-key steve-mode-map (kbd "<C-return>") 'ace-jump-mode-pop-mark)
 
 ;; change sizes
 (define-key steve-mode-map (kbd "C-+") 'text-scale-increase)
