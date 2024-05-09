@@ -262,6 +262,16 @@ switch to the list immediately:
     (switch-to-buffer "*Buffer List*")))
 ```
 
+There are times when you've been running Emacs for a few weeks and you have too many buffers, here's a quick function to kill them all:
+
+```lisp
+(defun kill-all-buffers ()
+  "Kill all open buffers."
+  (interactive)
+  (mapc 'kill-buffer (buffer-list))
+  (delete-other-windows))
+```
+
 
 
 ## Case Sensitivity
@@ -1798,6 +1808,9 @@ The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so
 ;; Disable the scroll-bars, and the tool-bar.
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
+
+;; Give the fringe some more space
+(set-fringe-mode 20)
 
 ;; Show the menubar only when running with graphics
 (menu-bar-mode (display-graphic-p))
