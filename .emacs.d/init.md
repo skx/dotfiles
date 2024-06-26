@@ -685,6 +685,7 @@ The golang setup here is a bit special, because I use the LSP stuff to get compl
 
 (use-package lsp-mode
   :config
+    (setq lsp-restart 'ignore) ; don't restart when I kill the buffer
     (setq lsp-auto-guess-root t))
 
 (use-package-straight yasnippet
