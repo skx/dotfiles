@@ -272,6 +272,13 @@ There are times when you've been running Emacs for a few weeks and you have too 
   (delete-other-windows))
 ```
 
+Finally there's a great tool [shortcuts-mode](https://github.com/tetron/shortcuts-mode) which shows a pinned list of your most recent buffers:
+
+```lisp
+(use-package shortcuts-mode
+  :defer 2)
+```
+
 
 
 ## Case Sensitivity
@@ -2081,6 +2088,7 @@ some I've grown accustomed to:
 (define-key steve-mode-map (kbd "C-c s") 'skx-scratch-buffer)
 (define-key steve-mode-map (kbd "C-c w") 'skx-load-diary)
 (define-key steve-mode-map (kbd "C-c d") 'skx-neotree)
+(define-key steve-mode-map (kbd "C-c b") 'shortcuts-mode)
 
 ;; ace-jump-mode
 (define-key steve-mode-map (kbd "C-c j") 'ace-jump-mode)
