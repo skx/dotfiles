@@ -36,6 +36,7 @@
         ("~/.emacs.d/tools/save-check.el"           . "https://raw.githubusercontent.com/skx/save-check.el/master/save-check.el")
         ("~/.emacs.d/ui/imenu-list.el"              . "https://raw.githubusercontent.com/bmag/imenu-list/master/imenu-list.el")
         ("~/.emacs.d/ui/recentf-buffer.el"          . "https://www.emacswiki.org/emacs/download/recentf-buffer.el")
+        ("~/.emacs.d/ui/shortcuts-mode.el"          . "https://raw.githubusercontent.com/tetron/shortcuts-mode/master/shortcuts-mode.el")
         ("~/.emacs.d/ui/smex.el"                    . "https://raw.githubusercontent.com/nonsequitur/smex/master/smex.el")
         ("~/.emacs.d/unix/exec-path-from-shell.el"  . "https://raw.githubusercontent.com/purcell/exec-path-from-shell/master/exec-path-from-shell.el")
         ))
