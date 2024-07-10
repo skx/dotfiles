@@ -17,9 +17,11 @@ go install sigs.k8s.io/kustomize/kustomize/v5@latest
 
 # linters & etc
 go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.59.1
 go install github.com/quasilyte/go-consistent@latest
 go install github.com/ryanrolds/sqlclosecheck@latest
 go install github.com/skx/alphavet/cmd/alphavet@latest
+go install github.com/terraform-linters/tflint@latest
 go install github.com/timakin/bodyclose@latest
 go install golang.org/x/lint/golint@latest
 go install golang.org/x/tools/cmd/deadcode@latest
@@ -27,7 +29,6 @@ go install golang.org/x/tools/go/analysis/passes/nilness/cmd/nilness@latest
 go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
 go install golang.org/x/vuln/cmd/govulncheck@latest
 go install honnef.co/go/tools/cmd/staticcheck@latest
-go install github.com/terraform-linters/tflint@latest
 
 # minifier for html/css
 go install github.com/tdewolff/minify/cmd/minify@latest
