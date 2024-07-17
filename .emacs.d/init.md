@@ -1222,6 +1222,23 @@ Now we're done with the general setup so we'll handle the more specific agenda t
     ))
 ```
 
+The states that I have often require some adjustment - a story might jump from "INPROGRESS" to "SPILLOVER" (i.e. incomplete in a given day), and manually cycling through the options is a pain.  So here's a function that lets the state be changed, with completion.
+
+```lisp
+(defun org-todo-change-state-with-completion ()
+   "Change the given TODO state, via completion."
+   (interactive)
+    (let ((state (ido-completing-read "State:" (seq-rest (seq-first org-todo-keywords)))))
+        ;; state will have the state, but we want to change to drop any suffix.
+        (setq state (replace-regexp-in-string "(\\(.\\))$" "" (print state)))
+      (org-todo state)
+    ))
+
+(add-hook 'org-mode-hook
+  (lambda ()
+    (local-set-key (kbd "C-c C-t") 'org-todo-change-state-with-completion)))
+```
+
 Since we're hiding the emphasis markers it can be hard to edit text which is formatted.  To handle that we use [org-appear](https://github.com/awth13/org-appear):
 
 ```lisp
