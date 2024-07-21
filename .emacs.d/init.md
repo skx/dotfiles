@@ -636,6 +636,18 @@ these files are C++ with magic-wrapping to make compilation happen:
 ```
 
 
+### Language Modes - Symbol Highlighting
+
+The [symbol-overlay package](https://github.com/wolray/symbol-overlay) allows highlighting other occurrences of the symbol under the point.  That's more useful than you might expect, so I turn it on for all programming modes:
+
+```lisp
+(use-package symbol-overlay
+  :defer 2
+  :config
+    (add-hook 'prog-mode-hook #'symbol-overlay-mode))
+```
+
+
 ### Language Modes - C / C++
 
 Now we can configure basic formatting for C/C++:
