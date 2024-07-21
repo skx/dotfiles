@@ -39,6 +39,7 @@
         ("~/.emacs.d/ui/shortcuts-mode.el"          . "https://raw.githubusercontent.com/tetron/shortcuts-mode/master/shortcuts-mode.el")
         ("~/.emacs.d/ui/smex.el"                    . "https://raw.githubusercontent.com/nonsequitur/smex/master/smex.el")
         ("~/.emacs.d/unix/exec-path-from-shell.el"  . "https://raw.githubusercontent.com/purcell/exec-path-from-shell/master/exec-path-from-shell.el")
+        ("~/.emacs.d/ui/symbol-overlay.el"         . "https://raw.githubusercontent.com/wolray/symbol-overlay/master/symbol-overlay.el")
         ))
 
 
