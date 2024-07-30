@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# In the past the default branch was often "master", which was the default for
+# both git and github.
+#
+# Nowadays most people seem to prefer to use "main".
+#
+# If you're working with multiple repositories this now means that the default
+# branch is going to vary, and this tool will show you what is in-use, by examining
+# the remote.
+#
+# Sample usage:
+#
+#   $ cd dotfiles/ ; git-default-branch
+#   master
+#
+#   $ cd segmentor/ ; git-default-branch
+#   develop
+#
+#   $ cd infra-tools/ ; git-default-branch
+#   main
+#
+
+
+#
+# Get the remote - there might be more than one, but we'll
+# assume that in this case they'll all have the same
+# default branch.
+#
+remote=$(git remote | egrep -o '(upstream|origin)' | tail -1)
+
+#
+# Using the remote show the value of "HEAD branch:"
+#
+git remote show "$remote" | awk '/HEAD branch/ {print $NF}'
