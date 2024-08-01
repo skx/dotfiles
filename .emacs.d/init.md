@@ -866,6 +866,19 @@ YAML is used in Gitlab CI, Kubernetes, and other similar places.
          ("\\.yaml\\'"  . yaml-mode)))
 ```
 
+YAML uses indention, so we'll setup a package to make folding on indentation-level too - use TAB and S-TAB to toggle visibility of things:
+
+```lisp
+(use-package outline-indent
+  :defer 2
+  :custom
+    (outline-indent-ellipsis " ▼ ")
+  :config
+    (add-hook 'yaml-mode-hook #'outline-indent-minor-mode)
+    (setq outline-minor-mode-cycle t)
+    )
+```
+
 
 ### Language Modes - Z80 Assembly
 
