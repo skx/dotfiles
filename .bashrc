@@ -18,3 +18,9 @@ source_dir()
 # Process global & local files
 source_dir ~/.bash/
 source_dir ~/.bash.local/
+
+if [[ $(type -t "__vte_prompt_command") != function ]]; then
+    function __vte_prompt_command(){
+        return 0
+    }
+fi

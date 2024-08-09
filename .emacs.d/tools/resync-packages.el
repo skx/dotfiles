@@ -33,14 +33,16 @@
         ("~/.emacs.d/org/org-nested-links.el"       . "https://raw.githubusercontent.com/skx/org-nested-links/master/org-nested-links.el")
         ("~/.emacs.d/org/org-tag-cloud.el"          . "https://raw.githubusercontent.com/skx/org-tag-cloud/master/org-tag-cloud.el")
         ("~/.emacs.d/tools/goto-last-change.el"     . "https://www.emacswiki.org/emacs/download/goto-last-change.el")
+        ("~/.emacs.d/tools/outline-indent.el"       . "https://raw.githubusercontent.com/jamescherti/outline-indent.el/main/outline-indent.el")
         ("~/.emacs.d/tools/save-check.el"           . "https://raw.githubusercontent.com/skx/save-check.el/master/save-check.el")
         ("~/.emacs.d/ui/imenu-list.el"              . "https://raw.githubusercontent.com/bmag/imenu-list/master/imenu-list.el")
         ("~/.emacs.d/ui/recentf-buffer.el"          . "https://www.emacswiki.org/emacs/download/recentf-buffer.el")
         ("~/.emacs.d/ui/shortcuts-mode.el"          . "https://raw.githubusercontent.com/tetron/shortcuts-mode/master/shortcuts-mode.el")
         ("~/.emacs.d/ui/smex.el"                    . "https://raw.githubusercontent.com/nonsequitur/smex/master/smex.el")
+        ("~/.emacs.d/ui/symbol-overlay.el"          . "https://raw.githubusercontent.com/wolray/symbol-overlay/master/symbol-overlay.el")
         ("~/.emacs.d/unix/exec-path-from-shell.el"  . "https://raw.githubusercontent.com/purcell/exec-path-from-shell/master/exec-path-from-shell.el")
-        ("~/.emacs.d/ui/symbol-overlay.el"         . "https://raw.githubusercontent.com/wolray/symbol-overlay/master/symbol-overlay.el")
         ))
+
 
 
 (defun resync/packages()
