@@ -35,11 +35,12 @@ We use `use-package` to configure/load packages where possible, and we've config
 The following section defines some constants relating to the local system, they might be useful in the future.
 
 ```lisp
-(defconst EMACS29+   (> emacs-major-version 28))
-(defconst IS-MAC     (eq system-type 'darwin))
-(defconst IS-LINUX   (eq system-type 'gnu/linux))
-(defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
-(defconst IS-BSD     (or IS-MAC (eq system-type 'berkeley-unix)))
+(defconst EMACS29+     (> emacs-major-version 28))
+(defconst IS-MAC       (eq system-type 'darwin))
+(defconst IS-LINUX     (eq system-type 'gnu/linux))
+(defconst IS-WINDOWS   (memq system-type '(cygwin windows-nt ms-dos)))
+(defconst IS-BSD       (or IS-MAC (eq system-type 'berkeley-unix)))
+(defconst IS-GRAPHICAL (display-graphic-p))
 ```
 
 
@@ -997,7 +998,7 @@ Macs are weird, so I've had to make some changes so that keybindings work as exp
       x-select-enable-clipboard t)
 ```
 
-On top of that I wanted to make sure that the default font-sizes are "big":
+On top of that I wanted to make sure that the default font-sizes are "big", but only when working with a graphical Emacs - if we're running in the terminal then these changes will fail:
 
 ```lisp
 (defun td/adapt-font-size (&optional frame)
@@ -1010,8 +1011,10 @@ On top of that I wanted to make sure that the default font-sizes are "big":
         (set-face-attribute 'default frame :height 200)
       (set-face-attribute 'default frame :height 150))))
 
-(add-hook 'emacs-startup-hook (lambda () (td/adapt-font-size)))
-(add-hook 'after-make-frame-functions (lambda (x) (td/adapt-font-size)))
+(if IS-GRAPHICAL
+  (progn
+    (add-hook 'emacs-startup-hook (lambda () (td/adapt-font-size)))
+    (add-hook 'after-make-frame-functions (lambda (x) (td/adapt-font-size)))))
 ```
 
 
