@@ -1846,14 +1846,17 @@ Finally we allow Emacs to control our music playback, which is supplied by [MPD]
 I prefer to keep a reasonably minimal look, so I disable the toolbar and scroll-bars.
 
 The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so I'll leave that enabled unless I'm running in a terminal.
-
 ```lisp
+(defun skx/screen-width()
+  "Width of the current monitor, distinct from `display-pixel-width'"
+  (nth 3 (assq 'geometry (frame-monitor-attributes)))
+
 (defun skx/almost-fullscreen()
   "Make the display almost full-screen, leaving some padding."
   (when window-system
     (let ((offset 50))
-      (set-frame-position (selected-frame) 0 0)
-      (set-frame-size (selected-frame) (- (display-pixel-width) (* 3 offset))  (- (display-pixel-height) (* 3 offset)) t))))
+      (set-frame-position (selected-frame) offset offset)
+      (set-frame-size (selected-frame) (- (skx/screen-width) (* 3 offset))  (- (display-pixel-height) (* 3 offset)) t))))
 
 ;; Now make it live
 (skx/almost-fullscreen)
