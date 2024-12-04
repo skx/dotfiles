@@ -1,32 +1,11 @@
-[user]
-name = Steve Kemp
-email = steve@steve.org.uk
-
-[color]
-diff  = auto
-status= auto
-branch= auto
-interactive = true
-
-[alias]
-ci = commit
-di = diff --color-words
-st = status
-
-[core]
-editor = vim
-quotepath = false
-
-[push]
-default = matching
-
 [init]
-defaultBranch = master
+	defaultBranch = main
 
-#
-# We might have a .local configuration-file which will make changes
-# here - this is not tracked by git for obvious reasons.
-#
-[include]
-path = .gitconfig.local
+[includeIf "hasconfig:remote.*.url:git@github.com:metacore-games/**"]
+  path = ~/.gitconfig.metacore
 
+[includeIf "hasconfig:remote.*.url:git@github.com:skx/**"]
+  path = ~/.gitconfig.home
+
+[includeIf "hasconfig:remote.*.url:git@github.com:MyCollective/**"]
+  path = ~/.gitconfig.home
