@@ -1846,21 +1846,8 @@ Finally we allow Emacs to control our music playback, which is supplied by [MPD]
 I prefer to keep a reasonably minimal look, so I disable the toolbar and scroll-bars.
 
 The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so I'll leave that enabled unless I'm running in a terminal.
+
 ```lisp
-(defun skx/screen-width()
-  "Width of the current monitor, distinct from `display-pixel-width'"
-  (nth 3 (assq 'geometry (frame-monitor-attributes)))
-
-(defun skx/almost-fullscreen()
-  "Make the display almost full-screen, leaving some padding."
-  (when window-system
-    (let ((offset 50))
-      (set-frame-position (selected-frame) offset offset)
-      (set-frame-size (selected-frame) (- (skx/screen-width) (* 3 offset))  (- (display-pixel-height) (* 3 offset)) t))))
-
-;; Now make it live
-(skx/almost-fullscreen)
-
 ;; Disable the scroll-bars, and the tool-bar.
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
@@ -1879,7 +1866,26 @@ The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so
     (mouse-avoidance-mode 'cat-and-mouse))
 ```
 
-Once the basics have been setup the next step is to configure our theme:
+When I launch Emacs I want it to be "fullscreen", not actually full-screen, but large.   The following snippet makes the window large, on a single monitor, for both my Linux and MacOS environments:
+
+```lisp
+(defun skx/screen-width()
+  "Width of the current monitor, distinct from `display-pixel-width'"
+  (nth 3 (assq 'geometry (frame-monitor-attributes)))
+
+(defun skx/almost-fullscreen()
+  "Make the display almost full-screen, leaving some padding.
+
+The screen will be centered and full-width, minus a little padding on each side.  For the height I've had to fudge a little to avoid the window footer overlapping with the MacOS dock."
+  (when window-system
+    (let ((offset 50))
+      (set-frame-position (selected-frame) (/ offset 2) 0)
+      (set-frame-size (selected-frame) (- (skx/screen-width) (* offset 2))  (- (display-pixel-height) (* 6 offset)) t))))
+
+(skx/almost-fullscreen)
+```
+
+Once the size and basic components have been configured the next step is to select our theme:
 
 ```lisp
 (load-theme 'wombat)
