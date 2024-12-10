@@ -29,14 +29,23 @@ execute directly."
           ;; Skip to the start of the code block.
           (re-search-forward "^```lisp$" (point-max) t)
 
-          (let ((l (match-end 0)))
+          (let (
+                (start (match-end 0))
+		(end  0)
+                (line (line-number-at-pos))
+                )
 
             ;; Find the end of the code-block
             (re-search-forward "^```$" (point-max) t)
 
+	    (setq end (match-beginning 0))
+
             ;; Evaluate it, and then keep going.
-            (if (< l (match-beginning 0))
-                (eval-region l (match-beginning 0))))))
+            (if (< start end)
+                (condition-case the-error
+                    (eval-region start end)
+                  (error
+                   (message "ERROR Execiting processing file %s starting at line %d" path line)))))))
     (message "Skipping file that doesn't exist %s" path)))
 
 ;; Record our start time
