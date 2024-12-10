@@ -1905,7 +1905,7 @@ When I launch Emacs I want it to be "fullscreen", not actually full-screen, but 
 ```lisp
 (defun skx/screen-width()
   "Width of the current monitor, distinct from `display-pixel-width'"
-  (nth 3 (assq 'geometry (frame-monitor-attributes)))
+  (nth 3 (assq 'geometry (frame-monitor-attributes))))
 
 (defun skx/almost-fullscreen()
   "Make the display almost full-screen, leaving some padding.
