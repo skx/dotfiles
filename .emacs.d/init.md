@@ -2097,6 +2097,19 @@ Weirdly I noticed that `rmail-after-save-hook` was always present in the `after-
     (remove-hook 'after-save-hook #'rmail-after-save-hook))
 ```
 
+Show line-numbers, temporarily, when jumping to a given line:
+
+```lisp
+(defun goto-line-with-feedback ()
+  "Show line numbers temporarily, while prompting for the line number input"
+  (interactive)
+  (unwind-protect
+      (progn
+        (linum-mode 1)
+        (goto-line (read-number "Goto line: ")))
+    (linum-mode -1)))
+```
+
 
 
 ## XXX - Keybindings
@@ -2126,7 +2139,7 @@ some I've grown accustomed to:
 ;; Finally, bind the keys
 
 ;; utilities
-(define-key steve-mode-map (kbd "M-g")   'goto-line)
+(define-key steve-mode-map (kbd "M-g")   'goto-line-with-feedback)
 (define-key steve-mode-map (kbd "M-=")   'align-equals)
 
 ;; Open specific files; init, scratch, github-repo, diary
