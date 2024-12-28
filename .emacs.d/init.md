@@ -602,6 +602,15 @@ Of course we also wish to install/use magit which is the emacs git package:
      #'skx/visit-pull-request-url))
 ```
 
+Finally even when we're not using `magit` I am often editing files which are stored under `git`, so seeing local changes is useful:
+
+```lisp
+(use-package-straight git-gutter
+  :defer 2
+  :config
+    (global-git-gutter-mode +1))
+```
+
 
 
 ## Help
