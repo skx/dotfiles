@@ -20,7 +20,7 @@
         ("~/.emacs.d/lang/lua-mode.el"              . "https://raw.githubusercontent.com/immerrr/lua-mode/master/lua-mode.el")
         ("~/.emacs.d/lang/markdown-mode.el"         . "https://raw.githubusercontent.com/jrblevin/markdown-mode/master/markdown-mode.el")
         ("~/.emacs.d/lang/monkey.el"                . "https://raw.githubusercontent.com/skx/monkey/master/emacs/monkey.el")
-        ("~/.emacs.d/lang/terraform-mode.el"        . "https://raw.githubusercontent.com/syohex/emacs-terraform-mode/master/terraform-mode.el")
+        ("~/.emacs.d/lang/terraform-mode.el"        . "https://raw.githubusercontent.com/hcl-emacs/terraform-mode/refs/heads/master/terraform-mode.el")
         ("~/.emacs.d/lang/web-mode.el"              . "https://raw.githubusercontent.com/fxbois/web-mode/master/web-mode.el")
         ("~/.emacs.d/lang/yaml-mode.el"             . "https://raw.githubusercontent.com/yoshiki/yaml-mode/master/yaml-mode.el")
         ("~/.emacs.d/lang/z80-mode.el"              . "https://raw.githubusercontent.com/SuperDisk/z80-mode/master/z80-mode.el")
