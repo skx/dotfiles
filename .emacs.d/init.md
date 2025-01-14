@@ -2149,6 +2149,10 @@ Weirdly I noticed that `rmail-after-save-hook` was always present in the `after-
 Show line-numbers, temporarily, when jumping to a given line:
 
 ```lisp
+;; linum-mode is obsolete.
+(if (not (fboundp 'linum-mode))
+  (fset 'linum-mode 'display-line-numbers-mode))
+
 (defun goto-line-with-feedback ()
   "Show line numbers temporarily, while prompting for the line number input"
   (interactive)
