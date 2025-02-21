@@ -1195,7 +1195,11 @@ We'll also improve the default list-management functionality:
 (use-package org-autolist
   :after org
   :defer 2
-  :hook (org-mode . org-autolist-mode))
+  :config
+    ;; delete won't try to undo lists.
+    (setq org-autolist-enable-delete nil)
+  :hook
+    (org-mode . org-autolist-mode))
 ```
 
 `org-mode` is __all__ about lists!  So one thing that is nice is to visually update the display of the list-prefixes, via unicode characters.  We'll use `org-bullets` for that:
