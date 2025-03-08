@@ -1913,23 +1913,12 @@ The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so
     (mouse-avoidance-mode 'cat-and-mouse))
 ```
 
-When I launch Emacs I want it to be "fullscreen", not actually full-screen, but large.   The following snippet makes the window large, on a single monitor, for both my Linux and MacOS environments:
+When I launch Emacs I want it to be "fullscreen", which means I don't actually want full-screen, but I do want it to be "large" - I realize this is incredibly non-specific and personal to me!
+
+Here's something that does the job:
 
 ```lisp
-(defun skx/screen-width()
-  "Width of the current monitor, distinct from `display-pixel-width'"
-  (nth 3 (assq 'geometry (frame-monitor-attributes))))
-
-(defun skx/almost-fullscreen()
-  "Make the display almost full-screen, leaving some padding.
-
-The screen will be centered and full-width, minus a little padding on each side.  For the height I've had to fudge a little to avoid the window footer overlapping with the MacOS dock."
-  (when window-system
-    (let ((offset 50))
-      (set-frame-position (selected-frame) (/ offset 2) 0)
-      (set-frame-size (selected-frame) (- (skx/screen-width) (* offset 2))  (- (display-pixel-height) (* 6 offset)) t))))
-
-(skx/almost-fullscreen)
+(when window-system (set-frame-size (selected-frame) 120 100))
 ```
 
 Once the size and basic components have been configured the next step is to select our theme:
