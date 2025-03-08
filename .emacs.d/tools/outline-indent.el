@@ -1,9 +1,9 @@
 ;;; outline-indent.el --- Folding text based on indentation (origami alternative) -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024 James Cherti | https://www.jamescherti.com/contact/
+;; Copyright (C) 2024-2025 James Cherti | https://www.jamescherti.com/contact/
 
 ;; Author: James Cherti
-;; Version: 1.1.0
+;; Version: 1.1.1
 ;; URL: https://github.com/jamescherti/outline-indent.el
 ;; Keywords: outlines
 ;; Package-Requires: ((emacs "26.1"))
@@ -101,7 +101,7 @@
 ;;; Customizations
 
 (defgroup outline-indent nil
-  "Non-nil if outline-indent mode mode is enabled."
+  "Folding text based on indentation."
   :group 'outline-indent
   :prefix "outline-indent-")
 
@@ -135,18 +135,12 @@ display table). To apply the change, you need to execute
   :type '(choice string (const nil))
   :group 'outline-indent)
 
-(defcustom outline-indent-make-window-start-visible t
-  "Non-nil to ensure `window-start' is never invisible.
-If you're in doubt, leave this to its default (t).
 
-Setting this to t improves the user experience by ensuring that the first line
-in a window is fully visible, rather than potentially becoming invisible. This
-sets the buffer local variable `make-window-start-visible'.
-
-You need to set the value of `outline-indent-make-window-start-visible' before
-enabling `outline-indent-minor-mode'."
-  :type 'boolean
-  :group 'outline-indent)
+(define-obsolete-variable-alias
+  'outline-indent-make-window-start-visible
+  'make-window-start-visible
+  "1.1.2"
+  "Obsolete. Use `make-window-start-visible' instead.")
 
 (defcustom outline-indent-insert-heading-add-blank-line nil
   "Non-nil to make `outline-indent-insert-heading' add a blank line.
@@ -156,6 +150,46 @@ and the cursor is moved to it. This behavior is useful for maintaining a visual
 separation between the new indented block and surrounding content."
   :type 'boolean
   :group 'outline-indent)
+
+(defun outline-indent--advise-func (advise)
+  "Advise `outline' functions.
+When ADVISE is set to t, advise the `outline' functions."
+  (if advise
+      ;; Advise the built-in `outline-mode' and `outline-minor-mode'
+      ;; functions to improve compatibility with
+      ;; `outline-indent-minor-mode'. The built-in `outline-minor-mode'
+      ;; functions will work exactly as before and will only exhibit
+      ;; different behavior when `outline-indent-minor-mode' is active.
+      (progn
+        (advice-add 'outline-promote :around
+                    #'outline-indent--advice-promote)
+        (advice-add 'outline-demote :around
+                    #'outline-indent--advice-demote)
+        (advice-add 'outline-insert-heading :around
+                    #'outline-indent--advice-insert-heading)
+        (advice-add 'outline-forward-same-level :around
+                    #'outline-indent--advice-forward-same-level)
+        (advice-add 'outline-backward-same-level :around
+                    #'outline-indent--advice-backward-same-level)
+        (advice-add 'outline-move-subtree-up :around
+                    #'outline-indent--advice-move-subtree-up)
+        (advice-add 'outline-move-subtree-down :around
+                    #'outline-indent--advice-move-subtree-down))
+    ;; Disable
+    (advice-remove 'outline-promote
+                   #'outline-indent--advice-promote)
+    (advice-remove 'outline-demote
+                   #'outline-indent--advice-demote)
+    (advice-remove 'outline-insert-heading
+                   #'outline-indent--advice-insert-heading)
+    (advice-remove 'outline-forward-same-level
+                   #'outline-indent--advice-forward-same-level)
+    (advice-remove 'outline-backward-same-level
+                   #'outline-indent--advice-backward-same-level)
+    (advice-remove 'outline-move-subtree-up
+                   #'outline-indent--advice-move-subtree-up)
+    (advice-remove 'outline-move-subtree-down
+                   #'outline-indent--advice-move-subtree-down)))
 
 (defcustom outline-indent-advise-outline-functions t
   "If non-nil, advises built-in `outline' functions to improve compatibility.
@@ -178,53 +212,13 @@ It is recommended to keep this set to t for improved behavior."
   :set
   (lambda (symbol value)
     (set-default symbol value)
-    (if value
-        ;; Advise the built-in `outline-mode' and `outline-minor-mode'
-        ;; functions to improve compatibility with
-        ;; `outline-indent-minor-mode'. The built-in `outline-minor-mode'
-        ;; functions will work exactly as before and will only exhibit
-        ;; different behavior when `outline-indent-minor-mode' is active.
-        (progn
-          (advice-add 'outline-promote :around
-                      #'outline-indent--advice-promote)
-          (advice-add 'outline-demote :around
-                      #'outline-indent--advice-demote)
-          (advice-add 'outline-insert-heading :around
-                      #'outline-indent--advice-insert-heading)
-          (advice-add 'outline-forward-same-level :around
-                      #'outline-indent--advice-forward-same-level)
-          (advice-add 'outline-backward-same-level :around
-                      #'outline-indent--advice-backward-same-level)
-          (advice-add 'outline-move-subtree-up :around
-                      #'outline-indent--advice-move-subtree-up)
-          (advice-add 'outline-move-subtree-down :around
-                      #'outline-indent--advice-move-subtree-down))
-      ;; Disable
-      (advice-remove 'outline-promote
-                     #'outline-indent--advice-promote)
-      (advice-remove 'outline-demote
-                     #'outline-indent--advice-demote)
-      (advice-remove 'outline-insert-heading
-                     #'outline-indent--advice-insert-heading)
-      (advice-remove 'outline-forward-same-level
-                     #'outline-indent--advice-forward-same-level)
-      (advice-remove 'outline-backward-same-level
-                     #'outline-indent--advice-backward-same-level)
-      (advice-remove 'outline-move-subtree-up
-                     #'outline-indent--advice-move-subtree-up)
-      (advice-remove 'outline-move-subtree-down
-                     #'outline-indent--advice-move-subtree-down)))
+    (outline-indent--advise-func value))
   :group 'outline-indent)
 
 (defvar outline-indent-minor-mode-map
   (let ((map (make-sparse-keymap)))
     map)
   "Keymap for `outline-indent-minor-mode'.")
-
-;;; Internal variables
-
-(defvar outline-indent--disable nil
-  "Non-nil to make outline functions to behave as if they are not advised.")
 
 ;;; Functions
 
@@ -249,15 +243,14 @@ level.
 
 This function finds the nearest non-empty line with the same or less
 indentation as the current line."
-  (interactive)
   (let ((initial-indentation nil)
         (found-point nil))
     (save-excursion
       (beginning-of-visual-line)
-      (setq initial-indentation (current-indentation))
+      (setq initial-indentation (outline-indent-level))
       (while (and (not found-point) (not (eobp)))
         (forward-line 1)
-        (if (and (>= initial-indentation (current-indentation))
+        (if (and (>= initial-indentation (outline-indent-level))
                  (not (looking-at-p "^[ \t]*$")))
             (setq found-point (point))))
 
@@ -609,9 +602,12 @@ This mode sets up outline to work based on indentation."
   :group 'outline-indent
   (if outline-indent-minor-mode
       (progn
+        (outline-indent--advise-func outline-indent-advise-outline-functions)
         ;; Enable minor mode
         (when (boundp 'outline-minor-mode-highlight)
           (setq-local outline-minor-mode-highlight nil))
+        (when (boundp 'outline-search-function)
+          (setq-local outline-search-function nil))
         (setq-local outline-heading-alist nil)
         (setq-local outline-level #'outline-indent-level)
         (setq-local outline-heading-end-regexp "\n")
@@ -619,11 +615,6 @@ This mode sets up outline to work based on indentation."
                                        (zero-or-more (any " \t"))
                                        (not (any " \t\n"))))
         (outline-indent--update-ellipsis)
-
-        ;; Ensures that window-start is never invisible
-        (when (boundp 'make-window-start-visible)
-          (setq-local make-window-start-visible
-                      outline-indent-make-window-start-visible))
         (outline-minor-mode 1))
     ;; Disable minor mode
     (outline-minor-mode -1)

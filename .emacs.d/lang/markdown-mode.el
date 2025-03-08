@@ -6,8 +6,8 @@
 ;; Author: Jason R. Blevins <jblevins@xbeta.org>
 ;; Maintainer: Jason R. Blevins <jblevins@xbeta.org>
 ;; Created: May 24, 2007
-;; Version: 2.7-alpha
-;; Package-Requires: ((emacs "27.1"))
+;; Version: 2.8-alpha
+;; Package-Requires: ((emacs "28.1"))
 ;; Keywords: Markdown, GitHub Flavored Markdown, itex
 ;; URL: https://jblevins.org/projects/markdown-mode/
 
@@ -62,7 +62,7 @@
 
 ;;; Constants =================================================================
 
-(defconst markdown-mode-version "2.7-alpha"
+(defconst markdown-mode-version "2.8-alpha"
   "Markdown mode version number.")
 
 (defconst markdown-output-buffer-name "*markdown-output*"
@@ -286,6 +286,13 @@ cause lag when typing on slower machines."
   :type 'boolean
   :safe 'booleanp
   :package-version '(markdown-mode . "2.2"))
+
+(defcustom markdown-wiki-link-retain-case nil
+  "When non-nil, wiki link file names do not have their case changed."
+  :group 'markdown
+  :type 'boolean
+  :safe 'booleanp
+  :package-version '(markdown-mode . "2.7"))
 
 (defcustom markdown-uri-types
   '("acap" "cid" "data" "dav" "fax" "file" "ftp"
@@ -1169,6 +1176,10 @@ escape character (see `markdown-match-escape').")
   "Return non-nil if POS is in a comment.
 If POS is not given, use point instead."
   (get-text-property (or pos (point)) 'markdown-comment))
+
+(defsubst markdown-in-inline-code-p (pos)
+  "Return non-nil if POS is in inline code."
+  (equal (get-text-property pos 'face) '(markdown-inline-code-face)))
 
 (defun markdown--face-p (pos faces)
   "Return non-nil if face of POS contain FACES."
@@ -5181,6 +5192,7 @@ list simply adds a blank line)."
    (markdown-indent-on-enter
     (let (bounds)
       (if (and (memq markdown-indent-on-enter '(indent-and-new-item))
+               (not (markdown-code-block-at-point-p))
                (setq bounds (markdown-cur-list-item-bounds)))
           (let ((beg (cl-first bounds))
                 (end (cl-second bounds))
@@ -8187,19 +8199,20 @@ Translate filenames using `markdown-filename-translate-function'."
                      'font-lock-multiline t))
            ;; Link part (without face)
            (lp (list 'keymap markdown-mode-mouse-map
-                     'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t
                      'help-echo (if title (concat title "\n" url) url)))
            ;; URL part
            (up (list 'keymap markdown-mode-mouse-map
                      'invisible 'markdown-markup
-                     'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t))
            ;; URL composition character
            (url-char (markdown--first-displayable markdown-url-compose-char))
            ;; Title part
            (tp (list 'invisible 'markdown-markup
                      'font-lock-multiline t)))
+      (when markdown-mouse-follow-link
+        (setq lp (append lp '(mouse-face 'markdown-highlight-face)))
+        (setq up (append up '(mouse-face 'markdown-highlight-face))))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
           (add-text-properties (match-beginning g) (match-end g) mp)
@@ -8231,7 +8244,6 @@ Translate filenames using `markdown-filename-translate-function'."
                      'font-lock-multiline t))
            ;; Link part
            (lp (list 'keymap markdown-mode-mouse-map
-                     'mouse-face 'markdown-highlight-face
                      'font-lock-multiline t
                      'help-echo (lambda (_ __ pos)
                                   (save-match-data
@@ -8244,6 +8256,8 @@ Translate filenames using `markdown-filename-translate-function'."
            ;; Reference part
            (rp (list 'invisible 'markdown-markup
                      'font-lock-multiline t)))
+      (when markdown-mouse-follow-link
+        (setq lp (append lp '(mouse-face markdown-highlight-face))))
       (dolist (g '(1 2 4 5 8))
         (when (match-end g)
           (add-text-properties (match-beginning g) (match-end g) mp)
@@ -8261,22 +8275,25 @@ Translate filenames using `markdown-filename-translate-function'."
 (defun markdown-fontify-angle-uris (last)
   "Add text properties to angle URIs from point to LAST."
   (when (markdown-match-angle-uris last)
-    (let* ((url-start (match-beginning 2))
-           (url-end (match-end 2))
-           ;; Markup part
-           (mp (list 'face 'markdown-markup-face
-                     'invisible 'markdown-markup
-                     'rear-nonsticky t
-                     'font-lock-multiline t))
-           ;; URI part
-           (up (list 'keymap markdown-mode-mouse-map
-                     'face 'markdown-plain-url-face
-                     'mouse-face 'markdown-highlight-face
-                     'font-lock-multiline t)))
-      (dolist (g '(1 3))
-        (add-text-properties (match-beginning g) (match-end g) mp))
-      (add-text-properties url-start url-end up)
-      t)))
+    (let ((url-start (match-beginning 2))
+          (url-end (match-end 2)))
+      (unless (or (markdown-in-inline-code-p url-start)
+                  (markdown-in-inline-code-p url-end))
+        (let* (;; Markup part
+               (mp (list 'face 'markdown-markup-face
+                         'invisible 'markdown-markup
+                         'rear-nonsticky t
+                         'font-lock-multiline t))
+               ;; URI part
+               (up (list 'keymap markdown-mode-mouse-map
+                         'face 'markdown-plain-url-face
+                         'font-lock-multiline t)))
+          (when markdown-mouse-follow-link
+            (setq up (append up '(mouse-face markdown-highlight-face))))
+          (dolist (g '(1 3))
+            (add-text-properties (match-beginning g) (match-end g) mp))
+          (add-text-properties url-start url-end up)
+          t)))))
 
 (defun markdown-fontify-plain-uris (last)
   "Add text properties to plain URLs from point to LAST."
@@ -8285,9 +8302,10 @@ Translate filenames using `markdown-filename-translate-function'."
            (end (match-end 0))
            (props (list 'keymap markdown-mode-mouse-map
                         'face 'markdown-plain-url-face
-                        'mouse-face 'markdown-highlight-face
                         'rear-nonsticky t
                         'font-lock-multiline t)))
+      (when markdown-mouse-follow-link
+        (setq props (append props '(mouse-face markdown-highlight-face))))
       (add-text-properties start end props)
       t)))
 
@@ -8374,7 +8392,7 @@ in parent directories if
     ;; This function must not overwrite match data(PR #590)
     (let* ((basename (replace-regexp-in-string
                       "[[:space:]\n]" markdown-link-space-sub-char name))
-           (basename (if (derived-mode-p 'gfm-mode)
+           (basename (if (and (derived-mode-p 'gfm-mode) (not markdown-wiki-link-retain-case))
                          (concat (upcase (substring basename 0 1))
                                  (downcase (substring basename 1 nil)))
                        basename))
@@ -9092,6 +9110,10 @@ LANG is a string, and the returned major mode is a symbol."
   (and mode
        (fboundp mode)
        (or
+        (not (string-match-p "ts-mode\\'" (symbol-name mode)))
+        ;; Don't load tree-sitter mode if the mode is in neither auto-mode-alist nor major-mode-remap-alist
+        ;; Because some ts-mode overwrites auto-mode-alist and it might break user configurations
+
         ;; https://github.com/jrblevin/markdown-mode/issues/787
         ;; major-mode-remap-alist was introduced at Emacs 29.1
         (cl-loop for pair in (bound-and-true-p major-mode-remap-alist)
@@ -10110,6 +10132,15 @@ rows and columns and the column alignment."
         (markdown-insert-inline-image link-text file)
       (markdown-insert-inline-link link-text file))))
 
+(defun markdown--dnd-multi-local-file-handler (urls action)
+  (let ((multile-urls-p (> (length urls) 1)))
+    (dolist (url urls)
+      (markdown--dnd-local-file-handler url action)
+      (when multile-urls-p
+        (insert " ")))))
+
+(put 'markdown--dnd-multi-local-file-handler 'dnd-multiple-handler t)
+
 
 ;;; Mode Definition  ==========================================================
 
@@ -10239,8 +10270,14 @@ rows and columns and the column alignment."
             #'markdown--inhibit-electric-quote nil :local)
 
   ;; drag and drop handler
-  (setq-local dnd-protocol-alist  (cons '("^file:///" . markdown--dnd-local-file-handler)
-                                        dnd-protocol-alist))
+  (let ((dnd-handler (if (>= emacs-major-version 30)
+                         #'markdown--dnd-multi-local-file-handler
+                       #'markdown--dnd-local-file-handler)))
+    (setq-local dnd-protocol-alist (append
+                                    (list (cons "^file:///" dnd-handler)
+                                          (cons "^file:/[^/]" dnd-handler)
+                                          (cons "^file:[^/]" dnd-handler))
+                                    dnd-protocol-alist)))
 
   ;; media handler
   (when (version< "29" emacs-version)
