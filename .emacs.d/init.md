@@ -628,6 +628,17 @@ Currently Apropos does not honour this setting, nor does the result of compilati
   (add-hook mode-hook (lambda ()  (pop-to-buffer (current-buffer)))))
 ```
 
+We can do something similar to make sure that `M-x occur` gets focus by default:
+
+```lisp
+(add-hook 'occur-hook (lambda () (switch-to-buffer-other-window "*Occur*")))
+```
+
+It would be nice if "RET" closed the occur buffer, while `n` and `p` did not, but the following didn't work the way that I wanted it to:
+
+      (define-key occur-mode-map (kbd "RET") (lambda ()
+          (occur-mode-goto-occurrence-other-window) (kill-buffer (current-buffer))))
+
 
 
 ## Language Modes
