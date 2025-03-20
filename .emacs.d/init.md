@@ -759,6 +759,7 @@ The golang setup here is a bit special, because I use the LSP stuff to get compl
 
 (use-package lsp-mode
   :config
+    (setq lsp-diagnostic-package :none)  ; this is mostly for python-mode
     (setq lsp-restart 'ignore) ; don't restart when I kill the buffer
     (setq lsp-auto-guess-root t))
 
@@ -863,10 +864,19 @@ Note that I also setup [code-folding](#language-mode-helpers---code-folding) lat
 
 ### Language Modes - Python
 
-Here we perform the very minimal Python & LSP setup - however this is only configured if `pylsp` is present upon the system $PATH.
+Here we perform the very minimal Python setup:
 
 ```lisp
+(use-package python-mode
+  :defer 2
+  :config
+  (flymake-mode -1)
+  :mode ("\\.py" . python-mode))
+```
 
+And now if we have LSP and PyLSP we can configure that:
+
+```lisp
 (defun has-pylsp ()
   "Return true if pylsp is installed, and available.
 
@@ -879,28 +889,16 @@ We first of all check that 'pylsp' is an executable that can be found, and then 
           t ; all good
           )))
 
-(use-package python-mode
-  :defer 2
-  :if (has-pylsp)
-  :mode ("\\.py" . python-mode)
-  :hook ((python-mode) . lsp-deferred))
 
-(defun lsp-python-install-save-hooks ()
-  "When saving the buffer (re)format the imports, and also setup some keybindings"
-  (add-hook 'before-save-hook #'lsp-organize-imports t t)
-  (local-set-key (kbd "M-.") 'lsp-find-definition)
-  (local-set-key (kbd "M-RET")    'pop-tag-mark))
-
-;; Only add the hook if pylsp exists.
 (if (has-pylsp)
-  (add-hook 'python-mode-hook #'lsp-python-install-save-hooks)
-  (message "pylsp not found, ignoring hook for LSP"))
+  (add-hook 'python-mode-hook 'lsp-deferred))
 ```
 
 Jumping to definitions works at least, once you've installed the tooling:
 
 ```sh
 % pip3 install python-lsp-server
+% brew install python-lsp-server pylint
 ```
 
 
