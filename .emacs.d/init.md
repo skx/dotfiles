@@ -866,9 +866,22 @@ Note that I also setup [code-folding](#language-mode-helpers---code-folding) lat
 Here we perform the very minimal Python & LSP setup - however this is only configured if `pylsp` is present upon the system $PATH.
 
 ```lisp
+
+(defun has-pylsp ()
+  "Return true if pylsp is installed, and available.
+
+We first of all check that 'pylsp' is an executable that can be found, and then validate that the exit-code of running 'pylsp -V' is zero.  If both those things are true then we have it available."
+
+  ; if it is available
+  (if (locate-file "pylsp" exec-path)
+      ; and the exit code is zero, when showing  version
+      (if (= 0 (call-process "pylsp" nil nil nil "-V"))
+          t ; all good
+          )))
+
 (use-package python-mode
   :defer 2
-  :if (locate-file "pylsp" exec-path)
+  :if (has-pylsp)
   :mode ("\\.py" . python-mode)
   :hook ((python-mode) . lsp-deferred))
 
@@ -879,7 +892,7 @@ Here we perform the very minimal Python & LSP setup - however this is only confi
   (local-set-key (kbd "M-RET")    'pop-tag-mark))
 
 ;; Only add the hook if pylsp exists.
-(if (locate-file "pylsp" exec-path)
+(if (has-pylsp)
   (add-hook 'python-mode-hook #'lsp-python-install-save-hooks)
   (message "pylsp not found, ignoring hook for LSP"))
 ```
