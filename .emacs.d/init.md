@@ -506,16 +506,6 @@ My only other irritation with `dired` is that by default "dotfiles" are shown, I
 ```
 
 
-### Navigation
-
-This is a neat thing to navigate easily, it is bound to `C-c j` later in the keybinding setup.
-
-```lisp
-(use-package-straight ace-jump-mode
-)
-```
-
-
 ### NeoTree
 
 [neotree](https://github.com/jaypei/emacs-neotree) presents a navigator for files/directories in a sidebar.
@@ -2248,10 +2238,6 @@ some I've grown accustomed to:
 (define-key steve-mode-map (kbd "C-c w") 'skx-load-diary)
 (define-key steve-mode-map (kbd "C-c d") 'skx-neotree)
 (define-key steve-mode-map (kbd "C-c b") 'shortcuts-mode)
-
-;; ace-jump-mode
-(define-key steve-mode-map (kbd "C-c j") 'ace-jump-mode)
-(define-key steve-mode-map (kbd "<C-return>") 'ace-jump-mode-pop-mark)
 
 ;; change sizes
 (define-key steve-mode-map (kbd "C-+") 'text-scale-increase)
