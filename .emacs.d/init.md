@@ -628,17 +628,6 @@ Currently Apropos does not honour this setting, nor does the result of compilati
   (add-hook mode-hook (lambda ()  (pop-to-buffer (current-buffer)))))
 ```
 
-We can do something similar to make sure that `M-x occur` gets focus by default:
-
-```lisp
-(add-hook 'occur-hook (lambda () (switch-to-buffer-other-window "*Occur*")))
-```
-
-It would be nice if "RET" closed the occur buffer, while `n` and `p` did not, but the following didn't work the way that I wanted it to:
-
-      (define-key occur-mode-map (kbd "RET") (lambda ()
-          (occur-mode-goto-occurrence-other-window) (kill-buffer (current-buffer))))
-
 
 
 ## Language Modes
@@ -1801,6 +1790,47 @@ I set "search-default-mode" to allow me to match `äiti` when searching for `ait
 
 ```lisp
 (setq search-default-mode 'char-fold-to-regexp)
+```
+
+The following section of searching lets use run "M-x occur" from within an isearch-session, via `Ctrl-o`.  This is surprisingly useful:
+
+```lisp
+(use-package isearch
+  :ensure nil
+  :defer t
+  :config
+  (defun my-occur-from-isearch ()
+    (interactive)
+    (let ((query (if isearch-regexp
+               isearch-string
+             (regexp-quote isearch-string))))
+      (isearch-update-ring isearch-string isearch-regexp)
+      (let (search-nonincremental-instead)
+        (ignore-errors (isearch-done t t)))
+      (occur query)))
+  :bind
+  (:map isearch-mode-map
+        ("C-o" . my-occur-from-isearch)))
+```
+
+We also make sure that `M-x occur` gets focus by default:
+
+```lisp
+(add-hook 'occur-hook (lambda () (switch-to-buffer-other-window "*Occur*")))
+```
+
+Finally it would be nice if "RET" closed the occur buffer, while `n` and `p` did not, so this does the necessary:
+
+```lisp
+(define-key occur-mode-map (kbd "RET")
+   '(lambda ()
+       (interactive)
+       ; goto the thing under the point
+       (occur-mode-goto-occurrence)
+       ; kill the occur-buffer
+       (kill-buffer "*Occur*")
+       ; unsplit
+       (delete-other-windows)))
 ```
 
 
