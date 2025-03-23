@@ -28,3 +28,7 @@ govulncheck ./...
 
 # Probably redundant
 golangci-lint run ./...
+
+# spelling
+echo misspell .
+misspell .
