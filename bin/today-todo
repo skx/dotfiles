@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+#
+# Show the todo-entries for today, outside emacs.
+#
+use strict;
+use warnings;
+
+use POSIX qw! strftime !;
+
+# Get the file
+my $path = $ENV{ 'HOME' } . "/Private/Worklog/Diary.org";
+
+# Get today's date
+my $date = sprintf( strftime( "%02d/%02m/%04Y", localtime time ) );
+
+# Show the lines of today
+my $in = 0;
+open my $handle, $path or die "Could not open $path: $!";
+while ( my $line = <$handle> )
+{
+    # Start of today's entry?
+    if ( $line =~ /^\* $date/ )
+    {
+        $in = 1;
+    }
+    else
+    {
+        # End of section
+        if ( $line =~ /^\* DD\/MM\/YYYY/ )
+        {
+            $in = 0;
+        }
+
+        # OK we're inside a section - show only the third-level TODO entries.
+        if ($in)
+        {
+            #           next if ( $line =~ /^\*\* / );
+            #           next if ( $line =~ /^None.$/ );
+            #           next if ( $line =~ /^$/ );
+            next unless ( $line =~ /^\*\*\* (.*)/ );
+            print $1 . "\n";
+        }
+    }
+}
+close($handle);
