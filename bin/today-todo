@@ -11,7 +11,7 @@ use POSIX qw! strftime !;
 my $path = $ENV{ 'HOME' } . "/Private/Worklog/Diary.org";
 
 # Get today's date
-my $date = sprintf( strftime( "%02d/%02m/%04Y", localtime time ) );
+my $date = sprintf( strftime( "%d/%m/%Y", localtime time ) );
 
 # Show the lines of today
 my $in = 0;
