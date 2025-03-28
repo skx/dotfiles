@@ -12,28 +12,11 @@ function lock_screen()
    caffeinate.lockScreen()
 end
 
---
--- Center the current window - not yet used
---
-function center_window()
-   local win = hs.window.focusedWindow()
-   win:centerOnScreen()
-end
-
-
--- show details about the current window - not yet used.
-function window_info()
-   hs.alert.show(string.format("App path:        %s\nApp name:      %s\nIM source id:  %s",
-                               hs.window.focusedWindow():application():path(),
-                               hs.window.focusedWindow():application():name(),
-                               hs.keycodes.currentSourceID()))
-end
-
 
 --
 -- This moves windows around and should be easy to update.
 --
-function steve_layout()
+function setup_work_layout()
 
    -- Count the number of screens.
    local numScreens = #screen.allScreens()
@@ -100,7 +83,7 @@ function ssidChangedCallback()
        -- We just joined our work network
        print("We're at metacore")
        hs.audiodevice.defaultOutputDevice():setVolume(25)
-       steve_layout()
+       setup_work_layout()
     elseif newSSID ~= workSSID and lastSSID == workSSID then
         -- We just departed our work WiFi network
         hs.audiodevice.defaultOutputDevice():setVolume(0)
@@ -120,8 +103,9 @@ wifiWatcher:start()
 -- Create a menu-bar to trigger layout reworking.
 --
 mb = hs.menubar.new()
-mb:setClickCallback(steve_layout)
-mb:setTitle("LAYOUT")
+mb:setClickCallback(setup_work_layout)
+mb:setTitle("🧘")
+mb:setTooltip("Recalculate window layout.")
 
 --
 -- Create a second menu-bar to allow locking the screen.
@@ -129,6 +113,7 @@ mb:setTitle("LAYOUT")
 lock = hs.menubar.new()
 lock:setClickCallback(lock_screen)
 lock:setTitle("🔒")
+lock:setTooltip("Lock the screen(s)")
 
 
 --
