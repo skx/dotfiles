@@ -3,33 +3,15 @@
 --
 -- Load our dependencies
 --
-alert = require("hs.alert")
 caffeinate = require("hs.caffeinate")
-pathwatcher = require("hs.pathwatcher")
 screen = require("hs.screen")
 
 
 --
--- Reload the configuration file autoamtically
+-- Reload automatically
 --
-function reloadConfig(files)
-   doReload = false
-   for _, file in pairs(files) do
-      if file:sub(-4) == ".lua" then
-         doReload = true
-      end
-   end
-   if doReload then
-      hs.reload()
-   end
-end
-
-
---
--- Watch our configuration, and automatically reload.
---
-pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/init.lua", reloadConfig):start()
-alert.show("Hammerspoon Config Loaded")
+hs.loadSpoon("ReloadConfiguration")
+spoon.ReloadConfiguration:start()
 
 
 --
