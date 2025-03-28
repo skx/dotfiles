@@ -1,16 +1,35 @@
+
+
 --
 -- Load our dependencies
 --
-caffeinate = require "hs.caffeinate"
+alert = require("hs.alert")
+caffeinate = require("hs.caffeinate")
+pathwatcher = require("hs.pathwatcher")
 screen = require("hs.screen")
 
 
 --
--- Lock the screen.
+-- Reload the configuration file autoamtically
 --
-function lock_screen()
-   caffeinate.lockScreen()
+function reloadConfig(files)
+   doReload = false
+   for _, file in pairs(files) do
+      if file:sub(-4) == ".lua" then
+         doReload = true
+      end
+   end
+   if doReload then
+      hs.reload()
+   end
 end
+
+
+--
+-- Watch our configuration, and automatically reload.
+--
+pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/init.lua", reloadConfig):start()
+alert.show("Hammerspoon Config Loaded")
 
 
 --
@@ -63,6 +82,7 @@ function applicationWatcher(appName, eventType, appObject)
    end
 end
 
+
 --
 -- Start the watcher for windows.
 --
@@ -92,6 +112,7 @@ function ssidChangedCallback()
     lastSSID = newSSID
 end
 
+
 --
 -- Create a helper and start watching for WiFi changes
 --
@@ -106,17 +127,3 @@ mb = hs.menubar.new()
 mb:setClickCallback(setup_work_layout)
 mb:setTitle("🧘")
 mb:setTooltip("Recalculate window layout.")
-
---
--- Create a second menu-bar to allow locking the screen.
---
-lock = hs.menubar.new()
-lock:setClickCallback(lock_screen)
-lock:setTitle("🔒")
-lock:setTooltip("Lock the screen(s)")
-
-
---
--- All is good
---
-hs.alert.show("HammerSpoon Launched/Restarted")
