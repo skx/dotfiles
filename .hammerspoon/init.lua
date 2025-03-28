@@ -1,4 +1,20 @@
+--
+-- Load our dependencies
+--
+caffeinate = require "hs.caffeinate"
+screen = require("hs.screen")
+
+
+--
+-- Lock the screen.
+--
+function lock_screen()
+   caffeinate.lockScreen()
+end
+
+--
 -- Center the current window - not yet used
+--
 function center_window()
    local win = hs.window.focusedWindow()
    win:centerOnScreen()
@@ -20,7 +36,6 @@ end
 function steve_layout()
 
    -- Count the number of screens.
-   local screen = require("hs.screen")
    local numScreens = #screen.allScreens()
 
    -- If we don't have two screens available then we should just skip
@@ -102,11 +117,18 @@ wifiWatcher:start()
 
 
 --
--- Create a menu-bar, and make it react to clicks.
+-- Create a menu-bar to trigger layout reworking.
 --
 mb = hs.menubar.new()
 mb:setClickCallback(steve_layout)
 mb:setTitle("LAYOUT")
+
+--
+-- Create a second menu-bar to allow locking the screen.
+--
+lock = hs.menubar.new()
+lock:setClickCallback(lock_screen)
+lock:setTitle("🔒")
 
 
 --
