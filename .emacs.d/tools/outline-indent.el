@@ -385,33 +385,48 @@ addressing the issue where the cursor might be reset after the operation."
   (unless arg
     (setq arg 1))
   (outline-indent--deactivate-region)
-  ;; Update 1: Save outline-blank-line
-  (let* ((original-outline-blank-line outline-blank-line)
-         ;; Update 2: Save the column
-         (column (current-column))
-         ;; Update 3: Ensure that all empty lines are included
-         (outline-blank-line nil))
+  (let ((column (current-column)))
     (unwind-protect
         (progn
           (outline-back-to-heading)
           (let* ((movfunc (if (> arg 0) 'outline-get-next-sibling
                             'outline-get-last-sibling))
                  ;; Find the end of the subtree to be moved as well as the point
-                 ;; to move it to, adding a newline if necessary to ensure these
-                 ;; points are at the beginning of the line below the subtree.
-                 (end-point-func (lambda ()
-                                   (outline-end-of-subtree)
-                                   (if (eq (char-after) ?\n)
-                                       (forward-char 1)
-                                     (if (and (eobp) (not (bolp)))
-                                         (insert "\n")))
+                 ;; to move it to, adding a newline if necessary, to ensure
+                 ;; these points are at bol on the line below the subtree.
+                 (add-new-line nil)
+                 (end-point-func (lambda (respect-outline-blank-line)
+                                   (let ((outline-blank-line
+                                          (if respect-outline-blank-line
+                                              outline-blank-line
+                                            nil)))
+                                     (outline-end-of-subtree))
+
+                                   (cond
+                                    ((eq (char-after) ?\n)
+                                     (forward-char 1))
+
+                                    ((and (eobp) (not (bolp)))
+                                     (insert "\n"))
+
+                                    ((and (< arg 0) outline-blank-line
+                                          (save-excursion
+                                            ;; Ensure the previous line is not
+                                            ;; empty
+                                            (forward-line -1)
+                                            (not (string-blank-p
+                                                  (string-trim
+                                                   (thing-at-point 'line t)))))
+                                          (eobp) (bolp))
+                                     (setq add-new-line t)))
+
                                    (point)))
                  (beg (point))
                  (folded (save-match-data
                            (outline-end-of-heading)
                            (outline-invisible-p)))
                  (end (save-match-data
-                        (funcall end-point-func)))
+                        (funcall end-point-func nil)))
                  (ins-point (make-marker))
                  (cnt (abs arg)))
             ;; Find insertion point, with error handling.
@@ -423,18 +438,23 @@ addressing the issue where the cursor might be reset after the operation."
               (setq cnt (1- cnt)))
             (if (> arg 0)
                 ;; Moving forward - still need to move over subtree.
-                (funcall end-point-func))
+                (funcall end-point-func nil))
+            (when (> arg 0)
+              (when (and (eobp) (bolp)
+                         (save-excursion
+                           (forward-line -1)
+                           (not (string-blank-p (thing-at-point 'line t)))))
+                (insert "\n")))
             (move-marker ins-point (point))
-            (insert (delete-and-extract-region beg end))
+            ;; Fix when moving the subtree of the node immediately preceding
+            ;; the last one to the position after the last one.
+            (let ((data (delete-and-extract-region beg end)))
+              (insert data))
+            (when add-new-line
+              (insert "\n"))
             (goto-char ins-point)
-            (if folded
-                ;; Update 4: Hide the subtree using the original
-                ;; outline-blank-line This ensures that the fold is closed
-                ;; properly
-                (let ((outline-blank-line original-outline-blank-line))
-                  (outline-hide-subtree)))
+            (if folded (outline-hide-subtree))
             (move-marker ins-point nil)))
-      ;; Update 5: Restore the column
       (move-to-column column))))
 
 (defun outline-indent--advice-insert-heading (orig-fun &rest args)
@@ -578,6 +598,10 @@ Stop at the first and last indented blocks of a superior indentation."
     (save-excursion
       (outline-end-of-heading)
       (outline-invisible-p (point)))))
+
+(defun outline-indent-close-level (level)
+  "Close the folds at the level: LEVEL."
+  (outline-hide-sublevels level))
 
 (defun outline-indent-toggle-level-at-point ()
   "Toggle the visibility of the indentation level under the cursor."
