@@ -122,8 +122,7 @@ Now we actually load use-package, which will be installed by straight.el.  This 
 To ensure we can update the packages bundled within this repository, not those installed via `straight.el`, we'll load our package-refresher.  This must be triggered manually.
 
 ```lisp
-(use-package resync-packages
- :defer t)
+(use-package resync-packages)
 ```
 
 
@@ -197,7 +196,6 @@ A good use of history is the ability to go to the last change in a buffer:
 
 ```lisp
 (use-package goto-last-change
-  :defer t
   :bind
     (
     ("M-m" . #'goto-last-change)
@@ -246,7 +244,6 @@ If multiple buffers use the same filename we'll prefix with the parent directory
 
 ```lisp
 (use-package uniquify
-  :defer t
   :init
   (setq uniquify-buffer-name-style 'forward
         uniquify-min-dir-content 2))
@@ -276,8 +273,7 @@ There are times when you've been running Emacs for a few weeks and you have too 
 Finally there's a great tool [shortcuts-mode](https://github.com/tetron/shortcuts-mode) which shows a pinned list of your most recent buffers:
 
 ```lisp
-(use-package shortcuts-mode
-  :defer t)
+(use-package shortcuts-mode)
 ```
 
 
@@ -391,7 +387,6 @@ I'm using `ido` - the only thing to note for myself is that when running `C-x C-
 
 ```lisp
 (use-package ido
-  :defer t
   :init
   (setq
     ido-everywhere                         t
@@ -494,7 +489,6 @@ My only other irritation with `dired` is that by default "dotfiles" are shown, I
 
 ```lisp
 (use-package dired-x
-  :defer t
   :bind (:map dired-mode-map
            ("q"   . kill-dired-buffers)   ; Kill all dired buffers.
            ("TAB" . dired-omit-mode)      ; Toggle hiding dotfiles.
@@ -514,7 +508,6 @@ I'm experimenting with it:
 
 ```lisp
 (use-package-straight neotree
-  :defer t
   :init
   (setq-default neo-smart-open  t
                 neo-autorefresh t)
@@ -548,7 +541,6 @@ Here we load it, and we can use `C-x C-b` to build the Dockerfile in the current
 
 ```lisp
 (use-package dockerfile-mode
-  :defer t
   :mode
   ("Dockerfile\\'" . dockerfile-mode))
 ```
@@ -568,7 +560,6 @@ Of course we also wish to install/use magit which is the emacs git package:
 ```lisp
 ;; install magit via straight
 (use-package-straight magit
-  :defer t
   :bind (("C-x g" . magit-status)))
 ```
 
@@ -596,7 +587,6 @@ Finally even when we're not using `magit` I am often editing files which are sto
 
 ```lisp
 (use-package-straight git-gutter
-  :defer t
   :config
     (global-git-gutter-mode +1))
 ```
@@ -632,12 +622,10 @@ Code I write tends to be in some combination of Lua, Ruby, Perl, Go, or C++.
 ```lisp
 ;; Lua
 (use-package lua-mode
-  :defer t
   :mode ("\\.lua\\'" . lua-mode))
 
 ;; Markdown
 (use-package markdown-mode
-  :defer t
   :commands (markdown-mode gfm-mode)
   :mode  (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
@@ -645,7 +633,6 @@ Code I write tends to be in some combination of Lua, Ruby, Perl, Go, or C++.
 
 ;; Ruby
 (use-package ruby-mode
-  :defer t
   :mode ("\\.rb" . ruby-mode))
 ```
 
@@ -657,7 +644,6 @@ enhancements, and comes complete with an emacs mode which we'll load here:
 
 ```lisp
 (use-package monkey
-  :defer t
   :mode ("\\.mon" . monkey-mode))
 ```
 
@@ -676,7 +662,6 @@ The [symbol-overlay package](https://github.com/wolray/symbol-overlay) allows hi
 
 ```lisp
 (use-package symbol-overlay
-  :defer t
   :config
     (add-hook 'prog-mode-hook #'symbol-overlay-mode))
 ```
@@ -743,14 +728,12 @@ The golang setup here is a bit special, because I use the LSP stuff to get compl
     (setq lsp-auto-guess-root t))
 
 (use-package-straight yasnippet
-  :defer t
   :config
     (setq yas-prompt-functions '(yas-ido-prompt))
     (yas-global-mode 1)
     (yas-reload-all))
 
 (use-package-straight yasnippet-snippets
-  :defer t
   :after yas)
 
 ```
@@ -759,7 +742,6 @@ Once installed we can now ensure that the mode is loaded for the editing of `*.g
 
 ```lisp
 (use-package go-mode
-  :defer t
   :mode ("\\.go" . go-mode)
   :hook ((go-mode) . lsp-deferred))
 
@@ -784,7 +766,6 @@ JSON is pretty common-place, so we have to load this, and configure it for `*.js
 
 ```lisp
 (use-package-straight json-mode
-   :defer t
    :mode ("\\.json\\'" . json-mode))
 ```
 
@@ -795,7 +776,6 @@ One of the tools I use most frequently for that is [Hashicorp](https://www.hashi
 
 ```lisp
 (use-package terraform-mode
-  :defer t
   :config
     (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode))
 ```
@@ -809,7 +789,6 @@ First of all we want to ensure that we use `cperl-mode`, rather than `perl-mode`
 
 ```lisp
 (use-package cperl-mode
-  :defer t
   :config
     ;;  We always prefer CPerl mode to Perl mode.
     (fset 'perl-mode 'cperl-mode)
@@ -833,7 +812,6 @@ I've also created a simple utility package which contains a pair of helpers for 
 
 ```lisp
 (use-package perl-utilities
-  :defer t
   :if (and (executable-find "perl") (not IS-MAC))
 )
 ```
@@ -847,7 +825,6 @@ Here we perform the very minimal Python setup:
 
 ```lisp
 (use-package python-mode
-  :defer t
   :config
   (flymake-mode -1)
   :mode ("\\.py" . python-mode))
@@ -887,7 +864,6 @@ One of the annoyances with writing HTML is that often it contains extra things i
 
 ```lisp
 (use-package web-mode
-  :defer t
   :mode (("\\.html\\'" . web-mode)
          ("\\.php\\'"  . web-mode)
          ("\\.erb\\'"  . web-mode))
@@ -906,7 +882,6 @@ YAML is used in Gitlab CI, Kubernetes, and other similar places.
 
 ```lisp
 (use-package yaml-mode
-  :defer t
   :mode (("\\.yml\\'"   . yaml-mode)
          ("\\.yaml\\'"  . yaml-mode)))
 ```
@@ -915,7 +890,6 @@ YAML uses indention, so we'll setup a package to make folding on indentation-lev
 
 ```lisp
 (use-package outline-indent
-  :defer t
   :custom
     (outline-indent-ellipsis " ▼ ")
   :config
@@ -943,7 +917,6 @@ I'm having fun doing "retro" things with a [Z80 processor](https://en.wikipedia.
   (local-set-key (kbd "M-+") 'hs-show-all))
 
 (use-package z80-mode
-  :defer t
   :mode ("\\.z80$" . z80-mode)
   :hook ((z80-mode . skx/z80-mode)))
 
@@ -958,7 +931,6 @@ This also binds `Esc-TAB` to toggle the block under the point, and `Esc--` and `
 
 ```lisp
 (use-package hs-minor-mode
-  :defer t
   :hook prog-mode
   :bind
     (
@@ -980,7 +952,6 @@ The following snippet of code ensures that `TODO` comments/lines are shown easil
 
 ```lisp
 (use-package my-todo
-  :defer t
   :config
     (add-hook 'text-mode-hook #'my/todo-fontify)
     (add-hook 'prog-mode-hook #'my/todo-fontify))
@@ -1068,7 +1039,6 @@ Highlighting links in all modes, and making them openable easily is a good thing
 
 ```lisp
 (use-package goto-addr
-  :defer t
   :config
   (global-goto-address-mode)
   :bind
@@ -1085,7 +1055,6 @@ First of all we load the mode, and make some basic setup happen:
 
 ```lisp
 (use-package org
-  :defer t
   :config
     ;; Don't track org-id-locations.
     ;; We don't want to see ~/.emacs.d/.org-id-locations
@@ -1179,15 +1148,13 @@ I put together the [org-nested-links](https://github.com/skx/org-nested-links) p
 
 ```lisp
 (use-package org-nested-links
-  :after org
-  :defer t)
+  :after org)
 ```
 
 As noted above it is possible to evaluated blocks of script from within `org-mode`, but shell-scripting is disabled by default so we need to enable this explicitly:
 
 ```lisp
 (use-package ob-shell
-  :defer t
   :after org
   :commands
   org-babel-execute:sh
@@ -1200,8 +1167,7 @@ Ensure that we can export org-blocks.  This is necessary for the CSS & Javascrip
 
 ```lisp
 (use-package ob-org
-  :after org
-  :defer t)
+  :after org)
 ```
 
 We'll also improve the default list-management functionality:
@@ -1209,7 +1175,6 @@ We'll also improve the default list-management functionality:
 ```lisp
 (use-package org-autolist
   :after org
-  :defer t
   :config
     ;; delete won't try to undo lists.
     (setq org-autolist-enable-delete nil)
@@ -1222,7 +1187,6 @@ We'll also improve the default list-management functionality:
 ```lisp
 (use-package org-bullets
   :after org
-  :defer t
   :hook (org-mode . org-bullets-mode))
 ```
 
@@ -1247,7 +1211,6 @@ A similar thing can be carried out by entering three graves:
 
 ```lisp
 (use-package dig-my-grave
-  :defer t
   :after org)
 ```
 
@@ -1255,7 +1218,6 @@ Now we're done with the general setup so we'll handle the more specific agenda t
 
 ```lisp
 (use-package org-agenda
-  :defer t
   :after org
   :bind
     ("C-c a" . org-agenda)
@@ -1334,7 +1296,6 @@ Since we're hiding the emphasis markers it can be hard to edit text which is for
 ```lisp
 (use-package org-appear
   :after org
-  :defer t
   :config
     (setq org-appear-autolinks t)
   :hook
@@ -1345,7 +1306,6 @@ Since we're living in the future we can use `org-mouse` for checking boxes, etc:
 
 ```lisp
 (use-package org-mouse
-  :defer t
   :after org)
 ```
 
@@ -1358,7 +1318,6 @@ The following configuration enables the contents of a block named `skx-startbloc
 
 ```lisp
 (use-package org-eval
-  :defer t
   :after org
   :init
     (setq org-eval-prefix-list     (list (expand-file-name "~/Private/"))
@@ -1392,15 +1351,13 @@ I keep a work-log where I write down tasks and notes about my working-life every
 Within my diary I want quick access to Jira (ugh), so I have a package to turn references into links:
 
 ```lisp
-(use-package linkifier
-  :defer t)
+(use-package linkifier)
 ```
 
 The diary itself is handled by my [org-diary](https://github.com/skx/org-diary) package, and here we load it and allow quick access to my journal:
 
 ```lisp
 (use-package org-diary
-  :defer t
   :after (org linkifier)
   :autoload org-diary-mode
   :init
@@ -1450,7 +1407,6 @@ To resolve this, and add extra features I created `org-return` allows following 
 
 ```lisp
 (use-package org-return
-  :defer t
   :after org
   :config
        (add-hook 'org-mode-hook
@@ -1482,7 +1438,6 @@ I put together a simple tag-cloud helper package, which we'll now load:
 (use-package org-tag-cloud
   :after org
   :disabled
-  :defer t
   :config
    (add-hook 'org-mode-hook 'skx-org-mode-hook-eval-ok))
 ```
@@ -1504,7 +1459,6 @@ I put together a simple helper to auto-tag TODO-tasks, using tags from within th
 ```lisp
 (use-package org-auto-tag
   :after org
-  :defer t
   :config
      (add-hook 'org-after-todo-state-change-hook 'org-auto-tag)
 )
@@ -1524,8 +1478,7 @@ These can be found within the `org-utils.el` package:
 
 ```lisp
 (use-package org-utils
-  :after org
-  :defer t)
+  :after org)
 ```
 
 
@@ -1624,7 +1577,6 @@ You can run `M-x org-decrypt-entries` to make them visible, but re-encrypt any t
 
 ```lisp
 (use-package org-crypt
-  :defer t
   :after org
   :config
     (org-crypt-use-before-save-magic)
@@ -1756,7 +1708,6 @@ Now we can view a list of recently-opened files via `C-c r`:
 
 ```lisp
 (use-package recentf-buffer
-  :defer t
   :ensure nil
   :bind
     (("C-c r"   . recentf-open-files-in-simply-buffer)
@@ -1801,7 +1752,6 @@ The following section of searching lets use run "M-x occur" from within an isear
 ```lisp
 (use-package isearch
   :ensure nil
-  :defer t
   :config
   (defun my-occur-from-isearch ()
     (interactive)
@@ -1849,7 +1799,6 @@ Typos and errors will be underlined, and `M-TAB` or middle-click can be used to 
 (use-package flyspell
   :if (executable-find "ispell")
   :ensure nil
-  :defer t
   :init
   (progn
     (add-hook 'prog-mode-hook 'flyspell-prog-mode)
@@ -1938,8 +1887,7 @@ Finally we allow Emacs to control our music playback, which is supplied by [MPD]
 
 ```lisp
 (use-package mpc
-  :ensure nil
-  :defer t)
+  :ensure nil)
 ```
 
 
@@ -1963,7 +1911,6 @@ The menu-bar is somewhat useful as I'm slowly learning more about `org-mode`, so
 
 ;; Make sure our cursor doesn't get in the way.
 (use-package avoid
-  :defer t
   :ensure nil
   :config
     (mouse-avoidance-mode 'cat-and-mouse))
@@ -2002,15 +1949,13 @@ Once we've removed things that we don't like the next section is responsible for
 
 (blink-cursor-mode 1)                            ; We want to blink
 
-(use-package cursor-colour
-  :defer t)
+(use-package cursor-colour)
 ```
 
 Lisp famously uses a lot of parenthesis, but so does Python, Perl, and many other languages.  The following section highlights expressions inside parenthesis in a cute way:
 
 ```lisp
 (use-package paren
-  :defer t
   :ensure nil
   :config
     (setq show-paren-style 'expression)
@@ -2102,7 +2047,6 @@ Here I configure it to be used for both general programming modes, as well as `o
 
 ```lisp
 (use-package imenu-list
-  :defer t
   :ensure nil
   :init
     (setq imenu-list-focus-after-activation t
@@ -2141,7 +2085,6 @@ We like to remove trailing whitespace when we save files, and we make it visible
 
 ```lisp
 (use-package whitespace
-  :defer  2
   :ensure nil
   :config
 
@@ -2169,7 +2112,6 @@ In addition to the general whitespace handling I also prefer to have consistent 
 
 ```lisp
 (use-package vertical-space-cleanup
-  :defer t
   :config
     (add-hook 'org-mode-hook
                 (lambda()
