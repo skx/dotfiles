@@ -6,6 +6,14 @@ export PATH=$HOME/Repos/github.com/skx/dotfiles/bin:$PATH
 export PATH=$HOME/go/bin:$PATH
 export PATH=$HOME/bin:$PATH
 
+export PYTHONDONTWRITEBYTECODE=1
+#
+#
+#
+export PASSWORD_STORE_ENABLE_EXTENSIONS=true
+export PASSWORD_STORE_EXTENSIONS_DIR=/usr/local/lib/password-store/extensions
+
+
 #
 # Avoid homebrew cleanup, so we keep old things around.
 #
@@ -33,15 +41,6 @@ if type atuin &>/dev/null
 then
   eval "$(atuin init zsh --disable-up-arrow)"
 fi
-
-
-#
-# We need to configure the use of plugins for the pass password-manager.
-#
-# specifically I use the OTP plugin for two factor authentication for various services.
-#
-export PASSWORD_STORE_ENABLE_EXTENSIONS=true
-export PASSWORD_STORE_EXTENSIONS_DIR=/usr/local/lib/password-store/extensions
 
 #
 # History control
@@ -84,3 +83,4 @@ select-word-style bash
 # Ensure the comment-character works in interactive sessions.
 #
 setopt interactivecomments
+export PATH="/opt/homebrew/sbin:$PATH"
