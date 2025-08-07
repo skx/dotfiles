@@ -987,17 +987,17 @@ The following section of code lets us select a region and run `M-=` to align the
 
 ## Link Following
 
-The following allows following links, via RET, in all text/programming modes.
+The following allows following links, via C-o, in all modes.
 
 This is particularly useful for Markdown mode, and similar, where you'd otherwise want to use `C-c C-o`:
 
-```link
+```lisp
 (use-package goto-addr
   :bind
-  (:map goto-address-highlight-keymap
-        ("RET" . goto-address-at-point))
-  :hook ((prog-mode . goto-address-prog-mode)
-         (text-mode . goto-address-mode)))
+   (:map goto-address-highlight-keymap ("RET" . goto-address-at-point))
+   ("C-o" . goto-address-at-point)
+  :custom
+   (global-goto-address-mode t))
 ```
 
 
@@ -1033,19 +1033,6 @@ On top of that I wanted to make sure that the default font-sizes are "big", but 
 ```
 
 
-## Opening Links
-
-Highlighting links in all modes, and making them openable easily is a good thing:
-
-```lisp
-(use-package goto-addr
-  :config
-  (global-goto-address-mode)
-  :bind
-  ("C-o" . goto-address-at-point)  ; o for open
-  )
-
-```
 
 ## Org-Mode
 
