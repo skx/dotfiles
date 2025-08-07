@@ -3830,7 +3830,7 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
 
           ((string= web-mode-engine "vue")
            (cond
-             ((string-match-p "[:@][-[:alpha:]]+=\"" tagopen)
+             ((string-match-p "[:@][-[:alpha:].]+=\"" tagopen)
               (setq closing-string "\""
                     delim-open tagopen
                     delim-close "\""))
@@ -5478,7 +5478,8 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
         ;;(message "%S: %S (%S %S)" (point) (match-string-no-properties 0) reg-beg reg-end)
 
         (setq flags 0
-              tname (downcase (match-string-no-properties 1))
+              tnameraw (match-string-no-properties 1)
+              tname (downcase tnameraw)
               char (aref tname 0)
               tbeg (match-beginning 0)
               tend nil
@@ -5507,7 +5508,9 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
 
           ((not (member char '(?\! ?\?)))
            (cond
-             ((string-match-p "-" tname)
+             ((or (string-match-p "-" tname)
+                  (let ((case-fold-search nil))
+                    (string-match-p "^/?[[:upper:]][[:lower:]]" tnameraw)))
               (setq flags (logior flags 2)))
              ;;((string-match-p ":" tname)
              ;; (setq flags (logior flags 32)))
@@ -8682,7 +8685,7 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
          (cond
            ((string= web-mode-engine "blade")
             (save-excursion
-              (when (web-mode-rsf "{[{!]+[ ]*")
+              (when (web-mode-rsf "{[{!]+[ ]*\\|@props[ ]*[(]") ;; #1318
                 (setq reg-col (current-column))))
             (setq reg-beg (+ reg-beg 2))
             )
@@ -9647,7 +9650,10 @@ Also return non-nil if it is the command `self-insert-command' is remapped to."
                                                               reg-beg))))
 
           (t
-           (when debug (message "I430(%S) bracket-indentation" pos))
+           (when debug
+             (message "I430(%S) bracket-indentation" pos)
+             ;;(message "reg-col=%S curr-ind=%S lang=%S reg-beg=%S" reg-col curr-indentation language reg-beg)
+             )
            (setq offset (car (web-mode-bracket-indentation pos
                                                            reg-col
                                                            curr-indentation
